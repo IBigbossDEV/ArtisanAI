@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة الحرفي السعودي | الأعمال اليدوية</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Tajawal -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Tajawal', 'sans-serif'],
+                    },
+                    colors: {
+                        craft: {
+                            50: '#fdf8f6',
+                            100: '#f2e8e5',
+                            200: '#eaddd7',
+                            300: '#e0cec7',
+                            400: '#d2bab0',
+                            500: '#a37c68', // Primary earth tone
+                            600: '#8b6450',
+                            700: '#6b4c3a',
+                            800: '#4c3528',
+                            900: '#32221a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Tajawal', sans-serif; background-color: #fdf8f6; }
+        .glass-panel { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #a37c68; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #8b6450; }
+        
+        /* Loading Dots Animation */
+        .dot-typing {
+            position: relative; left: -9999px; width: 6px; height: 6px; border-radius: 3px;
+            background-color: #a37c68; color: #a37c68;
+            box-shadow: 9984px 0 0 0 #a37c68, 9999px 0 0 0 #a37c68, 10014px 0 0 0 #a37c68;
+            animation: dot-typing 1.5s infinite linear;
+        }
+        @keyframes dot-typing {
+            0% { box-shadow: 9984px 0 0 0 #a37c68, 9999px 0 0 0 #a37c68, 10014px 0 0 0 #a37c68; }
+            16.667% { box-shadow: 9984px -6px 0 0 #a37c68, 9999px 0 0 0 #a37c68, 10014px 0 0 0 #a37c68; }
+            33.333% { box-shadow: 9984px 0 0 0 #a37c68, 9999px -6px 0 0 #a37c68, 10014px 0 0 0 #a37c68; }
+            50% { box-shadow: 9984px 0 0 0 #a37c68, 9999px 0 0 0 #a37c68, 10014px -6px 0 0 #a37c68; }
+            66.667% { box-shadow: 9984px 0 0 0 #a37c68, 9999px 0 0 0 #a37c68, 10014px 0 0 0 #a37c68; }
+            100% { box-shadow: 9984px 0 0 0 #a37c68, 9999px 0 0 0 #a37c68, 10014px 0 0 0 #a37c68; }
+        }
+    </style>
+</head>
+<body class="text-gray-800 antialiased min-h-screen flex flex-col">
+
+    <header class="bg-craft-700 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <i class="fa-solid fa-hands-holding-circle text-2xl text-craft-200"></i>
+                <h1 class="text-2xl font-bold tracking-wide">منصة الحرفي السعودي</h1>
+            </div>
+            <nav class="hidden md:flex gap-6">
+                <button onclick="switchTab('calculator')" id="tab-calculator" class="nav-btn font-semibold text-craft-200 hover:text-white transition border-b-2 border-transparent">
+                    <i class="fa-solid fa-calculator ml-1"></i> حاسبة التكاليف
+                </button>
+                <button onclick="switchTab('marketing')" id="tab-marketing" class="nav-btn font-semibold text-craft-200 hover:text-white transition border-b-2 border-transparent">
+                    <i class="fa-solid fa-bullhorn ml-1"></i> خطة التسويق
+                </button>
+                <button onclick="switchTab('description')" id="tab-description" class="nav-btn font-semibold text-craft-200 hover:text-white transition border-b-2 border-transparent">
+                    <i class="fa-solid fa-pen-nib ml-1"></i> وصف المنتجات
+                </button>
+                <button onclick="switchTab('storyteller')" id="tab-storyteller" class="nav-btn font-semibold text-craft-200 hover:text-white transition border-b-2 border-transparent">
+                    <i class="fa-solid fa-book-open-reader ml-1"></i> راوي التراث (AI)
+                </button>
+                <button onclick="switchTab('assistant')" id="tab-assistant" class="nav-btn font-semibold text-craft-200 hover:text-white transition border-b-2 border-transparent">
+                    <i class="fa-solid fa-robot ml-1"></i> المساعد الذكي
+                </button>
+            </nav>
+            <!-- Mobile Menu Button -->
+            <button class="md:hidden text-white text-2xl" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-craft-800 pb-4 px-4 flex flex-col gap-3">
+            <button onclick="switchTab('calculator'); document.getElementById('mobile-menu').classList.add('hidden')" class="text-right text-craft-200 py-2 border-b border-craft-600">حاسبة التكاليف</button>
+            <button onclick="switchTab('marketing'); document.getElementById('mobile-menu').classList.add('hidden')" class="text-right text-craft-200 py-2 border-b border-craft-600">خطة التسويق</button>
+            <button onclick="switchTab('description'); document.getElementById('mobile-menu').classList.add('hidden')" class="text-right text-craft-200 py-2 border-b border-craft-600">وصف المنتجات</button>
+            <button onclick="switchTab('storyteller'); document.getElementById('mobile-menu').classList.add('hidden')" class="text-right text-craft-200 py-2 border-b border-craft-600">راوي التراث (AI)</button>
+            <button onclick="switchTab('assistant'); document.getElementById('mobile-menu').classList.add('hidden')" class="text-right text-craft-200 py-2">المساعد الذكي</button>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-6xl mx-auto w-full px-4 py-8 relative">
+        
+        <!-- SECTION 1: Calculator -->
+        <section id="sec-calculator" class="tab-content block animate-fade-in">
+            <div class="glass-panel p-6 md:p-10 rounded-2xl shadow-xl border border-craft-200">
+                <div class="mb-8 text-center">
+                    <h2 class="text-3xl font-bold text-craft-800 mb-2">حاسبة تكاليف وتسعير الحرف اليدوية</h2>
+                    <p class="text-gray-600">احسب تكاليف إنتاجك بدقة وحدد سعر البيع المناسب لضمان الربحية في السوق السعودي.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Inputs Form -->
+                    <div class="space-y-5 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="text-xl font-bold text-craft-700 border-b pb-2"><i class="fa-solid fa-file-invoice-dollar ml-2"></i> مدخلات التكلفة</h3>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">اسم المنتج الحرفي</label>
+                            <input type="text" id="calc-product-name" placeholder="مثال: سدو تقليدي، وسادة منقوشة" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-craft-500 focus:border-craft-500 outline-none transition">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">تكلفة المواد الخام (ريال سعودي)</label>
+                            <input type="number" id="calc-materials" placeholder="مثال: 150" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-craft-500 focus:border-craft-500 outline-none transition">
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">ساعات العمل</label>
+                                <input type="number" id="calc-hours" placeholder="مثال: 5" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-craft-500 focus:border-craft-500 outline-none transition">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">أجر الساعة (ريال)</label>
+                                <input type="number" id="calc-wage" placeholder="مثال: 30" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-craft-500 focus:border-craft-500 outline-none transition">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">تكلفة الشحن والتغليف (ريال)</label>
+                            <input type="number" id="calc-shipping" placeholder="مثال: 35" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-craft-500 focus:border-craft-500 outline-none transition">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">هامش الربح المستهدف (%)</label>
+                            <input type="number" id="calc-profit" placeholder="مثال: 40" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-craft-500 focus:border-craft-500 outline-none transition">
+                        </div>
+
+                        <div class="flex gap-2">
+                            <button onclick="calculateCosts()" class="flex-grow bg-craft-600 hover:bg-craft-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition transform hover:-translate-y-0.5">
+                                احسب التكلفة والسعر
+                            </button>
+                            <button onclick="getAIPricingAdvice()" id="btn-ai-pricing" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition flex items-center justify-center gap-1 text-sm" title="الحصول على تحليل السوق الذكي بواسطة Gemini">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> تحليل ذكي
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Results Area -->
+                    <div class="bg-craft-50 p-6 rounded-xl shadow-inner border border-craft-200 flex flex-col justify-between relative overflow-hidden">
+                        <div class="absolute -right-6 -top-6 text-craft-200 opacity-20">
+                            <i class="fa-solid fa-chart-pie text-9xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-craft-800 mb-6 relative z-10"><i class="fa-solid fa-chart-line ml-2"></i> النتيجة النهائية</h3>
+                            
+                            <div class="space-y-4 relative z-10">
+                                <div class="flex justify-between items-center bg-white p-4 rounded-lg shadow-sm">
+                                    <span class="text-gray-600 font-semibold">إجمالي تكلفة الإنتاج:</span>
+                                    <span id="res-total-cost" class="text-xl font-bold text-craft-700">0.00 ر.س</span>
+                                </div>
+                                
+                                <div class="flex justify-between items-center bg-white p-4 rounded-lg shadow-sm">
+                                    <span class="text-gray-600 font-semibold">قيمة الربح الصافي:</span>
+                                    <span id="res-profit-value" class="text-xl font-bold text-green-600">0.00 ر.س</span>
+                                </div>
+
+                                <div class="flex justify-between items-center bg-craft-600 text-white p-5 rounded-lg shadow-md transform scale-105 mt-4">
+                                    <span class="font-bold text-lg">سعر البيع المقترح:</span>
+                                    <span id="res-selling-price" class="text-3xl font-extrabold">0.00 ر.س</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- AI Advice Box -->
+                        <div id="ai-pricing-advice-container" class="mt-6 bg-white border border-amber-200 p-4 rounded-xl shadow-sm hidden relative z-10">
+                            <h4 class="font-bold text-amber-800 text-sm mb-1 flex items-center gap-1"><i class="fa-solid fa-robot"></i> استشارة تسعير الذكاء الاصطناعي:</h4>
+                            <p id="ai-pricing-advice-text" class="text-xs text-gray-700 leading-relaxed"></p>
+                        </div>
+
+                        <div id="calc-msg" class="mt-4 text-sm text-center text-red-500 font-semibold hidden">يرجى تعبئة جميع الحقول بشكل صحيح.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: Marketing Plan -->
+        <section id="sec-marketing" class="tab-content hidden animate-fade-in">
+            <div class="glass-panel p-6 md:p-10 rounded-2xl shadow-xl border border-craft-200">
+                <div class="mb-8 text-center">
+                    <h2 class="text-3xl font-bold text-craft-800 mb-2">منشئ الخطط التسويقية</h2>
+                    <p class="text-gray-600">قم بإنشاء خطة تسويقية مخصصة لحرفتك للوصول إلى جمهورك المستهدف في السوق السعودي.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Inputs -->
+                    <div class="lg:col-span-1 space-y-5 bg-white p-6 rounded-xl shadow-sm border border-gray-100 h-fit">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">نوع المنتج / الحرفة</label>
+                            <input type="text" id="mkt-product" placeholder="مثال: فخار، تطريز، مجوهرات..." class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-craft-500 focus:border-craft-500 outline-none transition">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">الجمهور المستهدف</label>
+                            <textarea id="mkt-audience" rows="2" placeholder="مثال: الشباب من 18-30، النساء المهتمات بالتراث..." class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-craft-500 focus:border-craft-500 outline-none transition custom-scrollbar"></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">الميزانية التسويقية الشهرية (ريال)</label>
+                            <input type="text" id="mkt-budget" placeholder="مثال: 500 ريال" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-craft-500 focus:border-craft-500 outline-none transition">
+                        </div>
+
+                        <button onclick="generateMarketingPlan()" id="btn-generate-plan" class="w-full bg-craft-600 hover:bg-craft-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition flex justify-center items-center gap-2">
+                            <i class="fa-solid fa-bullhorn"></i> إنشاء الخطة
+                        </button>
+                    </div>
+
+                    <!-- Output -->
+                    <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col h-[600px]">
+                        <div class="bg-craft-100 p-4 rounded-t-xl border-b border-gray-200 flex justify-between items-center">
+                            <h3 class="font-bold text-craft-800"><i class="fa-solid fa-file-lines ml-2 text-craft-600"></i> الخطة المقترحة</h3>
+                            <button onclick="copyToClipboard('mkt-result-content')" class="text-gray-500 hover:text-craft-700 transition" title="نسخ النص">
+                                <i class="fa-regular fa-copy"></i>
+                            </button>
+                        </div>
+                        <div id="mkt-result-area" class="p-6 overflow-y-auto custom-scrollbar flex-grow bg-gray-50 relative">
+                            <div id="mkt-placeholder" class="h-full flex flex-col items-center justify-center text-gray-400 opacity-60">
+                                <i class="fa-solid fa-clipboard-list text-6xl mb-4"></i>
+                                <p>قم بإدخال بيانات المنتج والجمهور واضغط على "إنشاء الخطة".</p>
+                            </div>
+                            
+                            <div id="mkt-loader" class="hidden h-full flex flex-col items-center justify-center">
+                                <div class="dot-typing mb-8"></div>
+                                <p class="text-craft-600 font-semibold animate-pulse mr-4">جاري تحليل البيانات وإعداد الخطة...</p>
+                            </div>
+
+                            <div id="mkt-result-content" class="hidden text-gray-800 leading-relaxed whitespace-pre-wrap"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: Product Description Writer -->
+        <section id="sec-description" class="tab-content hidden animate-fade-in">
+            <div class="glass-panel p-6 md:p-10 rounded-2xl shadow-xl border border-craft-200">
+                <div class="mb-8 text-center">
+                    <h2 class="text-3xl font-bold text-craft-800 mb-2">كاتب وصف المنتجات بالذكاء الاصطناعي</h2>
+                    <p class="text-gray-600">قم بتوليد وصف جذاب واحترافي لمنتجاتك لزيادة مبيعاتك على منصات مثل سلة، زد وانستقرام.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Description Inputs -->
+                    <div class="lg:col-span-1 space-y-5 bg-white p-6 rounded-xl shadow-sm border border-gray-100 h-fit">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">اسم المنتج</label>
+                            <input type="text" id="desc-name" placeholder="مثال: مبخرة خشبية بنقش السدو" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-craft-500 focus:border-craft-500 outline-none transition">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">مميزات المنتج (اختياري)</label>
+                            <textarea id="desc-features" rows="2" placeholder="خشب جوز طبيعي، صناعة يدوية، تغليف فاخر..." class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-craft-500 focus:border-craft-500 outline-none transition custom-scrollbar"></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">منصة البيع المستهدفة</label>
+                            <select id="desc-platform" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-craft-500 focus:border-craft-500 outline-none transition bg-white">
+                                <option value="متجر إلكتروني (سلة / زد) مع التركيز على الكلمات المفتاحية">متجر إلكتروني (سلة / زد)</option>
+                                <option value="انستقرام (نص جذاب ومختصر للتفاعل)">انستقرام</option>
+                                <option value="واتساب (رسالة ترويجية قصيرة ومباشرة مع رابط)">واتساب</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">نبرة الصوت</label>
+                            <select id="desc-tone" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-craft-500 focus:border-craft-500 outline-none transition bg-white">
+                                <option value="فخمة واحترافية (للمنتجات الراقية)">فخمة واحترافية</option>
+                                <option value="ودية وقريبة للقلب (للمنتجات اليومية)">ودية وقريبة للقلب</option>
+                                <option value="تراثية وأصيلة (استخدام مفردات سعودية ونجدية/حجازية/إلخ)">تراثية وأصيلة</option>
+                            </select>
+                        </div>
+
+                        <button onclick="generateDescription()" id="btn-generate-desc" class="w-full bg-craft-600 hover:bg-craft-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition flex justify-center items-center gap-2">
+                            <i class="fa-solid fa-pen-nib"></i> كتابة الوصف بالذكاء الاصطناعي
+                        </button>
+                    </div>
+
+                    <!-- Description Output -->
+                    <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col h-[600px]">
+                        <div class="bg-craft-100 p-4 rounded-t-xl border-b border-gray-200 flex justify-between items-center">
+                            <h3 class="font-bold text-craft-800"><i class="fa-solid fa-file-lines ml-2 text-craft-600"></i> الوصف المقترح</h3>
+                            <button onclick="copyToClipboard('desc-result-content')" class="text-gray-500 hover:text-craft-700 transition" title="نسخ النص">
+                                <i class="fa-regular fa-copy"></i>
+                            </button>
+                        </div>
+                        <div id="desc-result-area" class="p-6 overflow-y-auto custom-scrollbar flex-grow bg-gray-50 relative">
+                            <div id="desc-placeholder" class="h-full flex flex-col items-center justify-center text-gray-400 opacity-60">
+                                <i class="fa-solid fa-align-right text-6xl mb-4"></i>
+                                <p>قم بإدخال بيانات المنتج واضغط على "كتابة الوصف".</p>
+                            </div>
+                            
+                            <div id="desc-loader" class="hidden h-full flex flex-col items-center justify-center">
+                                <div class="dot-typing mb-8"></div>
+                                <p class="text-craft-600 font-semibold animate-pulse mr-4">جاري صياغة الوصف الإبداعي...</p>
+                            </div>
+
+                            <div id="desc-result-content" class="hidden text-gray-800 leading-relaxed whitespace-pre-wrap"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: Cultural Storyteller -->
+        <section id="sec-storyteller" class="tab-content hidden animate-fade-in">
+            <div class="glass-panel p-6 md:p-10 rounded-2xl shadow-xl border border-craft-200">
+                <div class="mb-8 text-center">
+                    <h2 class="text-3xl font-bold text-craft-800 mb-2">راوي التراث والسرد القصصي (Storytelling)</h2>
+                    <p class="text-gray-600">استخدم نموذج الذكاء الاصطناعي لتأليف قصص تراثية عميقة عن منتجاتك لتعزيز قيمتها العاطفية والثقافية لدى العملاء.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Story Inputs -->
+                    <div class="lg:col-span-1 space-y-5 bg-white p-6 rounded-xl shadow-sm border border-gray-100 h-fit">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">اسم القطعة الحرفية</label>
+                            <input type="text" id="story-name" placeholder="مثال: سدو نجد العريق، طقم فخار عسيري" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-craft-500 focus:border-craft-500 outline-none transition">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">منطقة الإلهام في المملكة</label>
+                            <select id="story-region" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-craft-500 focus:border-craft-500 outline-none transition bg-white">
+                                <option value="منطقة نجد (الأصالة والعراقة)">منطقة نجد</option>
+                                <option value="منطقة عسير (الألوان والفنون التراثية)">منطقة عسير</option>
+                                <option value="المنطقة الحجازية (التنوع والثقافة الإسلامية)">المنطقة الحجازية</option>
+                                <option value="المنطقة الشرقية (البحر والنخيل)">المنطقة الشرقية</option>
+                                <option value="منطقة الحجاز / العلا (الآثار والتاريخ العريق)">العلا / التاريخ العريق</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">نوع السرد المطلوب</label>
+                            <select id="story-type" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-craft-500 focus:border-craft-500 outline-none transition bg-white">
+                                <option value="قصة تاريخية عميقة عن أصول الحرفة">قصة تاريخية عميقة</option>
+                                <option value="حكاية عاطفية لإهدائها كهدية فاخرة">حكاية إهداء فاخر</option>
+                                <option value="منشور ترويجي قصصي لمنصات التواصل">منشور ترويجي قصصي</option>
+                            </select>
+                        </div>
+
+                        <button onclick="generateCulturalStory()" id="btn-generate-story" class="w-full bg-craft-600 hover:bg-craft-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition flex justify-center items-center gap-2">
+                            <i class="fa-solid fa-feather-pointed"></i> توليد القصة التراثية
+                        </button>
+                    </div>
+
+                    <!-- Story Output -->
+                    <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col h-[600px]">
+                        <div class="bg-craft-100 p-4 rounded-t-xl border-b border-gray-200 flex justify-between items-center">
+                            <h3 class="font-bold text-craft-800"><i class="fa-solid fa-book-bookmark ml-2 text-craft-600"></i> نص السرد القصصي التراثي</h3>
+                            <button onclick="copyToClipboard('story-result-content')" class="text-gray-500 hover:text-craft-700 transition" title="نسخ النص">
+                                <i class="fa-regular fa-copy"></i>
+                            </button>
+                        </div>
+                        <div id="story-result-area" class="p-6 overflow-y-auto custom-scrollbar flex-grow bg-gray-50 relative">
+                            <div id="story-placeholder" class="h-full flex flex-col items-center justify-center text-gray-400 opacity-60">
+                                <i class="fa-solid fa-book-open text-6xl mb-4"></i>
+                                <p>أدخل تفاصيل القطعة وحدد المنطقة لاكتشاف السرد القصصي الساحر.</p>
+                            </div>
+                            
+                            <div id="story-loader" class="hidden h-full flex flex-col items-center justify-center">
+                                <div class="dot-typing mb-8"></div>
+                                <p class="text-craft-600 font-semibold animate-pulse mr-4">جاري نسج الحكاية التراثية بالذكاء الاصطناعي...</p>
+                            </div>
+
+                            <div id="story-result-content" class="hidden text-gray-800 leading-relaxed whitespace-pre-wrap font-serif text-lg"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: Smart Assistant (Chat & Image Generator) -->
+        <section id="sec-assistant" class="tab-content hidden animate-fade-in">
+            <div class="glass-panel rounded-2xl shadow-xl border border-craft-200 overflow-hidden flex flex-col h-[75vh] md:h-[800px]">
+                <!-- Chat Header -->
+                <div class="bg-craft-700 p-4 text-white flex items-center justify-between shadow-md z-10">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-craft-700 text-2xl shadow-inner">
+                            <i class="fa-solid fa-robot"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg">المستشار الفني وتوليد وتعديل الصور</h3>
+                            <p class="text-xs text-craft-200">حلل صورك أو اطلب توليد وتعديل التصاميم الفنية والمنتجات مباشرة</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Messages Area -->
+                <div id="chat-messages" class="flex-grow p-4 overflow-y-auto custom-scrollbar bg-gray-50 flex flex-col gap-4">
+                    <!-- Initial Greeting -->
+                    <div class="flex justify-start">
+                        <div class="bg-white border border-gray-200 text-gray-800 p-4 rounded-2xl rounded-tr-none shadow-sm max-w-[85%] md:max-w-[70%]">
+                            أهلاً بك يا صديقي الحرفي! 👋<br>
+                            أنا مستشارك الفني ومصممك الذكي مدعوم بنماذج Gemini المتقدمة. يمكنك رفع أي صورة لتحليل جودتها وخاماتها، أو كتابة طلب لتوليد أو تعديل تصميم فني (مثال: <em>"صمم لي مبخرة فخارية بتصميم تراثي سعودي"</em>). كيف يمكنني مساعدتك اليوم؟
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Typing Indicator -->
+                <div id="chat-typing" class="hidden px-6 py-2 bg-gray-50">
+                    <div class="bg-gray-200 p-3 rounded-2xl rounded-tr-none w-fit inline-block">
+                        <div class="dot-typing ml-4"></div>
+                    </div>
+                </div>
+
+                <!-- Chat Input Area -->
+                <div class="p-4 bg-white border-t border-gray-200 flex flex-col gap-2">
+                    <!-- Attachment Preview -->
+                    <div id="chat-attachment-preview" class="hidden items-center gap-3 p-2 bg-gray-50 rounded-lg w-fit border border-gray-200">
+                        <img id="chat-attachment-img" src="" alt="مرفق" class="h-10 w-10 object-cover rounded border border-gray-300">
+                        <span id="chat-attachment-name" class="text-xs font-semibold text-gray-600 truncate max-w-[150px]"></span>
+                        <button onclick="clearAttachment()" class="text-gray-400 hover:text-red-500 transition mr-2" title="إزالة">
+                            <i class="fa-solid fa-times-circle text-lg"></i>
+                        </button>
+                    </div>
+
+                    <div class="flex gap-2 items-end w-full">
+                        <button type="button" onclick="document.getElementById('chat-file-input').click()" class="w-12 h-12 flex-shrink-0 text-craft-600 hover:bg-craft-100 rounded-full flex items-center justify-center transition border border-transparent hover:border-craft-200" title="إرفاق صورة">
+                            <i class="fa-solid fa-paperclip text-xl"></i>
+                        </button>
+                        <!-- Hidden File Input -->
+                        <input type="file" id="chat-file-input" accept="image/png, image/jpeg, image/webp" class="hidden" onchange="handleFileSelect(event)">
+                        
+                        <textarea id="chat-input" rows="1" placeholder="اسأل المستشار أو اطلب تصميم وتوليد صورة جديدة..." class="flex-grow px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-craft-500 focus:border-craft-500 outline-none transition custom-scrollbar resize-none max-h-32" onkeydown="handleChatKeydown(event)"></textarea>
+                        
+                        <button onclick="sendChatMessage()" id="btn-send-chat" class="w-12 h-12 flex-shrink-0 bg-craft-600 hover:bg-craft-700 text-white rounded-full shadow-md flex items-center justify-center transition transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed">
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Global Message Box -->
+        <div id="msg-box" class="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg opacity-0 pointer-events-none transition-opacity duration-300 z-50 flex items-center gap-2">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span id="msg-box-text">حدث خطأ ما</span>
+        </div>
+
+    </main>
+
+    <script>
+        const API_KEY = ""; 
+        const TEXT_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${API_KEY}`;
+        const IMAGE_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key=${API_KEY}`;
+        
+        let chatHistory = [];
+
+        function showMessage(text, isError = true) {
+            const msgBox = document.getElementById('msg-box');
+            const msgText = document.getElementById('msg-box-text');
+            
+            if(isError) {
+                msgBox.className = "fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg transition-opacity duration-300 z-50 flex items-center gap-2 opacity-100";
+                msgText.innerHTML = text;
+            } else {
+                msgBox.className = "fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg transition-opacity duration-300 z-50 flex items-center gap-2 opacity-100";
+                msgText.innerHTML = text;
+            }
+
+            setTimeout(() => {
+                msgBox.classList.remove('opacity-100');
+                msgBox.classList.add('opacity-0');
+                setTimeout(() => msgBox.classList.add('pointer-events-none'), 300);
+            }, 3500);
+        }
+
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            if(element.innerText.trim() === '') return;
+            
+            navigator.clipboard.writeText(element.innerText).then(() => {
+                showMessage("تم نسخ النص بنجاح!", false);
+            }).catch(err => {
+                const textArea = document.createElement("textarea");
+                textArea.value = element.innerText;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    showMessage("تم نسخ النص بنجاح!", false);
+                } catch (e) {
+                    showMessage("فشل النسخ.", true);
+                }
+                document.body.removeChild(textArea);
+            });
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('block');
+            });
+            const activeSec = document.getElementById(`sec-${tabName}`);
+            if (activeSec) {
+                activeSec.classList.remove('hidden');
+                activeSec.classList.add('block');
+            }
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('border-white', 'text-white');
+                btn.classList.add('border-transparent', 'text-craft-200');
+            });
+            const activeBtn = document.getElementById(`tab-${tabName}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('border-transparent', 'text-craft-200');
+                activeBtn.classList.add('border-white', 'text-white');
+            }
+        }
+
+        document.getElementById('tab-calculator').classList.remove('border-transparent', 'text-craft-200');
+        document.getElementById('tab-calculator').classList.add('border-white', 'text-white');
+
+        function calculateCosts() {
+            const materials = parseFloat(document.getElementById('calc-materials').value) || 0;
+            const hours = parseFloat(document.getElementById('calc-hours').value) || 0;
+            const wage = parseFloat(document.getElementById('calc-wage').value) || 0;
+            const shipping = parseFloat(document.getElementById('calc-shipping').value) || 0;
+            const profitMargin = parseFloat(document.getElementById('calc-profit').value) || 0;
+            const msgEl = document.getElementById('calc-msg');
+
+            if (materials === 0 && hours === 0) {
+                msgEl.classList.remove('hidden');
+                return;
+            }
+            msgEl.classList.add('hidden');
+
+            const laborCost = hours * wage;
+            const totalCost = materials + laborCost + shipping;
+            const profitValue = totalCost * (profitMargin / 100);
+            const sellingPrice = totalCost + profitValue;
+
+            document.getElementById('res-total-cost').innerText = totalCost.toFixed(2) + ' ر.س';
+            document.getElementById('res-profit-value').innerText = profitValue.toFixed(2) + ' ر.س';
+            document.getElementById('res-selling-price').innerText = sellingPrice.toFixed(2) + ' ر.س';
+        }
+
+        async function getAIPricingAdvice() {
+            const productName = document.getElementById('calc-product-name').value || "منتج حرفي";
+            const materials = parseFloat(document.getElementById('calc-materials').value) || 0;
+            const hours = parseFloat(document.getElementById('calc-hours').value) || 0;
+            const profitMargin = parseFloat(document.getElementById('calc-profit').value) || 40;
+
+            if (materials === 0 && hours === 0) {
+                showMessage("يرجى إدخال تكلفة المواد أو ساعات العمل أولاً.");
+                return;
+            }
+
+            const container = document.getElementById('ai-pricing-advice-container');
+            const textEl = document.getElementById('ai-pricing-advice-text');
+            const btn = document.getElementById('btn-ai-pricing');
+
+            container.classList.remove('hidden');
+            textEl.innerHTML = "جاري تحليل السوق السعودي والتسعير بالذكاء الاصطناعي...";
+            btn.disabled = true;
+
+            const systemPrompt = "أنت خبير اقتصادي ومستشار أسعار للمشاريع الحرفية في السوق السعودي. قدم تحليلاً قصيراً ومباشراً لمدى تنافسية السعر مع اقتراح تحسينات.";
+            const userPrompt = `أريد تقييم سعر المنتج الحرفي (${productName}):
+- تكلفة المواد: ${materials} ريال
+- ساعات العمل: ${hours} ساعات
+- هامش الربح الحالي: ${profitMargin}%
+قيم ما إذا كان هذا السعر مناسباً للسوق السعودي الراهن وقدم نصيحة واحدة لزيادة القيمة المضافة.`;
+
+            try {
+                const res = await callGeminiAPI(systemPrompt, userPrompt);
+                textEl.innerHTML = formatMarkdown(res.text);
+            } catch (err) {
+                textEl.innerHTML = "تعذر جلب التحليل في الوقت الحالي. يرجى المحاولة لاحقاً.";
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        async function callGeminiAPI(systemPrompt, userPrompt, history = null, imageData = null, expectImage = false) {
+            let contents = [];
+            if (history && history.length > 0) {
+                contents = [...history];
+            }
+            
+            let userParts = [];
+            if (userPrompt) {
+                userParts.push({ text: userPrompt });
+            }
+            if (imageData) {
+                userParts.push({
+                    inlineData: {
+                        mimeType: imageData.mimeType,
+                        data: imageData.data
+                    }
+                });
+            }
+
+            contents.push({
+                role: "user",
+                parts: userParts
+            });
+
+            const apiUrl = expectImage ? IMAGE_API_URL : TEXT_API_URL;
+            const payload = {
+                contents: contents,
+                generationConfig: expectImage ? {
+                    responseModalities: ['IMAGE'],
+                    imageConfig: { aspectRatio: "1:1" }
+                } : {
+                    temperature: 0.7,
+                    systemInstruction: { parts: [{ text: systemPrompt }] }
+                }
+            };
+
+            let retries = 2;
+            let delay = 1000;
+
+            while (retries > 0) {
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 45000);
+
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload),
+                        signal: controller.signal
+                    });
+
+                    clearTimeout(timeoutId);
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    
+                    if (result.candidates && result.candidates.length > 0) {
+                        const candidate = result.candidates[0];
+                        
+                        let generatedImageUrl = null;
+                        let textResponse = "";
+
+                        const parts = candidate.content && Array.isArray(candidate.content.parts) 
+                            ? candidate.content.parts 
+                            : [];
+
+                        for (const part of parts) {
+                            if (part.inlineData) {
+                                generatedImageUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+                            } else if (part.text) {
+                                textResponse += part.text;
+                            }
+                        }
+
+                        if (!textResponse && candidate.output) {
+                            textResponse = candidate.output;
+                        }
+
+                        if (expectImage && !generatedImageUrl) {
+                            throw new Error("MODEL_FALLBACK_TO_IMAGE");
+                        }
+
+                        if (history != null && candidate.content) {
+                            history.push({ role: "user", parts: userParts });
+                            history.push({ role: "model", parts: parts });
+                        }
+                        
+                        return { text: textResponse, imageUrl: generatedImageUrl, history: history };
+                    } else {
+                        throw new Error("No candidates in response");
+                    }
+
+                } catch (error) {
+                    if (error.message === "MODEL_FALLBACK_TO_IMAGE" || (expectImage && apiUrl === TEXT_API_URL)) {
+                        return await callGeminiAPIForceImage(userPrompt, history, imageData);
+                    }
+
+                    console.error("API Call Failed:", error);
+                    retries--;
+                    if (retries === 0) {
+                        throw new Error(expectImage ? "عذراً، تعذر توليد الصورة مباشرة. يرجى تبسيط الطلب والمحاولة مرة أخرى." : "حدث خطأ في الاتصال، يرجى المحاولة لاحقاً.");
+                    }
+                    await new Promise(res => setTimeout(res, delay));
+                    delay *= 2;
+                }
+            }
+        }
+
+        async function callGeminiAPIForceImage(userPrompt, history, imageData) {
+            let contents = history ? [...history] : [];
+            let userParts = [{ text: `Generate a high quality photo: ${userPrompt}` }];
+            if (imageData) {
+                userParts.push({ inlineData: { mimeType: imageData.mimeType, data: imageData.data } });
+            }
+            contents.push({ role: "user", parts: userParts });
+
+            const payload = {
+                contents: contents,
+                generationConfig: {
+                    responseModalities: ['IMAGE'],
+                    imageConfig: { aspectRatio: "1:1" }
+                }
+            };
+
+            const response = await fetch(IMAGE_API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
+            const candidate = result.candidates?.[0];
+            const parts = candidate?.content?.parts || [];
+            let generatedImageUrl = null;
+
+            for (const part of parts) {
+                if (part.inlineData) {
+                    generatedImageUrl = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+                }
+            }
+
+            return { text: "إليك الصورة المطلوبة:", imageUrl: generatedImageUrl, history: history };
+        }
+
+        function formatMarkdown(text) {
+            if (!text) return '';
+            let html = text;
+            html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+            html = html.replace(/\n/g, '<br>');
+            html = html.replace(/<br>\s*-\s/g, '<br>• ');
+            return html;
+        }
+
+        async function generateMarketingPlan() {
+            const product = document.getElementById('mkt-product').value;
+            const audience = document.getElementById('mkt-audience').value;
+            const budget = document.getElementById('mkt-budget').value;
+
+            if (!audience.trim()) {
+                showMessage("يرجى كتابة وصف للجمهور المستهدف.");
+                return;
+            }
+
+            document.getElementById('mkt-placeholder').classList.add('hidden');
+            document.getElementById('mkt-result-content').classList.add('hidden');
+            document.getElementById('mkt-loader').classList.remove('hidden');
+            document.getElementById('btn-generate-plan').disabled = true;
+            document.getElementById('btn-generate-plan').classList.add('opacity-75', 'cursor-not-allowed');
+
+            const systemPrompt = `أنت خبير تسويق رقمي محترف ومستشار أعمال متخصص في السوق السعودي، وتحديداً في قطاع الحرف اليدوية والمشاريع الصغرية.`;
+            const userPrompt = `أرجو إعداد خطة تسويقية لمنتج حرفي بالبيانات التالية:
+- نوع المنتج/الحرفة: ${product}
+- وصف الجمهور المستهدف: ${audience}
+- الميزانية المتاحة: ${budget}`;
+
+            try {
+                const response = await callGeminiAPI(systemPrompt, userPrompt);
+                document.getElementById('mkt-result-content').innerHTML = formatMarkdown(response.text);
+                document.getElementById('mkt-loader').classList.add('hidden');
+                document.getElementById('mkt-result-content').classList.remove('hidden');
+            } catch (error) {
+                showMessage("حدث خطأ أثناء التواصل مع الخادم، يرجى المحاولة لاحقاً.");
+                document.getElementById('mkt-loader').classList.add('hidden');
+                document.getElementById('mkt-placeholder').classList.remove('hidden');
+            } finally {
+                document.getElementById('btn-generate-plan').disabled = false;
+                document.getElementById('btn-generate-plan').classList.remove('opacity-75', 'cursor-not-allowed');
+            }
+        }
+
+        async function generateDescription() {
+            const name = document.getElementById('desc-name').value;
+            const features = document.getElementById('desc-features').value;
+            const platform = document.getElementById('desc-platform').value;
+            const tone = document.getElementById('desc-tone').value;
+
+            if (!name.trim()) {
+                showMessage("يرجى إدخال اسم المنتج لتوليد الوصف.");
+                return;
+            }
+
+            document.getElementById('desc-placeholder').classList.add('hidden');
+            document.getElementById('desc-result-content').classList.add('hidden');
+            document.getElementById('desc-loader').classList.remove('hidden');
+            document.getElementById('btn-generate-desc').disabled = true;
+            document.getElementById('btn-generate-desc').classList.add('opacity-75', 'cursor-not-allowed');
+
+            const systemPrompt = `أنت كاتب محتوى إبداعي محترف ومتخصص في تحسين محركات البحث (SEO) للمتاجر الإلكترونية السعودية.`;
+            const userPrompt = `الرجاء كتابة وصف للمنتج الحرفي التالي:
+- اسم المنتج: ${name}
+- المميزات أو المكونات: ${features}
+- منصة البيع: ${platform}
+- نبرة الصوت: ${tone}`;
+
+            try {
+                const response = await callGeminiAPI(systemPrompt, userPrompt);
+                document.getElementById('desc-result-content').innerHTML = formatMarkdown(response.text);
+                document.getElementById('desc-loader').classList.add('hidden');
+                document.getElementById('desc-result-content').classList.remove('hidden');
+            } catch (error) {
+                showMessage("حدث خطأ أثناء التواصل مع الخادم، يرجى المحاولة لاحقاً.");
+                document.getElementById('desc-loader').classList.add('hidden');
+                document.getElementById('desc-placeholder').classList.remove('hidden');
+            } finally {
+                document.getElementById('btn-generate-desc').disabled = false;
+                document.getElementById('btn-generate-desc').classList.remove('opacity-75', 'cursor-not-allowed');
+            }
+        }
+
+        async function generateCulturalStory() {
+            const name = document.getElementById('story-name').value;
+            const region = document.getElementById('story-region').value;
+            const type = document.getElementById('story-type').value;
+
+            if (!name.trim()) {
+                showMessage("يرجى إدخال اسم القطعة الحرفية.");
+                return;
+            }
+
+            document.getElementById('story-placeholder').classList.add('hidden');
+            document.getElementById('story-result-content').classList.add('hidden');
+            document.getElementById('story-loader').classList.remove('hidden');
+            document.getElementById('btn-generate-story').disabled = true;
+            document.getElementById('btn-generate-story').classList.add('opacity-75', 'cursor-not-allowed');
+
+            const systemPrompt = `أنت راوي ومؤرخ تراثي سعودي، بارع في سبك الحكايات والقصص العاطفية التي تربط القطع اليدوية بالتاريخ والهوية الثقافية السعودية.`;
+            const userPrompt = `الرجاء تأليف نص سردي (Storytelling) للقطعة التالية:
+- اسم القطعة: ${name}
+- منطقة الإلهام: ${region}
+- نوع السرد: ${type}
+اكتب القصة بأسلوب أدبي رفيع وجذاب يلامس القلوب، ومناسب لعرضه في معارض الفنون أو كقصة مرفقة مع المنتج الفاخر.`;
+
+            try {
+                const response = await callGeminiAPI(systemPrompt, userPrompt);
+                document.getElementById('story-result-content').innerHTML = formatMarkdown(response.text);
+                document.getElementById('story-loader').classList.add('hidden');
+                document.getElementById('story-result-content').classList.remove('hidden');
+            } catch (error) {
+                showMessage("حدث خطأ أثناء الاتصال بالخادم، يرجى المحاولة لاحقاً.");
+                document.getElementById('story-loader').classList.add('hidden');
+                document.getElementById('story-placeholder').classList.remove('hidden');
+            } finally {
+                document.getElementById('btn-generate-story').disabled = false;
+                document.getElementById('btn-generate-story').classList.remove('opacity-75', 'cursor-not-allowed');
+            }
+        }
+
+        const chatInput = document.getElementById('chat-input');
+        const chatMessages = document.getElementById('chat-messages');
+        const chatTyping = document.getElementById('chat-typing');
+        const btnSendChat = document.getElementById('btn-send-chat');
+        
+        let currentAttachedBase64 = null;
+        let currentAttachedMimeType = null;
+
+        chatInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (!file.type.startsWith('image/')) {
+                showMessage("عذراً، يمكنك إرفاق الصور فقط.");
+                return;
+            }
+
+            currentAttachedMimeType = file.type;
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                currentAttachedBase64 = e.target.result.split(',')[1];
+                document.getElementById('chat-attachment-img').src = e.target.result;
+                document.getElementById('chat-attachment-name').textContent = file.name;
+                document.getElementById('chat-attachment-preview').classList.remove('hidden');
+                document.getElementById('chat-attachment-preview').classList.add('flex');
+            };
+            
+            reader.readAsDataURL(file);
+        }
+
+        function clearAttachment() {
+            currentAttachedBase64 = null;
+            currentAttachedMimeType = null;
+            document.getElementById('chat-file-input').value = "";
+            document.getElementById('chat-attachment-preview').classList.add('hidden');
+            document.getElementById('chat-attachment-preview').classList.remove('flex');
+        }
+
+        function handleChatKeydown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendChatMessage();
+            }
+        }
+
+        function appendMessage(text, isUser, imageSrc = null, generatedImageUrl = null) {
+            const div = document.createElement('div');
+            div.className = `flex ${isUser ? 'justify-end' : 'justify-start'}`;
+            
+            const innerDiv = document.createElement('div');
+            
+            if (isUser) {
+                innerDiv.className = "bg-craft-600 text-white p-4 rounded-2xl rounded-tl-none shadow-md max-w-[85%] md:max-w-[70%] whitespace-pre-wrap flex flex-col gap-2";
+                if (imageSrc) {
+                    const imgEl = document.createElement('img');
+                    imgEl.src = imageSrc;
+                    imgEl.className = "max-w-full h-auto rounded-lg border border-craft-500 object-contain max-h-48";
+                    innerDiv.appendChild(imgEl);
+                }
+                if (text) {
+                    const textEl = document.createElement('span');
+                    textEl.textContent = text;
+                    innerDiv.appendChild(textEl);
+                }
+            } else {
+                innerDiv.className = "bg-white border border-gray-200 text-gray-800 p-4 rounded-2xl rounded-tr-none shadow-sm max-w-[85%] md:max-w-[70%] whitespace-pre-wrap flex flex-col gap-3";
+                
+                if (text) {
+                    const textEl = document.createElement('div');
+                    textEl.innerHTML = formatMarkdown(text);
+                    innerDiv.appendChild(textEl);
+                }
+
+                if (generatedImageUrl) {
+                    const genImg = document.createElement('img');
+                    genImg.src = generatedImageUrl;
+                    genImg.className = "w-full h-auto rounded-lg border border-gray-300 shadow-md object-contain max-h-96 mt-2";
+                    innerDiv.appendChild(genImg);
+                }
+            }
+            
+            div.appendChild(innerDiv);
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        async function sendChatMessage() {
+            const text = chatInput.value.trim();
+            const hasAttachment = currentAttachedBase64 !== null;
+
+            if (!text && !hasAttachment) return;
+
+            const imageSrc = hasAttachment ? document.getElementById('chat-attachment-img').src : null;
+            const imageData = hasAttachment ? { mimeType: currentAttachedMimeType, data: currentAttachedBase64 } : null;
+
+            appendMessage(text, true, imageSrc);
+            
+            chatInput.value = '';
+            chatInput.style.height = 'auto';
+            clearAttachment();
+
+            chatTyping.classList.remove('hidden');
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            chatInput.disabled = true;
+            btnSendChat.disabled = true;
+
+            const systemPrompt = `أنت مستشار فني ومصمم ذكي للحرفيين في السعودية.`;
+
+            try {
+                const isImageRequest = text.includes("صمم") || text.includes("ارسم") || text.includes("توليد") || text.includes("صورة") || text.includes("تصميم") || text.includes("عدل") || text.includes("رسم") || text.includes("ضع") || text.includes("مجسم");
+
+                const response = await callGeminiAPI(systemPrompt, text, chatHistory, imageData, isImageRequest);
+                
+                chatHistory = response.history;
+                chatTyping.classList.add('hidden');
+                
+                appendMessage(response.text, false, null, response.imageUrl);
+
+            } catch (error) {
+                chatTyping.classList.add('hidden');
+                appendMessage(error.message || "عذراً، لم أتمكن من معالجة طلبك حالياً. حاول مرة أخرى.", false);
+            } finally {
+                chatInput.disabled = false;
+                btnSendChat.disabled = false;
+                chatInput.focus();
+            }
+        }
+    </script>
+</body>
+</html>
