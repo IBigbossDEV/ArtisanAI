@@ -1,0 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap');
+:root { color-scheme: light; --ink: #1f2937; --brown: #6b4c3a; --deep: #4c3528; --line: #eaddd7; --page: #fdf8f6; }
+* { box-sizing: border-box; }
+body { margin: 0; font-family: 'Tajawal', Tahoma, Arial, sans-serif; background: var(--page); color: var(--ink); line-height: 1.85; font-size: 17px; }
+header { background: var(--brown); color: #fff; }
+header .in { max-width: 46rem; margin: 0 auto; padding: .9rem 16px; display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+header a { color: #fff; text-decoration: none; font-weight: 800; }
+header .back { font-weight: 700; font-size: .95rem; background: rgba(0,0,0,.18); padding: .35rem .8rem; border-radius: .6rem; white-space: nowrap; }
+main { max-width: 46rem; margin: 0 auto; padding: 1.5rem 16px 3rem; }
+h1 { color: var(--deep); font-size: 1.75rem; line-height: 1.4; margin: 0 0 .25rem; }
+.meta { color: #6b7280; font-size: .9rem; margin: 0 0 1.5rem; }
+h2 { color: var(--deep); font-size: 1.2rem; margin: 1.8rem 0 .4rem; }
+.card { background: #fff; border: 1px solid var(--line); border-radius: 1rem; padding: 1rem 1.2rem; margin: 1rem 0; }
+ul { padding-inline-start: 1.3rem; margin: .3rem 0; }
+li { margin: .2rem 0; }
+a { color: var(--brown); }
+footer { border-top: 1px solid var(--line); text-align: center; padding: 1.2rem 16px 2rem; font-size: .9rem; color: #6b7280; }
+footer nav { display: flex; flex-wrap: wrap; justify-content: center; gap: .4rem 1.1rem; margin-bottom: .5rem; }
+.btn { display: inline-flex; align-items: center; gap: .5rem; background: var(--brown); color: #fff; text-decoration: none; font-weight: 800; padding: .7rem 1.1rem; border-radius: .7rem; }
+.btn.wa { background: #1f9d55; }

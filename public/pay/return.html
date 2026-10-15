@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>نتأكد من الدفع</title>
+<style>body{font-family:Tahoma,Arial,sans-serif;background:#fdf8f6;color:#4c3528;display:flex;min-height:100vh;align-items:center;justify-content:center;margin:0}</style>
+</head>
+<body>
+<p>لحظة، نرجّعك للمنصة…</p>
+<script>
+  // ميسّر يرجع الحرفي هنا ومعه رقم العملية. التحقق الفعلي يصير في السيرفر.
+  var id = new URLSearchParams(location.search).get('id') || '';
+  location.replace('/' + (/^[0-9a-fA-F-]{36}$/.test(id) ? '#pay=' + id : ''));
+</script>
+</body>
+</html>

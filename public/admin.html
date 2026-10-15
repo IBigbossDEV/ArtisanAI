@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>لوحة المالك — منصة الحرفي السعودي</title>
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = { theme: { extend: {
+    fontFamily: { sans: ['Tajawal', 'Tahoma', 'Arial', 'sans-serif'] },
+    colors: { craft: { 50:'#fdf8f6',100:'#f2e8e5',200:'#eaddd7',300:'#e0cec7',400:'#d2bab0',500:'#a37c68',600:'#8b6450',700:'#6b4c3a',800:'#4c3528',900:'#32221a' } } } } };
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root { color-scheme: light; }
+  body { font-family: 'Tajawal', Tahoma, Arial, sans-serif; background: #fdf8f6; color: #1f2937; }
+  .card { border: 1px solid #eaddd7; border-radius: 1rem; padding: 1rem; }
+  .card:not([class*="bg-"]) { background: #fff; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; font-weight: 700; border-radius: .6rem; padding: .5rem .85rem; font-size: .9rem; }
+  .btn:disabled { opacity: .5; }
+  .btn-main { background: #8b6450; color: #fff; } .btn-main:hover { background: #6b4c3a; }
+  .btn-soft { background: #fdf8f6; color: #6b4c3a; border: 1px solid #eaddd7; } .btn-soft:hover { background: #f2e8e5; }
+  .btn-red { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+  .inp { width: 100%; padding: .55rem .7rem; border: 1px solid #d1d5db; border-radius: .6rem; background: #fff; min-width: 0; }
+  .inp:focus { outline: 2px solid #a37c68; outline-offset: 1px; }
+  .tab { padding: .55rem .9rem; border-radius: .7rem; font-weight: 800; color: #6b4c3a; white-space: nowrap; }
+  .tab.on { background: #8b6450; color: #fff; }
+  .num { font-variant-numeric: tabular-nums; }
+  .kpi .v { font-size: 1.6rem; font-weight: 800; color: #4c3528; line-height: 1.2; }
+  .kpi .l { color: #6b7280; font-size: .85rem; }
+  .pill { font-size: .75rem; font-weight: 800; padding: .1rem .5rem; border-radius: 999px; }
+  .bars { display: flex; align-items: flex-end; gap: 2px; height: 120px; border-bottom: 1px solid #e5e7eb; }
+  .bars > div { flex: 1; position: relative; height: 100%; display: flex; align-items: flex-end; }
+  .bars > div > i { display: block; width: 100%; background: #8b6450; border-radius: 4px 4px 0 0; min-height: 0; }
+  .bars > div:hover > i { background: #6b4c3a; }
+  .tip { position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: #32221a; color: #fff; font-size: .75rem; padding: .2rem .5rem; border-radius: .4rem; white-space: nowrap; pointer-events: none; opacity: 0; }
+  .bars > div:hover .tip, .bars > div:focus .tip { opacity: 1; }
+  table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+  th { text-align: start; color: #6b7280; font-weight: 700; font-size: .8rem; padding: .4rem; border-bottom: 1px solid #eaddd7; }
+  td { padding: .5rem .4rem; border-bottom: 1px solid #f2e8e5; vertical-align: top; }
+</style>
+</head>
+<body>
+<header class="bg-craft-700 text-white">
+  <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center gap-3">
+    <div class="font-extrabold text-lg"><i class="fa-solid fa-chart-pie ml-1"></i> لوحة المالك</div>
+    <a href="/" class="btn bg-craft-800 text-white">رجوع للمنصة</a>
+  </div>
+</header>
+<main class="max-w-5xl mx-auto px-4 py-4 space-y-4">
+  <div id="test-banner" class="hidden card bg-amber-50 border-amber-200 text-amber-900 text-sm"><i class="fa-solid fa-flask ml-1"></i> ميسّر في وضع التجربة: المدفوعات الحالية تجريبية ولا تُحسب في الإيرادات.</div>
+  <nav class="flex gap-2 overflow-x-auto pb-1" id="tabs">
+    <button class="tab on" data-tab="overview">نظرة عامة</button>
+    <button class="tab" data-tab="users">الحرفيين</button>
+    <button class="tab" data-tab="payments">المدفوعات</button>
+    <button class="tab" data-tab="plans">الأسعار والحدود</button>
+    <button class="tab" data-tab="pages">نصوص الصفحات</button>
+  </nav>
+  <div id="view" class="space-y-3"><div class="card text-center text-gray-500">نحمّل…</div></div>
+</main>
+<div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-4 py-2 rounded-xl text-sm font-bold opacity-0 transition-opacity pointer-events-none z-50"></div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const sar = (h) => { const v = Math.round(Number(h) || 0) / 100; return v.toLocaleString('en-US', { maximumFractionDigits: 2 }) + ' ر.س'; };
+const n = (v) => Number(v || 0).toLocaleString('en-US');
+const day = (d) => d ? new Date(d).toLocaleDateString('ar-SA-u-nu-latn-ca-gregory', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
+const PRODUCT_NAMES = { pro_monthly: 'المحترف شهر', pro_yearly: 'المحترف سنة', images_20: 'باقة صور' };
+let SB = null, DATA = {}, TAB = 'overview';
+
+function toast(t) { const el = $('toast'); el.textContent = t; el.style.opacity = 1; clearTimeout(toast.t); toast.t = setTimeout(() => (el.style.opacity = 0), 2600); }
+
+async function api(path, body) {
+  const { data } = await SB.auth.getSession();
+  const tok = data && data.session ? data.session.access_token : '';
+  const res = await fetch(path, { method: body ? 'POST' : 'GET', headers: { authorization: 'Bearer ' + tok, 'content-type': 'application/json' }, body: body ? JSON.stringify(body) : undefined });
+  const j = await res.json().catch(() => ({}));
+  if (!res.ok) { const e = new Error(j.error || 'error'); e.code = j.error; throw e; }
+  return j;
+}
+
+/* ---------- تقدير التكلفة (يحفظ في هذا المتصفح فقط) ---------- */
+const RATES_KEY = 'artisan_admin_rates';
+function rates() { try { return Object.assign({ inUsd: 1, outUsd: 5, imgUsd: 0.04, fx: 3.75 }, JSON.parse(localStorage.getItem(RATES_KEY) || '{}')); } catch { return { inUsd: 1, outUsd: 5, imgUsd: 0.04, fx: 3.75 }; } }
+
+function last30(rows) {
+  const map = Object.fromEntries((rows || []).map((r) => [r.day, r]));
+  const out = [];
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(Date.now() + 3 * 3600e3 - i * 86400e3).toISOString().slice(0, 10); // توقيت الرياض
+    out.push(map[d] || { day: d, chat: 0, image: 0 });
+  }
+  return out;
+}
+function barChart(rows, key, label) {
+  rows = last30(rows);
+  const mx = Math.max(1, ...rows.map((r) => r[key] || 0));
+  const total = rows.reduce((a, r) => a + (r[key] || 0), 0);
+  return `<div class="card space-y-2">
+    <div class="flex justify-between"><b class="text-craft-800">${label}</b><span class="text-sm text-gray-500 num">${n(total)} خلال 30 يوم</span></div>
+    ${rows.length ? `<div class="bars" role="img" aria-label="${esc(label)} يومياً">${rows.map((r) => `<div tabindex="0"><i style="height:${((r[key] || 0) / mx) * 100}%"></i><span class="tip">${esc(r.day.slice(5))}: ${n(r[key] || 0)}</span></div>`).join('')}</div>
+    <div class="flex justify-between text-xs text-gray-400 num"><span>${esc(rows[0].day.slice(5))}</span><span>${esc(rows[rows.length - 1].day.slice(5))}</span></div>` : '<p class="text-sm text-gray-500">ما فيه استخدام للحين.</p>'}
+  </div>`;
+}
+
+function renderOverview() {
+  const s = DATA.stats || {};
+  const ai = s.ai_30 || {}, chat = ai.chat || {}, img = ai.image || {};
+  const r = rates();
+  const cost = ((chat.input_tokens || 0) / 1e6 * r.inUsd + (chat.output_tokens || 0) / 1e6 * r.outUsd + ((img.count || 0) - (img.failed || 0)) * r.imgUsd) * r.fx;
+  const kpi = (v, l, extra = '') => `<div class="card kpi"><div class="v num">${v}</div><div class="l">${l}</div>${extra}</div>`;
+  const byProd = s.revenue_by_product || {};
+  $('view').innerHTML = `
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+      ${kpi(n(s.users_total), 'كل الحرفيين', `<div class="text-xs text-gray-500 mt-1">+${n(s.users_new_30)} آخر 30 يوم</div>`)}
+      ${kpi(n(s.pro_active), 'مشترك المحترف الآن', s.pro_ending_7 ? `<div class="text-xs text-amber-700 mt-1">${n(s.pro_ending_7)} ينتهي خلال 7 أيام</div>` : '')}
+      ${kpi(sar(s.revenue_month), 'إيرادات هذا الشهر')}
+      ${kpi(sar(s.revenue_total), 'كل الإيرادات', s.revenue_test ? `<div class="text-xs text-gray-500 mt-1">تجريبي: ${sar(s.revenue_test)}</div>` : '')}
+    </div>
+    ${s.payments_review ? `<div class="card bg-red-50 border-red-200 text-red-800"><i class="fa-solid fa-triangle-exclamation ml-1"></i> فيه ${n(s.payments_review)} عملية مدفوعة ما تفعّلت تلقائياً (مثلاً المبلغ ما طابق السعر). شوفها في <button class="underline font-bold" data-go-tab="payments">المدفوعات</button> وفعّلها يدوياً من الحرفيين.</div>` : ''}
+    <div class="grid md:grid-cols-2 gap-3">
+      ${barChart(s.ai_daily || [], 'chat', 'طلبات المساعد يومياً')}
+      ${barChart(s.ai_daily || [], 'image', 'صور المصوّر يومياً')}
+    </div>
+    <div class="grid md:grid-cols-2 gap-3">
+      <div class="card space-y-2">
+        <b class="text-craft-800">استهلاك الذكاء الاصطناعي (30 يوم)</b>
+        <table><tbody>
+          <tr><td>طلبات المساعد</td><td class="num">${n(chat.count)}${chat.failed ? ` <span class="text-red-600">(${n(chat.failed)} فشلت)</span>` : ''}</td></tr>
+          <tr><td>توكنز داخلة / خارجة</td><td class="num">${n(chat.input_tokens)} / ${n(chat.output_tokens)}</td></tr>
+          <tr><td>صور المصوّر</td><td class="num">${n(img.count)}${img.failed ? ` <span class="text-red-600">(${n(img.failed)} فشلت ورجع رصيدها)</span>` : ''}</td></tr>
+          <tr><td><b>التكلفة التقديرية</b></td><td class="num"><b>${cost.toLocaleString('en-US', { maximumFractionDigits: 2 })} ر.س</b></td></tr>
+        </tbody></table>
+        <details class="text-sm"><summary class="cursor-pointer text-craft-600">أسعار التقدير (عدّلها حسب فاتورتك)</summary>
+          <div class="grid grid-cols-2 gap-2 mt-2">
+            <label>دولار لكل مليون توكن داخل<input class="inp num" id="r-in" value="${r.inUsd}" inputmode="decimal"></label>
+            <label>دولار لكل مليون توكن خارج<input class="inp num" id="r-out" value="${r.outUsd}" inputmode="decimal"></label>
+            <label>دولار لكل صورة<input class="inp num" id="r-img" value="${r.imgUsd}" inputmode="decimal"></label>
+            <label>سعر الدولار بالريال<input class="inp num" id="r-fx" value="${r.fx}" inputmode="decimal"></label>
+          </div>
+          <button class="btn btn-soft mt-2" id="r-save">احفظ</button>
+        </details>
+      </div>
+      <div class="card space-y-2">
+        <b class="text-craft-800">الإيرادات حسب الباقة</b>
+        ${Object.keys(byProd).length ? `<table><tbody>${Object.entries(byProd).map(([k, v]) => `<tr><td>${esc(PRODUCT_NAMES[k] || k)}</td><td class="num">${sar(v)}</td></tr>`).join('')}</tbody></table>` : '<p class="text-sm text-gray-500">ما فيه مدفوعات حقيقية للحين.</p>'}
+      </div>
+    </div>`;
+  $('r-save').onclick = () => {
+    const v = (id) => Number($(id).value) || 0;
+    try { localStorage.setItem(RATES_KEY, JSON.stringify({ inUsd: v('r-in'), outUsd: v('r-out'), imgUsd: v('r-img'), fx: v('r-fx') || 3.75 })); } catch {}
+    renderOverview(); toast('انحفظت ✅');
+  };
+}
+
+async function renderUsers(q = '') {
+  $('view').innerHTML = `<div class="card space-y-3">
+    <div class="flex gap-2"><input class="inp" id="u-q" placeholder="ابحث بالإيميل أو الاسم" value="${esc(q)}"><button class="btn btn-main" id="u-go">ابحث</button></div>
+    <div id="u-list" class="overflow-x-auto"><p class="text-gray-500">نحمّل…</p></div></div>`;
+  $('u-go').onclick = () => renderUsers($('u-q').value.trim());
+  $('u-q').onkeydown = (e) => { if (e.key === 'Enter') renderUsers($('u-q').value.trim()); };
+  const { users } = await api('/api/admin?view=users&q=' + encodeURIComponent(q));
+  $('u-list').innerHTML = users.length ? `<table><thead><tr><th>الحرفي</th><th>الخطة</th><th>الاستهلاك</th><th>دفع</th><th></th></tr></thead><tbody>${users.map((u) => `
+    <tr><td><div class="font-bold break-all" dir="ltr" style="text-align:right">${esc(u.email || '—')}</div><div class="text-xs text-gray-500">${esc(u.name || '')} · سجّل ${esc(day(u.created_at))}</div></td>
+    <td>${u.plan === 'pro' ? `<span class="pill bg-amber-100 text-amber-800">المحترف</span><div class="text-xs text-gray-500 mt-1">حتى ${esc(day(u.period_end))}</div>` : '<span class="pill bg-gray-100 text-gray-600">مجاني</span>'}</td>
+    <td class="num text-sm">مساعد ${u.chat_used}/${u.chat_limit}<br>صور ${u.images_used}/${u.images_limit}${u.extra_images ? ` +${u.extra_images}` : ''}</td>
+    <td class="num text-sm">${sar(u.paid_total)}</td>
+    <td><div class="flex flex-wrap gap-1">
+      <button class="btn btn-soft" data-u="${u.user_id}" data-a="grant" data-m="1" title="منح شهر محترف">+شهر</button>
+      <button class="btn btn-soft" data-u="${u.user_id}" data-a="grant" data-m="12" title="منح سنة محترف">+سنة</button>
+      <button class="btn btn-soft" data-u="${u.user_id}" data-a="images" title="إضافة صور">+صور</button>
+      ${u.plan === 'pro' ? `<button class="btn btn-red" data-u="${u.user_id}" data-a="revoke">إيقاف</button>` : ''}
+    </div></td></tr>`).join('')}</tbody></table>` : '<p class="text-gray-500">ما فيه نتائج.</p>';
+  $('u-list').querySelectorAll('[data-a]').forEach((b) => b.onclick = async () => {
+    const a = b.dataset.a, user_id = b.dataset.u;
+    let body = { action: a, user_id };
+    if (a === 'grant') { if (!confirm(`تمنح هذا الحرفي ${b.dataset.m === '12' ? 'سنة' : 'شهر'} محترف مجاناً؟`)) return; body.months = Number(b.dataset.m); }
+    if (a === 'images') { const c = prompt('كم صورة تضيف؟ (اكتب رقم سالب للخصم)', '20'); if (!c) return; body.count = Number(c); }
+    if (a === 'revoke' && !confirm('توقف اشتراك المحترف لهذا الحرفي الآن؟')) return;
+    b.disabled = true;
+    try { await api('/api/admin', body); toast('تم ✅'); renderUsers($('u-q').value.trim()); } catch (e) { b.disabled = false; toast('ما تم: ' + (e.code || '')); }
+  });
+}
+
+async function renderPayments() {
+  $('view').innerHTML = '<div class="card"><p class="text-gray-500">نحمّل…</p></div>';
+  const { payments } = await api('/api/admin?view=payments');
+  const NOTES = { amount_mismatch: 'المبلغ ما طابق السعر', unknown_product: 'باقة غير معروفة', no_user: 'بدون حساب' };
+  $('view').innerHTML = `<div class="card overflow-x-auto">${payments.length ? `<table><thead><tr><th>التاريخ</th><th>الحرفي</th><th>الباقة</th><th>المبلغ</th><th>الحالة</th></tr></thead><tbody>${payments.map((p) => `
+    <tr><td class="text-sm">${esc(day(p.created_at))}</td>
+    <td class="text-sm break-all" dir="ltr" style="text-align:right">${esc(p.email || '—')}</td>
+    <td class="text-sm">${esc(PRODUCT_NAMES[p.product] || p.product)}${p.method ? `<div class="text-xs text-gray-500">${esc(p.method)}</div>` : ''}</td>
+    <td class="num text-sm">${sar(p.amount)}${p.live === false ? ' <span class="pill bg-amber-100 text-amber-800">تجربة</span>' : ''}</td>
+    <td class="text-sm">${p.applied_at ? '<span class="pill bg-green-100 text-green-800">تفعّل</span>' : p.status === 'paid' ? `<span class="pill bg-red-100 text-red-700">يحتاج مراجعة</span><div class="text-xs text-red-700 mt-1">${esc(NOTES[p.note] || p.note || '')}</div>` : `<span class="pill bg-gray-100 text-gray-600">${esc(p.status)}</span>`}
+      <div class="text-[10px] text-gray-400 break-all" dir="ltr">${esc(p.id)}</div></td></tr>`).join('')}</tbody></table>` : '<p class="text-gray-500">ما فيه مدفوعات للحين.</p>'}</div>`;
+}
+
+function renderPlans() {
+  const p = DATA.plans || { free: {}, pro: {}, products: {} };
+  const pr = p.products || {};
+  const f = (id, label, v, hint = '') => `<label class="block"><span class="text-sm font-bold text-gray-700">${label}</span><input class="inp num mt-1" id="${id}" value="${esc(v)}" inputmode="numeric">${hint ? `<span class="text-xs text-gray-500">${hint}</span>` : ''}</label>`;
+  $('view').innerHTML = `<div class="grid md:grid-cols-2 gap-3">
+    <div class="card space-y-3"><b class="text-craft-800">الحدود الشهرية</b>
+      <div class="grid grid-cols-2 gap-2">${f('free-chat', 'المجانية: طلبات المساعد', p.free.chat)}${f('free-images', 'المجانية: صور', p.free.images)}${f('pro-chat', 'المحترف: طلبات المساعد', p.pro.chat)}${f('pro-images', 'المحترف: صور', p.pro.images)}</div>
+    </div>
+    <div class="card space-y-3"><b class="text-craft-800">الأسعار (بالريال)</b>
+      <div class="grid grid-cols-2 gap-2">
+        ${pr.pro_monthly ? f('pm-amount', 'المحترف شهر', pr.pro_monthly.amount / 100) : ''}
+        ${pr.pro_yearly ? f('py-amount', 'المحترف سنة', pr.pro_yearly.amount / 100) : ''}
+        ${pr.images_20 ? f('im-amount', 'باقة الصور', pr.images_20.amount / 100) : ''}
+        ${pr.images_20 ? f('im-count', 'عدد صور الباقة', pr.images_20.images) : ''}
+      </div>
+      <p class="text-xs text-gray-500">السعر يشمل ضريبة القيمة المضافة إذا كنت مسجل فيها. التغيير ما يأثر على اشتراكات مدفوعة قبل.</p>
+    </div></div>
+    <button class="btn btn-main mt-3" id="plans-save"><i class="fa-solid fa-floppy-disk"></i> احفظ الأسعار والحدود</button>`;
+  $('plans-save').onclick = async () => {
+    const v = (id) => ($(id) ? Number($(id).value) : undefined);
+    const body = { action: 'plans', plans: {
+      free: { chat: v('free-chat'), images: v('free-images') }, pro: { chat: v('pro-chat'), images: v('pro-images') },
+      products: {
+        pro_monthly: $('pm-amount') ? { amount: Math.round(v('pm-amount') * 100) } : undefined,
+        pro_yearly: $('py-amount') ? { amount: Math.round(v('py-amount') * 100) } : undefined,
+        images_20: $('im-amount') ? { amount: Math.round(v('im-amount') * 100), images: v('im-count') } : undefined,
+      } } };
+    try { const r = await api('/api/admin', body); DATA.plans = r.plans; toast('انحفظت ✅'); } catch (e) { toast('قيمة غير صحيحة: ' + (e.code || '')); }
+  };
+}
+
+function renderPages() {
+  const pg = DATA.pages || {};
+  const NAMES = { terms: 'الشروط والأحكام', privacy: 'سياسة الخصوصية', refund: 'سياسة الاسترجاع', contact: 'تواصل معنا' };
+  $('view').innerHTML = `<div class="card space-y-2 text-sm text-gray-600">اترك الخانة فاضية عشان يظهر النص الافتراضي المكتوب في الصفحة. إذا كتبت نص هنا يظهر بدله. سطر يبدأ بـ "## " يصير عنوان، والأسطر اللي تبدأ بـ "- " تصير قائمة، واترك سطر فاضي بين الفقرات. بيانات المنشأة (الاسم والسجل والإيميل) تعدّلها في ملف site-info.js.</div>
+    ${Object.entries(NAMES).map(([k, l]) => `<div class="card space-y-2"><div class="flex justify-between items-center"><b class="text-craft-800">${l}</b><a class="text-sm underline text-craft-600" href="/${k}.html" target="_blank">شوف الصفحة</a></div><textarea class="inp" rows="8" id="pg-${k}">${esc(pg[k] || '')}</textarea></div>`).join('')}
+    <button class="btn btn-main" id="pages-save"><i class="fa-solid fa-floppy-disk"></i> احفظ النصوص</button>`;
+  $('pages-save').onclick = async () => {
+    const pages = {}; Object.keys(NAMES).forEach((k) => (pages[k] = $('pg-' + k).value));
+    try { await api('/api/admin', { action: 'pages', pages }); DATA.pages = pages; toast('انحفظت ✅'); } catch { toast('ما انحفظت'); }
+  };
+}
+
+async function show(tab) {
+  TAB = tab;
+  document.querySelectorAll('[data-tab]').forEach((b) => b.classList.toggle('on', b.dataset.tab === tab));
+  try {
+    if (tab === 'overview') { renderOverview(); }
+    if (tab === 'users') await renderUsers();
+    if (tab === 'payments') await renderPayments();
+    if (tab === 'plans') renderPlans();
+    if (tab === 'pages') renderPages();
+  } catch (e) { $('view').innerHTML = `<div class="card text-red-700">ما قدرنا نجيب البيانات (${esc(e.code || e.message)}).</div>`; }
+}
+document.addEventListener('click', (e) => {
+  const t = e.target.closest('[data-tab],[data-go-tab]'); if (!t) return;
+  show(t.dataset.tab || t.dataset.goTab);
+});
+
+(async () => {
+  try {
+    const cfg = await (await fetch('/api/config')).json();
+    await new Promise((res, rej) => { const s = document.createElement('script'); s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js'; s.onload = res; s.onerror = rej; document.head.appendChild(s); });
+    SB = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, { auth: { persistSession: true, autoRefreshToken: true, flowType: 'pkce' } });
+    const { data } = await SB.auth.getSession();
+    if (!data || !data.session) { $('view').innerHTML = '<div class="card">ادخل حسابك من <a class="underline" href="/">المنصة</a> أول، ثم ارجع هنا.</div>'; return; }
+    DATA = await api('/api/admin?view=stats');
+    if (DATA.testMode) $('test-banner').classList.remove('hidden');
+    show('overview');
+  } catch (e) {
+    $('view').innerHTML = e.code === 'not_granted'
+      ? '<div class="card">هذي الصفحة لصاحب المنصة فقط. تأكد إن إيميلك مكتوب في ADMIN_EMAILS في إعدادات Cloudflare.</div>'
+      : `<div class="card text-red-700">ما قدرنا نفتح اللوحة (${esc(e.code || e.message)}).</div>`;
+  }
+})();
+</script>
+</body>
+</html>
