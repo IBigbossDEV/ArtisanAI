@@ -122,7 +122,7 @@
   <div id="price-bar" class="price-bar hidden fixed inset-x-0 z-30 px-3">
     <div class="max-w-3xl mx-auto bg-craft-800 text-white rounded-2xl shadow-2xl px-4 py-3 flex items-center justify-between gap-3">
       <div class="min-w-0">
-        <div class="text-xs text-craft-200">بِع القطعة بـ</div>
+        <div class="text-xs text-craft-200" id="pb-label">بِع القطعة بـ</div>
         <div id="pb-price" class="text-2xl font-extrabold num leading-tight">—</div>
       </div>
       <div class="text-start">
@@ -159,7 +159,8 @@ const CONFIG = {
   orgName: 'الحرفيين',                     // يظهر في عنوان المجتمع: "مجتمع الحرفيين"
   supportedBy: '',                        // اسم جهة داعمة تظهر في "من نحن" (اتركه فاضي إذا ما فيه)
   orgAbout: 'مستشارك الذكي في الحرفة: يساعدك تسعّر منتجاتك صح، وتسوّق لها، وتصوّرها صور احترافية.',
-  contactWhatsapp: '',                      // رقم واتساب إدارة المنصة (اختياري)
+  contactWhatsapp: '',
+  vatRate: 15,                            // ضريبة القيمة المضافة في السعودية (%)                      // رقم واتساب إدارة المنصة (اختياري)
 };
 
 const REGIONS = ['جازان', 'عسير والباحة ونجران', 'الرياض ونجد', 'القصيم وحائل', 'مكة والمدينة والحجاز', 'المنطقة الشرقية والأحساء', 'تبوك والجوف والحدود الشمالية'];
@@ -250,7 +251,7 @@ const STORE_KEY = 'artisan_state_v2';
 const DEFAULT_STATE = () => ({
   v: 2, updatedAt: 0,
   profile: { name: '', craft: '', region: '', category: 'crafts', store: '', whatsapp: '', handle: '' },
-  settings: { scale: 1, onboarded: false, lastProduct: '' },
+  settings: { scale: 1, onboarded: false, lastProduct: '', vat: false },
   products: [], orders: [], sales: [], customers: [], texts: [], reviews: [],
   bazaar: null, impact: { baseline: null, followups: [] }, lessonsRead: [],
   usage: { visits: 0, tabs: {}, actions: {} }, feedback: [], catalogItems: [],
@@ -628,11 +629,14 @@ function computeRow(p) {
   const sellingPrice = beforeFee / (1 - fee / 100);
   const feeValue = sellingPrice - beforeFee;
   const realMargin = sellingPrice > 0 ? profitValue / sellingPrice * 100 : 0;
-  const rounded = sellingPrice > 0 ? Math.ceil(sellingPrice / 5) * 5 : 0;
+  const vatRate = S.settings.vat ? CONFIG.vatRate : 0;
+  const vatValue = sellingPrice * vatRate / 100;
+  const finalPrice = sellingPrice + vatValue;            // اللي يدفعه الزبون
+  const rounded = finalPrice > 0 ? Math.ceil(finalPrice / 5) * 5 : 0;
   const t = p.tiers || {};
   const shopPrice = production * (1 + nz(t.shop) / 100);
   const bulkPrice = production * (1 + nz(t.bulk) / 100);
-  return { materials, overhead, hours, wage, shipping, shipIn, labor, production, totalCost, profitValue, artValue, feeValue, sellingPrice, realMargin, rounded, markup, fee, shopPrice, bulkPrice, bulkMin: nz(t.bulkMin) || 20 };
+  return { materials, overhead, hours, wage, shipping, shipIn, labor, production, totalCost, profitValue, artValue, feeValue, sellingPrice, vatRate, vatValue, finalPrice, realMargin, rounded, markup, fee, shopPrice, bulkPrice, bulkMin: nz(t.bulkMin) || 20 };
 }
 function marginTone(m) {
   if (m < 15) return { text: 'text-red-700', box: 'bg-red-50 border-red-200', tag: 'bg-red-100 text-red-700', label: 'قليل، ارفع السعر', row: 'border-red-300' };
@@ -646,7 +650,7 @@ function productContext(p) {
 - المواد: ${r.materials} ريال، الشغل: ${r.hours} ساعة × ${r.wage} ريال، الإيجار والكهرباء على القطعة: ${r.overhead} ريال
 - الشحن: ${r.shipping} ريال (${r.shipIn ? 'داخل السعر' : 'على الزبون'})، نسبة المتجر أو الدفع: ${r.fee}%
 - الربح فوق التكلفة: ${r.markup}%${p.unique ? `، قطعة فنية فريدة (+${nz(p.uniqueExtra)}% قيمة فنية)` : ''}
-- كل التكاليف ${r2(r.totalCost)} ريال، سعر البيع ${r2(r.sellingPrice)} ريال، الربح ${r2(r.profitValue)} ريال، ربحه من كل 100 ريال: ${Math.round(r.realMargin)} ريال
+- كل التكاليف ${r2(r.totalCost)} ريال، سعر البيع ${r2(r.sellingPrice)} ريال${r.vatRate ? ` قبل الضريبة، ومع ضريبة القيمة المضافة ${r.vatRate}% يصير ${r2(r.finalPrice)} ريال (الحرفي مسجّل في الضريبة)` : ' (الحرفي غير مسجّل في ضريبة القيمة المضافة)'}، الربح ${r2(r.profitValue)} ريال، ربحه من كل 100 ريال: ${Math.round(r.realMargin)} ريال
 - سعر المحلات ${r2(r.shopPrice)} ريال، سعر الطلبات الكبيرة (${r.bulkMin}+ قطعة) ${r2(r.bulkPrice)} ريال للقطعة`;
 }
 
@@ -662,7 +666,7 @@ ROUTES.products = {
           <div class="text-sm text-gray-500">التكلفة ${money(r.totalCost)}</div>
         </div>
         <div class="text-start flex-shrink-0">
-          <div class="font-extrabold text-lg text-craft-800 num">${r.sellingPrice ? money(r.sellingPrice) : '—'}</div>
+          <div class="font-extrabold text-lg text-craft-800 num">${r.sellingPrice ? money(r.finalPrice) : '—'}</div>${r.vatRate && r.sellingPrice ? '<div class="text-[11px] text-gray-500">شامل الضريبة</div>' : ''}
           ${r.sellingPrice ? `<div class="text-xs font-bold ${t.text}">ربحك ${per100(r.realMargin)} من 100</div>` : ''}
         </div>
       </button>`;
@@ -727,7 +731,7 @@ ROUTES.product = {
       </div>
 
       <details class="more card p-0" id="d-extra">
-        <summary>تكاليف ثانية: إيجار، شحن، متجر إلكتروني <i class="fa-solid fa-chevron-down chev"></i></summary>
+        <summary>تكاليف ثانية: إيجار، شحن، متجر إلكتروني، الضريبة <i class="fa-solid fa-chevron-down chev"></i></summary>
         <div class="px-4 pb-4 space-y-4">
           <div>
             ${fInput({ id: 'p-overhead', label: 'الإيجار والكهرباء وغيرها، على القطعة (ر.س)', value: p.overhead, type: 'number', ph: '0', attrs: 'data-f="overhead"' })}
@@ -745,6 +749,11 @@ ROUTES.product = {
             <div class="mt-2">${segGroup('p-shipIn', [['1', 'داخل السعر'], ['0', 'يدفعه الزبون']], p.shipIn !== false ? '1' : '0')}</div>
           </div>
           ${fInput({ id: 'p-fee', label: 'نسبة المتجر الإلكتروني أو الدفع بالبطاقة (%)', value: p.fee, type: 'number', ph: '0', hint: 'إذا تبيع بنفسك (كاش أو تحويل) خلّها 0.', attrs: 'data-f="fee"' })}
+          <div>
+            <span class="lbl">مسجّل في ضريبة القيمة المضافة؟</span>
+            ${segGroup('p-vat', [['0', 'لا'], ['1', `نعم، أضف ${CONFIG.vatRate}%`]], S.settings.vat ? '1' : '0')}
+            <p class="hint">التسجيل إلزامي إذا مبيعاتك في السنة 375 ألف ريال أو أكثر، واختياري من 187,500 ريال. إذا مو مسجّل لا تضيف ضريبة على الزبون. هذا الاختيار ينطبق على كل منتجاتك.</p>
+          </div>
         </div>
       </details>
 
@@ -810,6 +819,7 @@ ROUTES.product = {
   onSeg({ id: g, value }, { id }) {
     const p = prodById(id); if (!p) return;
     if (g === 'p-shipIn') p.shipIn = value === '1';
+    if (g === 'p-vat') S.settings.vat = value === '1';
     if (g === 'p-unique') { p.unique = value === '1'; $('unique-box').classList.toggle('hidden', !p.unique); }
     if (g === 'p-uniqueExtra') p.uniqueExtra = Number(value);
     save(); updateProductResult(p);
@@ -837,7 +847,8 @@ ACT.openTimer = () => { const d = $('d-timer'); d.open = true; d.scrollIntoView(
 
 function updateProductResult(p) {
   const r = computeRow(p), t = marginTone(r.realMargin);
-  $('pb-price').textContent = r.sellingPrice ? money(r.sellingPrice) : '—';
+  $('pb-price').textContent = r.sellingPrice ? money(r.finalPrice) : '—';
+  $('pb-label').textContent = r.vatRate ? 'بِع القطعة (شامل الضريبة) بـ' : 'بِع القطعة بـ';
   $('pb-margin').textContent = r.sellingPrice ? per100(r.realMargin) : '—';
   $('pb-tag').className = 'text-xs font-bold rounded-full px-2 py-0.5 ' + (r.sellingPrice ? t.tag : '');
   $('pb-tag').textContent = r.sellingPrice ? t.label : '';
@@ -851,24 +862,27 @@ function updateProductResult(p) {
       ${r.artValue ? row('قيمة فنية (قطعة فريدة)', money(r.artValue)) : ''}
       ${row('ربحك', `<span class="text-green-700">${money(r.profitValue)}</span>`)}
       ${r.fee ? row('نصيب المتجر أو الدفع', money(r.feeValue)) : ''}
+      ${r.vatRate ? row('سعرك قبل الضريبة', money(r.sellingPrice), 'bg-gray-50') : ''}
+      ${r.vatRate ? row(`ضريبة القيمة المضافة ${r.vatRate}% <span class="text-gray-400 text-sm">(تدفعها للهيئة، مو لك)</span>`, money(r.vatValue)) : ''}
     </div>
     <div class="bg-craft-700 text-white rounded-2xl p-4">
-      <div class="flex justify-between items-center gap-2"><span class="font-bold">بِع القطعة بـ</span><span class="text-2xl font-extrabold num">${r.sellingPrice ? money(r.sellingPrice) : '—'}</span></div>
+      <div class="flex justify-between items-center gap-2"><span class="font-bold">${r.vatRate ? 'بِع القطعة شامل الضريبة بـ' : 'بِع القطعة بـ'}</span><span class="text-2xl font-extrabold num">${r.sellingPrice ? money(r.finalPrice) : '—'}</span></div>
       ${r.rounded ? `<div class="flex justify-between text-sm text-craft-100 mt-1"><span>أو قرّبه إلى</span><b class="num">${r.rounded} ر.س</b></div>` : ''}
       ${!r.shipIn && r.shipping ? `<p class="text-sm text-craft-100 mt-2 border-t border-craft-500 pt-2">+ الشحن ${money(r.shipping)} يدفعه الزبون. اكتبها واضحة في الإعلان.</p>` : ''}
     </div>
     <div class="rounded-2xl border p-4 ${t.box}">
       <div class="flex justify-between items-center gap-2">
-        <span class="font-bold text-gray-800">من كل 100 ريال يدفعها الزبون، ربحك</span>
+        <span class="font-bold text-gray-800">${r.vatRate ? 'من كل 100 ريال من سعرك (قبل الضريبة)، ربحك' : 'من كل 100 ريال يدفعها الزبون، ربحك'}</span>
         <span class="flex items-center gap-2"><span class="text-xs font-bold rounded-full px-2 py-0.5 ${r.sellingPrice ? t.tag : ''}">${r.sellingPrice ? t.label : ''}</span><span class="text-xl font-extrabold num ${t.text}">${r.sellingPrice ? per100(r.realMargin) : '—'}</span></span>
       </div>
-      <p class="text-gray-700 mt-1 text-sm leading-relaxed">${r.sellingPrice ? `تبيع بـ ${money(r.sellingPrice)}: منها ${money(r.totalCost)} تكاليف${r.fee ? ` و${money(r.feeValue)} للمتجر` : ''}، ويبقى لك ${money(r.profitValue)} ربح.` : 'اكتب تكاليفك عشان يطلع سعرك وربحك.'}</p>
+      <p class="text-gray-700 mt-1 text-sm leading-relaxed">${r.sellingPrice ? `الزبون يدفع ${money(r.finalPrice)}: ${r.vatRate ? `منها ${money(r.vatValue)} ضريبة توردها لهيئة الزكاة، و` : 'منها '}${money(r.totalCost)} تكاليف${r.fee ? ` و${money(r.feeValue)} للمتجر` : ''}، ويبقى لك ${money(r.profitValue)} ربح.${r.vatRate ? '' : ''}` : 'اكتب تكاليفك عشان يطلع سعرك وربحك.'}</p>
     </div>`;
   const tiers = $('tiers-out');
   if (tiers) tiers.innerHTML = r.production ? `
-    <div class="flex justify-between bg-craft-50 rounded-xl p-3"><span>للزبون (القطعة)</span><b class="num">${money(r.sellingPrice)}</b></div>
+    <div class="flex justify-between bg-craft-50 rounded-xl p-3"><span>للزبون (القطعة)${r.vatRate ? ' قبل الضريبة' : ''}</span><b class="num">${money(r.sellingPrice)}</b></div>
     <div class="flex justify-between bg-craft-50 rounded-xl p-3"><span>للمحلات</span><b class="num">${money(r.shopPrice)}</b></div>
     <div class="flex justify-between bg-craft-50 rounded-xl p-3"><span>طلبات ${r.bulkMin} قطعة وأكثر (للقطعة)</span><b class="num">${money(r.bulkPrice)}</b></div>
+    ${r.vatRate ? `<p class="hint">الأسعار هنا قبل الضريبة. أضف عليها ${r.vatRate}% في الفاتورة.</p>` : ''}
     ${nz(p.tiers.shop) < 10 || nz(p.tiers.bulk) < 10 ? '<p class="hint text-red-700">ربح أقل من 10% فوق التكلفة يعتبر مخاطرة، أي غلطة بسيطة تخليك تخسر.</p>' : ''}` : '<p class="hint">اكتب التكاليف فوق أول.</p>';
   renderCompSummary(p);
 }
@@ -951,7 +965,7 @@ function renderCompSummary(p) {
   const el = $('comp-sum'); if (!el) return;
   const xs = p.competitors.map(nz).filter(Boolean);
   if (!xs.length) { el.innerHTML = ''; return; }
-  const mn = Math.min(...xs), mx = Math.max(...xs), avg = xs.reduce((a, b) => a + b, 0) / xs.length, mine = computeRow(p).sellingPrice;
+  const mn = Math.min(...xs), mx = Math.max(...xs), avg = xs.reduce((a, b) => a + b, 0) / xs.length, mine = computeRow(p).finalPrice;
   const pos = mine < mn ? 'سعرك أرخص من الكل. تأكد إنك ما تبخس شغلك.' : mine > mx ? 'سعرك أغلى من الكل. لازم صورك ووصفك يوضحون ليش منتجك يستاهل.' : mine <= avg ? 'سعرك في الوسط، أقل من المتوسط شوي.' : 'سعرك في الوسط، أعلى من المتوسط شوي.';
   const pct = mx > mn ? Math.min(100, Math.max(0, (mine - mn) / (mx - mn) * 100)) : 50;
   el.innerHTML = `<div class="bg-craft-50 rounded-xl p-3 space-y-2">
@@ -1659,7 +1673,8 @@ ACT.chatReset = () => { if (CHAT.busy) return; CHAT.turns = []; CHAT.view = []; 
 ACT.chatClearAtt = () => { CHAT.file = null; CHAT.fileUrl = null; $('chat-file').value = ''; $('chat-att').classList.add('hidden'); $('chat-att').classList.remove('flex'); };
 function allProductsContext() {
   if (!S.products.length) return 'الحرفي ما أضاف منتجات للحين.';
-  return 'منتجات الحرفي:\n' + S.products.slice(0, 15).map(p => { const c = computeRow(p); return `- ${p.name || 'منتج'}: التكلفة ${r2(c.totalCost)} ريال، السعر ${r2(c.sellingPrice)} ريال، الربح فوق التكلفة ${c.markup}%، ربحه من كل 100 ريال ${Math.round(c.realMargin)} ريال`; }).join('\n');
+  const vatNote = S.settings.vat ? `الحرفي مسجّل في ضريبة القيمة المضافة (${CONFIG.vatRate}%)، وأرباحه محسوبة قبل الضريبة.\n` : 'الحرفي غير مسجّل في ضريبة القيمة المضافة.\n';
+  return vatNote + 'منتجات الحرفي:\n' + S.products.slice(0, 15).map(p => { const c = computeRow(p); return `- ${p.name || 'منتج'}: التكلفة ${r2(c.totalCost)} ريال، السعر ${r2(c.sellingPrice)} ريال${c.vatRate ? ` (${r2(c.finalPrice)} شامل الضريبة)` : ''}، الربح فوق التكلفة ${c.markup}%، ربحه من كل 100 ريال ${Math.round(c.realMargin)} ريال`; }).join('\n');
 }
 async function sendChat(text) {
   text = (text || '').trim();
