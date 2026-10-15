@@ -270,7 +270,7 @@
       <div class="plat-card">
         <div class="text-center mb-5">
           <div class="mx-auto mb-3 w-16 h-16 rounded-2xl bg-craft-700 text-craft-100 flex items-center justify-center text-3xl"><i class="fa-solid fa-hands-holding-circle"></i></div>
-          <h1 class="text-2xl font-extrabold text-craft-800">منصة الحرفي السعودي</h1>
+          <h1 class="text-2xl font-extrabold text-craft-800">منصة شوري</h1>
           <p class="text-gray-600 mt-1">مستشارك الذكي في الحرفة: سعّر منتجاتك، وسوّقها، وصوّرها صوراً احترافية.</p>
         </div>
         ${msg ? `<div class="mb-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 p-3 text-sm">${escH(msg)}</div>` : ''}
@@ -435,7 +435,7 @@
       metadata: { user_id: PLAT.me.id, product: key },
       language: 'ar',
       fixed_width: false,
-      apple_pay: { country: 'SA', label: 'منصة الحرفي السعودي', validate_merchant_url: 'https://api.moyasar.com/v1/applepay/initiate' },
+      apple_pay: { country: 'SA', label: 'منصة شوري', validate_merchant_url: 'https://api.moyasar.com/v1/applepay/initiate' },
       on_completed: async (payment) => { try { localStorage.setItem('artisan_pending_pay', payment.id); } catch {} },
     });
   };
