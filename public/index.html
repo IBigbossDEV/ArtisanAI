@@ -114,7 +114,7 @@
   </header>
 
   <div id="offline-banner" class="hidden bg-amber-50 border-b border-amber-200 text-amber-900 text-sm">
-    <div class="max-w-3xl mx-auto px-4 py-2 flex items-center gap-2"><i class="fa-solid fa-circle-info"></i><span id="offline-text">المساعد ما تفعّل في الموقع للحين. باقي الأدوات تشتغل عادي.</span></div>
+    <div class="max-w-3xl mx-auto px-4 py-2 flex items-center gap-2"><i class="fa-solid fa-circle-info"></i><span id="offline-text">المساعد غير مفعّل في الموقع حتى الآن. بقية الأدوات تعمل كالمعتاد.</span></div>
   </div>
 
   <main id="view" class="flex-grow max-w-3xl mx-auto w-full px-4 pt-4" aria-live="polite"></main>
@@ -122,7 +122,7 @@
   <div id="price-bar" class="price-bar hidden fixed inset-x-0 z-30 px-3">
     <div class="max-w-3xl mx-auto bg-craft-800 text-white rounded-2xl shadow-2xl px-4 py-3 flex items-center justify-between gap-3">
       <div class="min-w-0">
-        <div class="text-xs text-craft-200" id="pb-label">بِع القطعة بـ</div>
+        <div class="text-xs text-craft-200" id="pb-label">سعر بيع القطعة</div>
         <div id="pb-price" class="text-2xl font-extrabold num leading-tight">—</div>
       </div>
       <div class="text-start">
@@ -157,14 +157,14 @@
 const CONFIG = {
   platformName: 'منصة الحرفي السعودي',
   orgName: 'الحرفيين',                     // يظهر في عنوان المجتمع: "مجتمع الحرفيين"
-  supportedBy: '',                        // اسم جهة داعمة تظهر في "من نحن" (اتركه فاضي إذا ما فيه)
-  orgAbout: 'مستشارك الذكي في الحرفة: يساعدك تسعّر منتجاتك صح، وتسوّق لها، وتصوّرها صور احترافية.',
+  supportedBy: '',                        // اسم جهة داعمة تظهر في "من نحن" (اتركه فارغاً إن لم توجد)
+  orgAbout: 'مستشارك الذكي في الحرفة: يساعدك على تسعير منتجاتك بشكل صحيح، وتسويقها، وتصويرها صوراً احترافية.',
   contactWhatsapp: '',
   vatRate: 15,                            // ضريبة القيمة المضافة في السعودية (%)                      // رقم واتساب إدارة المنصة (اختياري)
 };
 
 const REGIONS = ['جازان', 'عسير والباحة ونجران', 'الرياض ونجد', 'القصيم وحائل', 'مكة والمدينة والحجاز', 'المنطقة الشرقية والأحساء', 'تبوك والجوف والحدود الشمالية'];
-const CATEGORIES = [['crafts', 'حرف يدوية'], ['food', 'أكل بيتي وحلويات'], ['scent', 'عطور وبخور وصابون'], ['sewing', 'خياطة وتطريز'], ['art', 'فن ورسم'], ['other', 'شي ثاني']];
+const CATEGORIES = [['crafts', 'حرف يدوية'], ['food', 'مأكولات منزلية وحلويات'], ['scent', 'عطور وبخور وصابون'], ['sewing', 'خياطة وتطريز'], ['art', 'فن ورسم'], ['other', 'أخرى']];
 const CRAFT_EXAMPLES = {
   'جازان': 'الخوص والسعف، الفخار، المشغولات الجازانية، الحناء',
   'عسير والباحة ونجران': 'القط العسيري، المشغولات الجلدية، الفضيات، الحجر والفخار',
@@ -286,7 +286,7 @@ let S = loadState();
 let warnedQuota = false;
 function saveLocal() {
   try { localStorage.setItem(STORE_KEY, JSON.stringify(S)); }
-  catch { if (!warnedQuota) { warnedQuota = true; toast('ذاكرة الجهاز امتلأت. احذف صور منتجات قديمة.'); } }
+  catch { if (!warnedQuota) { warnedQuota = true; toast('امتلأت ذاكرة الجهاز. احذف صور منتجات قديمة.'); } }
 }
 function save() { S.updatedAt = Date.now(); saveLocal(); queueAccountSync(); }
 const prodById = (id) => S.products.find(p => p.id === id);
@@ -402,24 +402,25 @@ function rules() {
   const p = S.profile;
   const cat = (CATEGORIES.find(c => c[0] === p.category) || [])[1] || 'حرف يدوية';
   return `أنت "مساعد الحرفي"، المساعد الذكي في ${CONFIG.platformName}.
-مهمتك مساعدة الحرفيين والحرفيات والأسر المنتجة في السعودية، وأغلبهم غير متمرسين في التقنية أو التسعير، في: تسعير المنتجات، كتابة أوصاف وإعلانات، أفكار تسويق بسيطة، الرد على الزبائن، تصوير المنتجات بالجوال، أفكار منتجات جديدة، وإدارة المشروع الصغير.
+مهمتك مساعدة الحرفيين والحرفيات والأسر المنتجة في الخليج، وأغلبهم غير متمرسين في التقنية أو التسعير، في: تسعير المنتجات، كتابة أوصاف وإعلانات، أفكار تسويق بسيطة، الرد على الزبائن، تصوير المنتجات بالجوال، أفكار منتجات جديدة، وإدارة المشروع الصغير.
 
-عن الحرفي اللي تكلمه:
+عن الحرفي الذي تحدّثه:
 - الاسم: ${p.name || 'غير محدد'}
 - الحرفة: ${p.craft || 'غير محددة'} (التصنيف: ${cat})
 - المنطقة: ${p.region || 'غير محددة'}${p.region && CRAFT_EXAMPLES[p.region] ? ` (من حرف المنطقة: ${CRAFT_EXAMPLES[p.region]})` : ''}
-- اسم المتجر: ${p.store || 'ما عنده اسم للحين'}
+- اسم المتجر: ${p.store || 'لا يوجد اسم بعد'}
 استخدم أمثلة وأسواق ومناسبات قريبة من منطقته وحرفته.
 
 طريقة الكلام:
-- كلّم الحرفي كأنك جاره الفاهم: عربي بسيط قريب من اللهجة السعودية البيضاء، جمل قصيرة، ودود ومحترم.
-- لا تستخدم كلمات صعبة أو مصطلحات تجارية. بدّلها بكلام الناس:
-  "هامش الربح" ← "ربحك من كل 100 ريال"، "الجمهور المستهدف" ← "اللي يشترون منك"، "استراتيجية" ← "خطة"، "قناة بيع" ← "مكان البيع"، "محتوى" ← "منشورات"، "التكاليف غير المباشرة" ← "الإيجار والكهرباء"، "عمولة" ← "نسبة المتجر".
-- لا تستخدم كلمات إنجليزية إلا أسماء التطبيقات (انستقرام، سناب، واتساب، تيك توك).
-- أعط خطوات عملية يقدر يسويها اليوم، وأمثلة بالأرقام. ضع أهم رقم أو جملة بخط عريض **هكذا**.
+- تحدّث بعربية فصحى بسيطة يفهمها الجميع، كما يتحدث مذيع الأخبار مع الناس العاديين: جمل قصيرة، وكلمات مألوفة، وأسلوب ودود ومحترم. لا تستخدم اللهجات المحلية.
+- لا تستخدم كلمات صعبة أو مصطلحات تجارية. استبدلها بكلمات سهلة:
+  "هامش الربح" ← "ربحك من كل 100 ريال"، "الجمهور المستهدف" ← "الذين يشترون منك"، "استراتيجية" ← "خطة"، "قناة بيع" ← "مكان البيع"، "محتوى" ← "منشورات"، "التكاليف غير المباشرة" ← "الإيجار والكهرباء"، "عمولة" ← "نسبة المتجر".
+- لا تستخدم كلمات إنجليزية إلا أسماء التطبيقات (إنستغرام، سناب شات، واتساب، تيك توك).
+- قدّم خطوات عملية يستطيع تنفيذها اليوم، وأمثلة بالأرقام. اكتب أهم رقم أو جملة بخط عريض **هكذا**.
+- إذا كتب الحرفي بلهجته، افهمه وأجبه بالفصحى البسيطة نفسها.
 
 قواعد التسعير:
-- العملة دائماً الريال السعودي.
+- العملة الريال السعودي ما لم يذكر الحرفي عملة أخرى.
 - كل التكاليف = المواد + (ساعات العمل × أجر الساعة) + الإيجار والكهرباء على القطعة + الشحن إذا كان داخل السعر.
 - "الربح فوق التكلفة" نسبة تُحسب على التكلفة، و"ربحك من كل 100 ريال" = الربح ÷ سعر البيع × 100. اشرحه بالريال (مثال: تضيف 40% فوق التكلفة = يبقى لك 29 ريال من كل 100 ريال يدفعها الزبون). لا تقل "هامش".
 - إضافة بين 30% و60% فوق التكلفة غالباً مناسبة (ربح 23 إلى 38 ريال من كل 100). أقل من 15 ريال من كل 100 ربح قليل.
@@ -432,11 +433,11 @@ function rules() {
 - إذا سُئلت عن موضوع خارج الحرف والمشاريع الصغيرة، اعتذر بلطف في جملة وارجع لمنتج الحرفي.
 - لا تقدم استشارات قانونية أو ضريبية ملزمة؛ انصح بمراجعة الجهات الرسمية.
 - لا تخترع آراء زبائن أو أرقام مبيعات أو شهادات غير حقيقية.
-- احترم التراث والهوية السعودية، وأبرز قيمة العمل اليدوي.
+- احترم التراث والهوية الخليجية، وأبرز قيمة العمل اليدوي.
 
-معلومات عامة عن الأنظمة (آخر تحديث أكتوبر 2026، قلها كمعلومة عامة وانصح بالتأكد من الجهة الرسمية):
+معلومات عامة عن الأنظمة في السعودية (آخر تحديث أكتوبر 2026). قدّمها معلومةً عامة، وانصح بالتأكد من الجهة الرسمية. إذا كان الحرفي من دولة خليجية أخرى، فوضّح أن هذه أنظمة سعودية وانصحه بمراجعة الجهات المختصة في بلده:
 - صدر نظام الحرف والصناعات اليدوية، وفيه مهلة لتصحيح الأوضاع من 23 مايو 2026 إلى 23 مايو 2027.
-- اللي يمارس الحرفة لأغراض تجارية أو يتاجر بالمنتجات الحرفية يحتاج "ترخيص ممارس حرفي" من هيئة التراث، ويُسجَّل في السجل الوطني للحرفيين. وفيه ترخيص منفصل لمحلات بيع المنتجات الحرفية التراثية. كانت الرخص تصدر عبر منصة "أبدع" التابعة لوزارة الثقافة، والإجراء ممكن يتحدث مع النظام الجديد.
+- من يمارس الحرفة لأغراض تجارية أو يتاجر بالمنتجات الحرفية يحتاج "ترخيص ممارس حرفي" من هيئة التراث، ويُسجَّل في السجل الوطني للحرفيين. ويوجد ترخيص منفصل لمحلات بيع المنتجات الحرفية التراثية. كانت الرخص تصدر عبر منصة "أبدع" التابعة لوزارة الثقافة، وقد تتغير الإجراءات مع النظام الجديد.
 - وثيقة العمل الحر (منصة العمل الحر freelance.sa من وزارة الموارد البشرية): مجانية، مدتها سنة وتتجدد، للسعوديين من 18 سنة بحساب النفاذ الوطني، وفيها فئة الأسر المنتجة (الأكل والحلويات، الخياطة، الأعمال اليدوية والحرفية، العطور والبخور). تفيد في فتح حساب بنكي للنشاط، وتوثيق المتجر الإلكتروني، وبوابات الدفع، وبرامج الدعم والتمويل.
 - ضريبة القيمة المضافة: التسجيل إلزامي إذا المبيعات السنوية 375 ألف ريال أو أكثر، واختياري بين 187,500 و375 ألف ريال، وغير مطلوب تحت ذلك (هيئة الزكاة والضريبة والجمارك zatca.gov.sa).
 - الأكل ومنتجات العناية والعطور لها اشتراطات خاصة في التصنيع والتغليف والملصق: انصح بسؤال البلدية والهيئة العامة للغذاء والدواء (sfda.gov.sa).`;
@@ -444,33 +445,33 @@ function rules() {
 
 /* ---------- تشغيل المساعد وعرض الرد ---------- */
 const AI_ERR = {
-  rate_limited: 'استخدمت المساعد كثير. ارتاح شوي وجرّب بعدين.',
-  session_expired: 'طلعت من حسابك. ادخل مرة ثانية.',
-  quota_exceeded: 'خلص رصيدك هذا الشهر.',
-  capability_disabled: 'المساعد ما تفعّل في الموقع للحين.',
-  no_image: 'المصوّر ما طلّع صورة. جرّب صورة أوضح أو مكان ثاني.',
-  refused: 'المساعد ما قدر يجاوب. اكتب طلبك بطريقة ثانية.',
-  empty_completion: 'ما وصل رد. جرّب طلب أقصر.',
-  prompt_too_large: 'الكلام طويل. اختصره شوي.',
-  image_rejected: 'الصورة ما انفتحت. جرّب صورة ثانية.',
-  images_unavailable: 'إرسال الصور ما يشتغل هنا.',
-  invalid_json: 'صار خطأ بسيط. اضغط الزر مرة ثانية.',
-  upstream_error: 'انقطع الاتصال. جرّب مرة ثانية.',
+  rate_limited: 'استخدمت المساعد كثيراً. انتظر قليلاً ثم حاول مرة أخرى.',
+  session_expired: 'انتهت جلستك. سجّل الدخول مرة أخرى.',
+  quota_exceeded: 'انتهى رصيدك لهذا الشهر.',
+  capability_disabled: 'المساعد غير مفعّل في الموقع حتى الآن.',
+  no_image: 'لم يتمكن المصوّر من إنتاج صورة. جرّب صورة أوضح أو مكاناً آخر.',
+  refused: 'لم يتمكن المساعد من الإجابة. اكتب طلبك بطريقة أخرى.',
+  empty_completion: 'لم يصل رد. جرّب طلباً أقصر.',
+  prompt_too_large: 'النص طويل. اختصره قليلاً.',
+  image_rejected: 'تعذّر فتح الصورة. جرّب صورة أخرى.',
+  images_unavailable: 'إرسال الصور غير متاح هنا.',
+  invalid_json: 'حدث خطأ بسيط. اضغط الزر مرة أخرى.',
+  upstream_error: 'انقطع الاتصال. حاول مرة أخرى.',
 };
 const AI_FATAL = ['not_granted', 'sampling_disabled', 'not_declared', 'capability_disabled', 'capability_removed'];
 function lockAI(text) {
   CAP.aiLocked = true;
   $('offline-text').textContent = text; $('offline-banner').classList.remove('hidden');
-  $('ai-dot').className = 'w-2 h-2 rounded-full bg-red-400'; $('ai-pill-text').textContent = 'المساعد مو شغّال هنا';
+  $('ai-dot').className = 'w-2 h-2 rounded-full bg-red-400'; $('ai-pill-text').textContent = 'المساعد لا يعمل هنا';
 }
 function aiReady() {
-  if (CAP.aiLocked || !CAP.sample) { toast(CAP.ready ? 'المساعد ما تفعّل في الموقع للحين.' : 'لحظة، المساعد يتجهّز…'); return false; }
+  if (CAP.aiLocked || !CAP.sample) { toast(CAP.ready ? 'المساعد غير مفعّل في الموقع حتى الآن.' : 'لحظة، المساعد يستعد…'); return false; }
   return true;
 }
 function handleAIError(e) {
   const code = e && e.code;
   if (code === 'cancelled' || code === 'quota_exceeded') return;
-  if (AI_FATAL.includes(code)) { lockAI(code === 'not_granted' ? 'المساعد يحتاج موافقتك. افتح الرابط مرة ثانية واضغط موافق لما يسألك.' : 'المساعد ما يشتغل في هذا الحساب حالياً. باقي الأدوات تشتغل عادي.'); return; }
+  if (AI_FATAL.includes(code)) { lockAI(code === 'not_granted' ? 'المساعد يحتاج إلى موافقتك. افتح الرابط مرة أخرى واضغط "موافق" عندما يُطلب منك.' : 'المساعد لا يعمل في هذا الحساب حالياً. بقية الأدوات تعمل كالمعتاد.'); return; }
   toast(AI_ERR[code] || AI_ERR.upstream_error);
 }
 const loaderHtml = (t = 'المساعد يكتب…') => `<div class="flex items-center gap-4 py-4 px-2"><div class="dot-typing ms-4"></div><span class="text-craft-600 font-bold text-sm">${t}</span></div>`;
@@ -502,7 +503,7 @@ async function aiRun({ prompt, outId, btn, kind, title = '', productId = '', ima
       if (!started) opts.onText({ text: r.text });
       body.innerHTML = md(r.text);
       body.parentElement.appendChild(outActions(r.text, { kind, title, productId, wa, saveable }));
-      if (r.truncated) toast('الرد طويل وانقطع. اطلب شي أقصر.', true);
+      if (r.truncated) toast('الرد طويل وانقطع. اطلب شيئاً أقصر.', true);
     }
   } catch (e) {
     if (e && e.text && e.code !== 'refused' && !json) { body.innerHTML = md(e.text); }
@@ -519,7 +520,7 @@ function outActions(text, { kind, title, productId, wa = true, saveable = true }
     <button type="button" class="btn btn-soft btn-sm" data-r="copy"><i class="fa-regular fa-copy"></i> نسخ</button>
     ${wa ? `<a class="btn btn-wa btn-sm" target="_blank" rel="noopener" href="${esc(waLink(plain(text)))}"><i class="fa-brands fa-whatsapp"></i> واتساب</a>` : ''}
     ${saveable ? `<button type="button" class="btn btn-soft btn-sm" data-r="save"><i class="fa-regular fa-bookmark"></i> احفظ</button>` : ''}
-    <button type="button" class="btn btn-soft btn-sm tts-btn ${TTS.ok ? '' : 'hidden'}" data-r="speak"><i class="fa-solid fa-volume-high"></i> اسمع</button>`;
+    <button type="button" class="btn btn-soft btn-sm tts-btn ${TTS.ok ? '' : 'hidden'}" data-r="speak"><i class="fa-solid fa-volume-high"></i> استمع</button>`;
   row.addEventListener('click', e => {
     const b = e.target.closest('[data-r]'); if (!b) return;
     if (b.dataset.r === 'copy') copyText(plain(text));
@@ -527,8 +528,8 @@ function outActions(text, { kind, title, productId, wa = true, saveable = true }
     if (b.dataset.r === 'save') {
       S.texts.unshift({ id: uid(), kind, title: title || KIND_NAMES[kind] || 'نص', text, productId, at: Date.now() });
       S.texts = S.texts.slice(0, 80); save();
-      b.innerHTML = '<i class="fa-solid fa-bookmark"></i> انحفظ'; b.disabled = true;
-      toast('انحفظ في "نصوصي المحفوظة" ✅', true);
+      b.innerHTML = '<i class="fa-solid fa-bookmark"></i> تم الحفظ'; b.disabled = true;
+      toast('تم الحفظ في "نصوصي المحفوظة" ✅', true);
     }
   });
   return row;
@@ -605,10 +606,10 @@ function updateBadges() {
 }
 
 /* ---------- حفظ ملف للجهاز ---------- */
-async function offerFile(filename, blob, okText = 'انحفظ ✅') {
-  if (!CAP.downloads) { toast('حفظ الملفات ما يشتغل في هذا المتصفح.'); return; }
+async function offerFile(filename, blob, okText = 'تم الحفظ ✅') {
+  if (!CAP.downloads) { toast('حفظ الملفات لا يعمل في هذا المتصفح.'); return; }
   try { await CAP.downloads.save({ filename, data: blob }); toast(okText, true); }
-  catch (e) { const c = e && e.code; if (c === 'declined') return; toast(c === 'rate_limited' ? 'فيه ملف ينتظر موافقتك، كمّله أول.' : 'ما قدرنا نحفظ الملف هنا.'); }
+  catch (e) { const c = e && e.code; if (c === 'declined') return; toast(c === 'rate_limited' ? 'يوجد ملف ينتظر موافقتك، أكمله أولاً.' : 'تعذّر حفظ الملف هنا.'); }
 }
 const safeName = (s) => String(s || 'ملف').replace(/[\\/:*?"<>|]+/g, ' ').trim().replace(/\s+/g, '_') || 'ملف';
 
@@ -647,10 +648,10 @@ function productContext(p) {
   if (!p) return '';
   const r = computeRow(p);
   return `منتج الحرفي "${p.name || 'بدون اسم'}"${p.details ? ` (${p.details})` : ''}:
-- المواد: ${r.materials} ريال، الشغل: ${r.hours} ساعة × ${r.wage} ريال، الإيجار والكهرباء على القطعة: ${r.overhead} ريال
+- المواد: ${r.materials} ريال، العمل: ${r.hours} ساعة × ${r.wage} ريال، الإيجار والكهرباء على القطعة: ${r.overhead} ريال
 - الشحن: ${r.shipping} ريال (${r.shipIn ? 'داخل السعر' : 'على الزبون'})، نسبة المتجر أو الدفع: ${r.fee}%
 - الربح فوق التكلفة: ${r.markup}%${p.unique ? `، قطعة فنية فريدة (+${nz(p.uniqueExtra)}% قيمة فنية)` : ''}
-- كل التكاليف ${r2(r.totalCost)} ريال، سعر البيع ${r2(r.sellingPrice)} ريال${r.vatRate ? ` قبل الضريبة، ومع ضريبة القيمة المضافة ${r.vatRate}% يصير ${r2(r.finalPrice)} ريال (الحرفي مسجّل في الضريبة)` : ' (الحرفي غير مسجّل في ضريبة القيمة المضافة)'}، الربح ${r2(r.profitValue)} ريال، ربحه من كل 100 ريال: ${Math.round(r.realMargin)} ريال
+- كل التكاليف ${r2(r.totalCost)} ريال، سعر البيع ${r2(r.sellingPrice)} ريال${r.vatRate ? ` قبل الضريبة، ومع ضريبة القيمة المضافة ${r.vatRate}% يصبح ${r2(r.finalPrice)} ريال (الحرفي مسجّل في الضريبة)` : ' (الحرفي غير مسجّل في ضريبة القيمة المضافة)'}، الربح ${r2(r.profitValue)} ريال، ربحه من كل 100 ريال: ${Math.round(r.realMargin)} ريال
 - سعر المحلات ${r2(r.shopPrice)} ريال، سعر الطلبات الكبيرة (${r.bulkMin}+ قطعة) ${r2(r.bulkPrice)} ريال للقطعة`;
 }
 
@@ -673,18 +674,18 @@ ROUTES.products = {
     }).join('');
     const tot = S.products.reduce((a, p) => a + computeRow(p).realMargin, 0);
     return screen({
-      title: 'منتجاتي', sub: 'كل منتج له بطاقة فيها تكاليفه وسعره. اضغط على المنتج عشان تعدّله.',
+      title: 'منتجاتي', sub: 'لكل منتج بطاقة فيها تكاليفه وسعره. اضغط على المنتج لتعديله.',
       body: `
-      <button type="button" class="btn btn-main w-full text-lg" data-act="newProduct"><i class="fa-solid fa-plus"></i> أضف منتج جديد</button>
+      <button type="button" class="btn btn-main w-full text-lg" data-act="newProduct"><i class="fa-solid fa-plus"></i> أضف منتجاً جديداً</button>
       ${S.products.length ? `
         <div class="grid grid-cols-2 gap-3">
           <div class="card text-center"><div class="text-sm text-gray-500 font-bold">عدد المنتجات</div><div class="text-2xl font-extrabold text-craft-800 num">${S.products.length}</div></div>
           <div class="card text-center"><div class="text-sm text-gray-500 font-bold">ربحك من كل 100 (المتوسط)</div><div class="text-2xl font-extrabold text-craft-800 num">${per100(tot / S.products.length)}</div></div>
         </div>
         <div class="space-y-3">${cards}</div>
-        <p class="hint">الإطار الأحمر يعني ربحك قليل في هالمنتج.</p>
+        <p class="hint">الإطار الأحمر يعني أن ربحك قليل في هذا المنتج.</p>
         <button type="button" class="btn btn-soft w-full" data-go="chat"><i class="fa-solid fa-comments"></i> اسأل المساعد عن أسعارك</button>`
-      : `<div class="card text-center py-10 text-gray-500"><i class="fa-solid fa-box-open text-5xl text-craft-300 mb-3"></i><p class="font-bold">ما أضفت منتجات للحين</p><p class="text-sm mt-1">أضف أول منتج، ونحسب لك سعره وربحك.</p></div>`}
+      : `<div class="card text-center py-10 text-gray-500"><i class="fa-solid fa-box-open text-5xl text-craft-300 mb-3"></i><p class="font-bold">لم تضف منتجات بعد</p><p class="text-sm mt-1">أضف أول منتج، وسنحسب لك سعره وربحك.</p></div>`}
       `,
     });
   },
@@ -704,42 +705,42 @@ ROUTES.product = {
       body: `
       <div class="card space-y-4">
         ${fInput({ id: 'p-name', label: 'اسم المنتج', value: p.name, ph: 'مثال: وسادة سدو', attrs: 'data-f="name"' })}
-        ${fInput({ id: 'p-details', label: 'وش هو؟ ومن وش مصنوع؟', value: p.details, ph: 'مثال: صوف طبيعي، 45×45 سم، ألوان السدو', attrs: 'data-f="details"' })}
+        ${fInput({ id: 'p-details', label: 'ما هو؟ ومن أي شيء صُنع؟', value: p.details, ph: 'مثال: صوف طبيعي، 45×45 سم، ألوان السدو', attrs: 'data-f="details"' })}
         <div class="flex items-center gap-3">
           <div id="p-photo-box" class="w-20 h-20 rounded-xl bg-craft-100 overflow-hidden flex items-center justify-center flex-shrink-0">${p.photo ? `<img src="${p.photo}" alt="صورة المنتج" class="w-full h-full object-cover">` : '<i class="fa-solid fa-image text-2xl text-craft-300"></i>'}</div>
           <div class="flex flex-col gap-2">
             <label for="p-photo" class="btn btn-soft btn-sm cursor-pointer"><i class="fa-solid fa-camera"></i> ${p.photo ? 'غيّر الصورة' : 'أضف صورة'}</label>
             <input type="file" id="p-photo" accept="image/*" class="hidden">
-            ${p.photo ? `<button type="button" class="btn btn-soft btn-sm" ${goP('studio', { productId: p.id })}><i class="fa-solid fa-wand-magic-sparkles"></i> عدّلها في تعديل الصور</button>` : ''}
+            ${p.photo ? `<button type="button" class="btn btn-soft btn-sm" ${goP('studio', { productId: p.id })}><i class="fa-solid fa-wand-magic-sparkles"></i> عدّلها في محرر الصور</button>` : ''}
           </div>
         </div>
       </div>
 
       <div class="card space-y-4">
-        <h2 class="text-lg font-extrabold text-craft-800"><i class="fa-solid fa-coins ml-1"></i> كم تكلفك القطعة الوحدة؟</h2>
+        <h2 class="text-lg font-extrabold text-craft-800"><i class="fa-solid fa-coins ml-1"></i> كم تكلّفك القطعة الواحدة؟</h2>
         <div>
           ${fInput({ id: 'p-materials', label: 'المواد والخامات (ر.س)', value: p.materials, type: 'number', ph: '0', attrs: 'data-f="materials"' })}
-          <button type="button" class="btn btn-soft btn-sm mt-2" data-act="toggle" data-target="mat-helper"><i class="fa-solid fa-boxes-stacked"></i> شريت المواد بالجملة؟ احسبها لي</button>
+          <button type="button" class="btn btn-soft btn-sm mt-2" data-act="toggle" data-target="mat-helper"><i class="fa-solid fa-boxes-stacked"></i> اشتريت المواد بالجملة؟ احسبها لي</button>
           <div id="mat-helper" class="hidden mt-2 bg-craft-50 border border-craft-200 rounded-xl p-3 space-y-2"></div>
         </div>
         <div class="grid grid-cols-2 gap-3">
-          ${fInput({ id: 'p-hours', label: 'كم ساعة تشتغل عليها؟', value: p.hours, type: 'number', ph: '0', attrs: 'data-f="hours"' })}
-          ${fInput({ id: 'p-wage', label: 'كم تستاهل ساعتك؟ (ر.س)', value: p.wage, type: 'number', ph: '25', attrs: 'data-f="wage"' })}
+          ${fInput({ id: 'p-hours', label: 'كم ساعة تعمل عليها؟', value: p.hours, type: 'number', ph: '0', attrs: 'data-f="hours"' })}
+          ${fInput({ id: 'p-wage', label: 'كم تستحق ساعة عملك؟ (ر.س)', value: p.wage, type: 'number', ph: '25', attrs: 'data-f="wage"' })}
         </div>
-        <p class="hint -mt-2">ما تعرف كم ساعة؟ استخدم <button type="button" class="underline text-craft-700 font-bold" data-act="openTimer">مؤقّت الشغل</button> تحت.</p>
-        ${fInput({ id: 'p-margin', label: 'كم تبي تضيف ربح فوق التكلفة؟ (%)', value: p.margin, type: 'number', ph: '40', hint: 'مثال: تكلفتك 100 ريال وتضيف 40% = تبيع بـ 140 ريال.', attrs: 'data-f="margin"' })}
+        <p class="hint -mt-2">لا تعرف عدد الساعات؟ استخدم <button type="button" class="underline text-craft-700 font-bold" data-act="openTimer">مؤقّت العمل</button> في الأسفل.</p>
+        ${fInput({ id: 'p-margin', label: 'كم تريد أن تضيف ربحاً فوق التكلفة؟ (%)', value: p.margin, type: 'number', ph: '40', hint: 'مثال: تكلفتك 100 ريال وتضيف 40% = تبيع بـ 140 ريالاً.', attrs: 'data-f="margin"' })}
       </div>
 
       <details class="more card p-0" id="d-extra">
-        <summary>تكاليف ثانية: إيجار، شحن، متجر إلكتروني، الضريبة <i class="fa-solid fa-chevron-down chev"></i></summary>
+        <summary>تكاليف أخرى: إيجار، شحن، متجر إلكتروني، الضريبة <i class="fa-solid fa-chevron-down chev"></i></summary>
         <div class="px-4 pb-4 space-y-4">
           <div>
             ${fInput({ id: 'p-overhead', label: 'الإيجار والكهرباء وغيرها، على القطعة (ر.س)', value: p.overhead, type: 'number', ph: '0', attrs: 'data-f="overhead"' })}
-            <button type="button" class="btn btn-soft btn-sm mt-2" data-act="toggle" data-target="oh-helper"><i class="fa-solid fa-calculator"></i> ما أعرف، احسبها لي</button>
+            <button type="button" class="btn btn-soft btn-sm mt-2" data-act="toggle" data-target="oh-helper"><i class="fa-solid fa-calculator"></i> لا أعرف، احسبها لي</button>
             <div id="oh-helper" class="hidden mt-2 bg-craft-50 border border-craft-200 rounded-xl p-3 space-y-2">
               <div class="grid grid-cols-2 gap-2">
                 ${fInput({ id: 'oh-month', label: 'كم تصرف في الشهر؟', type: 'number', ph: '600' })}
-                ${fInput({ id: 'oh-pieces', label: 'كم قطعة تسوي في الشهر؟', type: 'number', ph: '40' })}
+                ${fInput({ id: 'oh-pieces', label: 'كم قطعة تصنع في الشهر؟', type: 'number', ph: '40' })}
               </div>
               <div class="flex items-center justify-between gap-2"><span id="oh-result" class="font-bold text-craft-800 num">اكتب الرقمين</span><button type="button" class="btn btn-main btn-sm" data-act="applyOverhead">استخدم الرقم</button></div>
             </div>
@@ -748,11 +749,11 @@ ROUTES.product = {
             ${fInput({ id: 'p-shipping', label: 'الشحن (ر.س)', value: p.shipping, type: 'number', ph: '0', attrs: 'data-f="shipping"' })}
             <div class="mt-2">${segGroup('p-shipIn', [['1', 'داخل السعر'], ['0', 'يدفعه الزبون']], p.shipIn !== false ? '1' : '0')}</div>
           </div>
-          ${fInput({ id: 'p-fee', label: 'نسبة المتجر الإلكتروني أو الدفع بالبطاقة (%)', value: p.fee, type: 'number', ph: '0', hint: 'إذا تبيع بنفسك (كاش أو تحويل) خلّها 0.', attrs: 'data-f="fee"' })}
+          ${fInput({ id: 'p-fee', label: 'نسبة المتجر الإلكتروني أو الدفع بالبطاقة (%)', value: p.fee, type: 'number', ph: '0', hint: 'إذا كنت تبيع بنفسك (نقداً أو بتحويل) فاتركها 0.', attrs: 'data-f="fee"' })}
           <div>
             <span class="lbl">مسجّل في ضريبة القيمة المضافة؟</span>
             ${segGroup('p-vat', [['0', 'لا'], ['1', `نعم، أضف ${CONFIG.vatRate}%`]], S.settings.vat ? '1' : '0')}
-            <p class="hint">التسجيل إلزامي إذا مبيعاتك في السنة 375 ألف ريال أو أكثر، واختياري من 187,500 ريال. إذا مو مسجّل لا تضيف ضريبة على الزبون. هذا الاختيار ينطبق على كل منتجاتك.</p>
+            <p class="hint">في السعودية: التسجيل إلزامي إذا بلغت مبيعاتك السنوية 375 ألف ريال أو أكثر، واختياري من 187,500 ريال. إذا لم تكن مسجّلاً فلا تُضف ضريبة على الزبون. هذا الاختيار ينطبق على جميع منتجاتك.</p>
           </div>
         </div>
       </details>
@@ -762,16 +763,16 @@ ROUTES.product = {
       <details class="more card p-0">
         <summary><span><i class="fa-solid fa-gem ml-1 text-craft-500"></i> قطعة فنية فريدة؟</span> <i class="fa-solid fa-chevron-down chev"></i></summary>
         <div class="px-4 pb-4 space-y-3">
-          <p class="hint">القطعة اللي ما تتكرر (لوحة، قطعة بتصميم خاص) قيمتها أكبر من تكلفتها. أضف لها قيمة فنية فوق السعر.</p>
+          <p class="hint">القطعة التي لا تتكرر (لوحة، أو قطعة بتصميم خاص) قيمتها أكبر من تكلفتها. أضف لها قيمة فنية فوق السعر.</p>
           ${segGroup('p-unique', [['0', 'لا، منتج عادي'], ['1', 'نعم، قطعة فريدة']], p.unique ? '1' : '0')}
-          <div id="unique-box" class="${p.unique ? '' : 'hidden'}">${segGroup('p-uniqueExtra', [['25', '+25%'], ['50', '+50%'], ['100', '+100%']], String(p.uniqueExtra || 50), 3)}<p class="hint">كل ما كانت القطعة أندر واسمك معروف أكثر، ارفع النسبة.</p></div>
+          <div id="unique-box" class="${p.unique ? '' : 'hidden'}">${segGroup('p-uniqueExtra', [['25', '+25%'], ['50', '+50%'], ['100', '+100%']], String(p.uniqueExtra || 50), 3)}<p class="hint">كلما كانت القطعة أندر وكان اسمك أشهر، فارفع النسبة.</p></div>
         </div>
       </details>
 
       <details class="more card p-0">
         <summary><span><i class="fa-solid fa-store ml-1 text-craft-500"></i> سعر المحلات والطلبات الكبيرة</span> <i class="fa-solid fa-chevron-down chev"></i></summary>
         <div class="px-4 pb-4 space-y-3">
-          <p class="hint">المحل يبي سعر أقل عشان يضيف ربحه. والشركات اللي تطلب كمية كبيرة تبي خصم. هنا تعرف أقل سعر يناسبك.</p>
+          <p class="hint">المحل يريد سعراً أقل ليضيف ربحه، والشركات التي تطلب كميات كبيرة تريد خصماً. هنا تعرف أقل سعر يناسبك.</p>
           <div class="grid grid-cols-3 gap-2">
             ${fInput({ id: 't-shop', label: 'ربحك من المحلات %', value: p.tiers.shop, type: 'number', attrs: 'data-t="shop"' })}
             ${fInput({ id: 't-bulk', label: 'ربحك من الكميات %', value: p.tiers.bulk, type: 'number', attrs: 'data-t="bulk"' })}
@@ -782,7 +783,7 @@ ROUTES.product = {
       </details>
 
       <details class="more card p-0" id="d-timer">
-        <summary><span><i class="fa-solid fa-stopwatch ml-1 text-craft-500"></i> مؤقّت الشغل</span> <i class="fa-solid fa-chevron-down chev"></i></summary>
+        <summary><span><i class="fa-solid fa-stopwatch ml-1 text-craft-500"></i> مؤقّت العمل</span> <i class="fa-solid fa-chevron-down chev"></i></summary>
         <div class="px-4 pb-4 space-y-3" id="timer-box"></div>
       </details>
 
@@ -792,16 +793,16 @@ ROUTES.product = {
       </details>
 
       <div class="card space-y-3">
-        <div class="font-extrabold text-craft-800"><i class="fa-solid fa-wand-magic-sparkles ml-1"></i> سعري مناسب؟</div>
-        <p class="hint mt-0">المساعد يشوف أرقامك ويقول لك رأيه، ويقترح 3 أسعار.</p>
+        <div class="font-extrabold text-craft-800"><i class="fa-solid fa-wand-magic-sparkles ml-1"></i> هل سعري مناسب؟</div>
+        <p class="hint mt-0">يراجع المساعد أرقامك ويعطيك رأيه، ويقترح 3 أسعار.</p>
         <button type="button" class="btn btn-soft w-full" id="btn-review" data-act="priceReview" data-id="${p.id}">اسأل المساعد</button>
         <div id="out-review" class="hidden"></div>
       </div>
 
-      ${savedTexts.length ? `<div class="card space-y-2"><div class="font-extrabold text-craft-800"><i class="fa-regular fa-bookmark ml-1"></i> نصوص محفوظة لهالمنتج</div>${savedTexts.map(t => `<button type="button" class="w-full text-start border border-craft-100 rounded-xl p-3 hover:bg-craft-50" ${goP('savedText', { id: t.id })}><div class="text-xs text-craft-600 font-bold">${esc(t.title)} · ${fmtDay(t.at)}</div><div class="text-sm text-gray-700 line-clamp-2">${esc(plain(t.text).slice(0, 140))}</div></button>`).join('')}</div>` : ''}
+      ${savedTexts.length ? `<div class="card space-y-2"><div class="font-extrabold text-craft-800"><i class="fa-regular fa-bookmark ml-1"></i> نصوص محفوظة لهذا المنتج</div>${savedTexts.map(t => `<button type="button" class="w-full text-start border border-craft-100 rounded-xl p-3 hover:bg-craft-50" ${goP('savedText', { id: t.id })}><div class="text-xs text-craft-600 font-bold">${esc(t.title)} · ${fmtDay(t.at)}</div><div class="text-sm text-gray-700 line-clamp-2">${esc(plain(t.text).slice(0, 140))}</div></button>`).join('')}</div>` : ''}
 
       <div class="grid grid-cols-2 gap-2">
-        <button type="button" class="btn btn-soft" ${goP('description', { productId: p.id })}><i class="fa-solid fa-pen-nib"></i> اكتب وصف</button>
+        <button type="button" class="btn btn-soft" ${goP('description', { productId: p.id })}><i class="fa-solid fa-pen-nib"></i> اكتب وصفاً</button>
         <button type="button" class="btn btn-soft" ${goP('photographer', { productId: p.id })}><i class="fa-solid fa-wand-magic-sparkles"></i> صوّره بالمصوّر الذكي</button>
       </div>
       <div id="del-zone"><button type="button" class="btn w-full text-red-700 hover:bg-red-50" data-act="askDelete" data-id="${p.id}"><i class="fa-solid fa-trash"></i> احذف المنتج</button></div>
@@ -829,7 +830,7 @@ ROUTES.product = {
     $('price-bar').classList.remove('hidden'); $('view').classList.add('with-bar');
     $('p-photo').addEventListener('change', async e => {
       const f = e.target.files[0]; if (!f) return;
-      try { p.photo = await thumbFromFile(f, 480); save(); rerender(); } catch { toast('الصورة ما انفتحت. جرّب صورة ثانية.'); }
+      try { p.photo = await thumbFromFile(f, 480); save(); rerender(); } catch { toast('تعذّر فتح الصورة. جرّب صورة أخرى.'); }
     });
     ['oh-month', 'oh-pieces'].forEach(i => $(i).addEventListener('input', () => { const m = nz(val('oh-month')), n = nz(val('oh-pieces')); $('oh-result').textContent = m && n ? `= ${money(m / n)} على كل قطعة` : 'اكتب الرقمين'; }));
     renderMatHelper(p); renderTimer(p); renderComp(p);
@@ -848,7 +849,7 @@ ACT.openTimer = () => { const d = $('d-timer'); d.open = true; d.scrollIntoView(
 function updateProductResult(p) {
   const r = computeRow(p), t = marginTone(r.realMargin);
   $('pb-price').textContent = r.sellingPrice ? money(r.finalPrice) : '—';
-  $('pb-label').textContent = r.vatRate ? 'بِع القطعة (شامل الضريبة) بـ' : 'بِع القطعة بـ';
+  $('pb-label').textContent = r.vatRate ? 'سعر البيع شامل الضريبة' : 'سعر بيع القطعة';
   $('pb-margin').textContent = r.sellingPrice ? per100(r.realMargin) : '—';
   $('pb-tag').className = 'text-xs font-bold rounded-full px-2 py-0.5 ' + (r.sellingPrice ? t.tag : '');
   $('pb-tag').textContent = r.sellingPrice ? t.label : '';
@@ -856,26 +857,26 @@ function updateProductResult(p) {
   const row = (l, v, cls = '') => `<div class="flex justify-between items-center p-3 ${cls}"><span class="text-gray-600">${l}</span><span class="font-bold num whitespace-nowrap">${v}</span></div>`;
   out.innerHTML = `
     <div class="card p-0 divide-y divide-gray-100">
-      ${row('تكلفة صنع القطعة <span class="text-gray-400 text-sm">(مواد + تعبك + إيجار وكهرباء)</span>', money(r.production))}
+      ${row('تكلفة صنع القطعة <span class="text-gray-400 text-sm">(مواد + جهدك + إيجار وكهرباء)</span>', money(r.production))}
       ${r.shipIn && r.shipping ? row('الشحن', money(r.shipping)) : ''}
       ${row('<b class="text-gray-800">كل التكاليف</b>', money(r.totalCost), 'bg-gray-50')}
       ${r.artValue ? row('قيمة فنية (قطعة فريدة)', money(r.artValue)) : ''}
       ${row('ربحك', `<span class="text-green-700">${money(r.profitValue)}</span>`)}
       ${r.fee ? row('نصيب المتجر أو الدفع', money(r.feeValue)) : ''}
       ${r.vatRate ? row('سعرك قبل الضريبة', money(r.sellingPrice), 'bg-gray-50') : ''}
-      ${r.vatRate ? row(`ضريبة القيمة المضافة ${r.vatRate}% <span class="text-gray-400 text-sm">(تدفعها للهيئة، مو لك)</span>`, money(r.vatValue)) : ''}
+      ${r.vatRate ? row(`ضريبة القيمة المضافة ${r.vatRate}% <span class="text-gray-400 text-sm">(تدفعها للهيئة، وليست لك)</span>`, money(r.vatValue)) : ''}
     </div>
     <div class="bg-craft-700 text-white rounded-2xl p-4">
-      <div class="flex justify-between items-center gap-2"><span class="font-bold">${r.vatRate ? 'بِع القطعة شامل الضريبة بـ' : 'بِع القطعة بـ'}</span><span class="text-2xl font-extrabold num">${r.sellingPrice ? money(r.finalPrice) : '—'}</span></div>
+      <div class="flex justify-between items-center gap-2"><span class="font-bold">${r.vatRate ? 'سعر البيع شامل الضريبة' : 'سعر بيع القطعة'}</span><span class="text-2xl font-extrabold num">${r.sellingPrice ? money(r.finalPrice) : '—'}</span></div>
       ${r.rounded ? `<div class="flex justify-between text-sm text-craft-100 mt-1"><span>أو قرّبه إلى</span><b class="num">${r.rounded} ر.س</b></div>` : ''}
-      ${!r.shipIn && r.shipping ? `<p class="text-sm text-craft-100 mt-2 border-t border-craft-500 pt-2">+ الشحن ${money(r.shipping)} يدفعه الزبون. اكتبها واضحة في الإعلان.</p>` : ''}
+      ${!r.shipIn && r.shipping ? `<p class="text-sm text-craft-100 mt-2 border-t border-craft-500 pt-2">+ الشحن ${money(r.shipping)} يدفعه الزبون. اذكر ذلك بوضوح في الإعلان.</p>` : ''}
     </div>
     <div class="rounded-2xl border p-4 ${t.box}">
       <div class="flex justify-between items-center gap-2">
         <span class="font-bold text-gray-800">${r.vatRate ? 'من كل 100 ريال من سعرك (قبل الضريبة)، ربحك' : 'من كل 100 ريال يدفعها الزبون، ربحك'}</span>
         <span class="flex items-center gap-2"><span class="text-xs font-bold rounded-full px-2 py-0.5 ${r.sellingPrice ? t.tag : ''}">${r.sellingPrice ? t.label : ''}</span><span class="text-xl font-extrabold num ${t.text}">${r.sellingPrice ? per100(r.realMargin) : '—'}</span></span>
       </div>
-      <p class="text-gray-700 mt-1 text-sm leading-relaxed">${r.sellingPrice ? `الزبون يدفع ${money(r.finalPrice)}: ${r.vatRate ? `منها ${money(r.vatValue)} ضريبة توردها لهيئة الزكاة، و` : 'منها '}${money(r.totalCost)} تكاليف${r.fee ? ` و${money(r.feeValue)} للمتجر` : ''}، ويبقى لك ${money(r.profitValue)} ربح.${r.vatRate ? '' : ''}` : 'اكتب تكاليفك عشان يطلع سعرك وربحك.'}</p>
+      <p class="text-gray-700 mt-1 text-sm leading-relaxed">${r.sellingPrice ? `الزبون يدفع ${money(r.finalPrice)}: ${r.vatRate ? `منها ${money(r.vatValue)} ضريبة تورّدها لهيئة الزكاة، و` : 'منها '}${money(r.totalCost)} تكاليف${r.fee ? ` و${money(r.feeValue)} للمتجر` : ''}، ويبقى لك ${money(r.profitValue)} ربح.${r.vatRate ? '' : ''}` : 'اكتب تكاليفك ليظهر سعرك وربحك.'}</p>
     </div>`;
   const tiers = $('tiers-out');
   if (tiers) tiers.innerHTML = r.production ? `
@@ -883,7 +884,7 @@ function updateProductResult(p) {
     <div class="flex justify-between bg-craft-50 rounded-xl p-3"><span>للمحلات</span><b class="num">${money(r.shopPrice)}</b></div>
     <div class="flex justify-between bg-craft-50 rounded-xl p-3"><span>طلبات ${r.bulkMin} قطعة وأكثر (للقطعة)</span><b class="num">${money(r.bulkPrice)}</b></div>
     ${r.vatRate ? `<p class="hint">الأسعار هنا قبل الضريبة. أضف عليها ${r.vatRate}% في الفاتورة.</p>` : ''}
-    ${nz(p.tiers.shop) < 10 || nz(p.tiers.bulk) < 10 ? '<p class="hint text-red-700">ربح أقل من 10% فوق التكلفة يعتبر مخاطرة، أي غلطة بسيطة تخليك تخسر.</p>' : ''}` : '<p class="hint">اكتب التكاليف فوق أول.</p>';
+    ${nz(p.tiers.shop) < 10 || nz(p.tiers.bulk) < 10 ? '<p class="hint text-red-700">الربح الأقل من 10% فوق التكلفة مخاطرة، فأي خطأ بسيط قد يجعلك تخسر.</p>' : ''}` : '<p class="hint">اكتب التكاليف في الأعلى أولاً.</p>';
   renderCompSummary(p);
 }
 
@@ -893,14 +894,14 @@ function renderMatHelper(p) {
   if (!p.matList.length) p.matList.push({ name: '', price: '', pieces: '' });
   const per = p.matList.reduce((a, m) => a + (nz(m.pieces) ? nz(m.price) / nz(m.pieces) : 0), 0);
   box.innerHTML = `
-    <p class="hint mt-0">اكتب كل مادة: بكم شريتها، وكم قطعة تكفي. ونحسب نصيب القطعة.</p>
+    <p class="hint mt-0">اكتب كل مادة: بكم اشتريتها، وكم قطعة تكفي، ونحسب لك نصيب القطعة.</p>
     ${p.matList.map((m, i) => `<div class="grid grid-cols-12 gap-2 items-end">
       <div class="col-span-5">${i === 0 ? '<span class="text-xs font-bold text-gray-600">المادة</span>' : ''}<input class="inp" data-mi="${i}" data-mk="name" value="${esc(m.name)}" placeholder="لفة صوف" aria-label="المادة"></div>
       <div class="col-span-3">${i === 0 ? '<span class="text-xs font-bold text-gray-600">سعرها</span>' : ''}<input class="inp num" type="number" min="0" inputmode="decimal" data-mi="${i}" data-mk="price" value="${esc(m.price)}" placeholder="120" aria-label="سعرها"></div>
-      <div class="col-span-3">${i === 0 ? '<span class="text-xs font-bold text-gray-600">تكفي كم قطعة</span>' : ''}<input class="inp num" type="number" min="0" inputmode="decimal" data-mi="${i}" data-mk="pieces" value="${esc(m.pieces)}" placeholder="8" aria-label="تكفي كم قطعة"></div>
+      <div class="col-span-3">${i === 0 ? '<span class="text-xs font-bold text-gray-600">تكفي لكم قطعة</span>' : ''}<input class="inp num" type="number" min="0" inputmode="decimal" data-mi="${i}" data-mk="pieces" value="${esc(m.pieces)}" placeholder="8" aria-label="تكفي لكم قطعة"></div>
       <button type="button" class="col-span-1 text-gray-400 hover:text-red-600 pb-2" data-act="matDel" data-i="${i}" aria-label="احذف"><i class="fa-solid fa-xmark"></i></button>
     </div>`).join('')}
-    <button type="button" class="btn btn-soft btn-sm" data-act="matAdd"><i class="fa-solid fa-plus"></i> مادة ثانية</button>
+    <button type="button" class="btn btn-soft btn-sm" data-act="matAdd"><i class="fa-solid fa-plus"></i> مادة أخرى</button>
     <div class="flex items-center justify-between gap-2 border-t border-craft-200 pt-2"><span class="font-bold">نصيب القطعة: <span id="mat-per" class="num">${money(per)}</span></span><button type="button" class="btn btn-main btn-sm" data-act="matUse">استخدم الرقم</button></div>`;
   box.oninput = e => {
     const i = e.target.dataset.mi; if (i === undefined) return;
@@ -914,7 +915,7 @@ ACT.matDel = (b) => { const p = prodById(CUR.params.id); p.matList.splice(Number
 ACT.matUse = () => {
   const p = prodById(CUR.params.id);
   const per = p.matList.reduce((a, m) => a + (nz(m.pieces) ? nz(m.price) / nz(m.pieces) : 0), 0);
-  if (!per) { toast('اكتب سعر مادة وكم قطعة تكفي.'); return; }
+  if (!per) { toast('اكتب سعر المادة وعدد القطع التي تكفيها.'); return; }
   p.materials = r2(per); $('p-materials').value = p.materials; $('mat-helper').classList.add('hidden'); save(); updateProductResult(p);
 };
 
@@ -928,10 +929,10 @@ function renderTimer(p) {
   const fmtT = (ms) => { const m = Math.floor(ms / 60000); return `${Math.floor(m / 60)} ساعة و ${m % 60} دقيقة`; };
   const avg = nz(tm.pieces) ? hrs / nz(tm.pieces) : 0;
   box.innerHTML = `
-    <p class="hint mt-0">اضغط "بدأت" لما تبدأ الشغل، و"وقفت" لما تخلص أو ترتاح. المؤقت يكمل حتى لو قفلت الصفحة.</p>
-    <div class="text-center bg-craft-50 rounded-xl p-4"><div class="text-sm text-gray-500 font-bold">وقتك على هالمنتج</div><div id="timer-total" class="text-2xl font-extrabold text-craft-800 num">${fmtT(totalMs)}</div></div>
-    ${tm.running ? `<button type="button" class="btn w-full bg-red-600 hover:bg-red-700 text-white text-lg" data-act="timerStop"><i class="fa-solid fa-stop"></i> وقفت</button>` : `<button type="button" class="btn btn-main w-full text-lg" data-act="timerStart"><i class="fa-solid fa-play"></i> بدأت الشغل</button>`}
-    ${fInput({ id: 'timer-pieces', label: 'كم قطعة خلّصت في هالوقت؟', value: tm.pieces || '', type: 'number', ph: '1' })}
+    <p class="hint mt-0">اضغط "بدأت" عندما تبدأ العمل، و"توقفت" عندما تنتهي أو تستريح. يستمر المؤقت حتى لو أغلقت الصفحة.</p>
+    <div class="text-center bg-craft-50 rounded-xl p-4"><div class="text-sm text-gray-500 font-bold">وقتك على هذا المنتج</div><div id="timer-total" class="text-2xl font-extrabold text-craft-800 num">${fmtT(totalMs)}</div></div>
+    ${tm.running ? `<button type="button" class="btn w-full bg-red-600 hover:bg-red-700 text-white text-lg" data-act="timerStop"><i class="fa-solid fa-stop"></i> توقفت</button>` : `<button type="button" class="btn btn-main w-full text-lg" data-act="timerStart"><i class="fa-solid fa-play"></i> بدأت العمل</button>`}
+    ${fInput({ id: 'timer-pieces', label: 'كم قطعة أنجزت في هذا الوقت؟', value: tm.pieces || '', type: 'number', ph: '1' })}
     ${avg ? `<div class="flex items-center justify-between gap-2 bg-craft-50 rounded-xl p-3"><span>متوسط القطعة: <b class="num">${r2(avg)} ساعة</b></span><button type="button" class="btn btn-main btn-sm" data-act="timerUse">استخدمه في السعر</button></div>` : ''}
     ${tm.sessions.length ? `<button type="button" class="btn btn-soft btn-sm" data-act="timerReset">صفّر المؤقت</button>` : ''}`;
   $('timer-pieces').addEventListener('change', e => { tm.pieces = e.target.value; save(); renderTimer(p); });
@@ -944,7 +945,7 @@ ACT.timerReset = () => { const p = prodById(CUR.params.id); p.timer = { sessions
 ACT.timerUse = () => {
   const p = prodById(CUR.params.id), tm = p.timer;
   const hrs = tm.sessions.reduce((a, s) => a + (s.e - s.s), 0) / 3600000 / nz(tm.pieces);
-  p.hours = r2(hrs); $('p-hours').value = p.hours; save(); updateProductResult(p); toast('انحسب وقتك في السعر ✅', true);
+  p.hours = r2(hrs); $('p-hours').value = p.hours; save(); updateProductResult(p); toast('أُضيف وقتك إلى السعر ✅', true);
 };
 
 /* مقارنة بأسعار السوق */
@@ -952,11 +953,11 @@ function renderComp(p) {
   const box = $('comp-box'); if (!box) return;
   if (!p.competitors.length) p.competitors = ['', ''];
   box.innerHTML = `
-    <p class="hint mt-0">شفت منتجات شبهك في السوق أو الانستقرام؟ اكتب أسعارها، ونقول لك وين سعرك منها.</p>
+    <p class="hint mt-0">رأيت منتجات تشبه منتجك في السوق أو في إنستغرام؟ اكتب أسعارها، ونخبرك أين يقع سعرك منها.</p>
     <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">${p.competitors.map((c, i) => `<input class="inp num" type="number" min="0" inputmode="decimal" data-ci="${i}" value="${esc(c)}" placeholder="سعر ${i + 1}" aria-label="سعر منافس ${i + 1}">`).join('')}</div>
-    ${p.competitors.length < 6 ? '<button type="button" class="btn btn-soft btn-sm" data-act="compAdd"><i class="fa-solid fa-plus"></i> سعر ثاني</button>' : ''}
+    ${p.competitors.length < 6 ? '<button type="button" class="btn btn-soft btn-sm" data-act="compAdd"><i class="fa-solid fa-plus"></i> سعر آخر</button>' : ''}
     <div id="comp-sum"></div>
-    <button type="button" class="btn btn-soft w-full" id="btn-comp" data-act="compAI">وش رأي المساعد؟</button>
+    <button type="button" class="btn btn-soft w-full" id="btn-comp" data-act="compAI">ما رأي المساعد؟</button>
     <div id="out-comp" class="hidden"></div>`;
   box.oninput = e => { const i = e.target.dataset.ci; if (i === undefined) return; p.competitors[i] = e.target.value; save(); renderCompSummary(p); };
   renderCompSummary(p);
@@ -966,7 +967,7 @@ function renderCompSummary(p) {
   const xs = p.competitors.map(nz).filter(Boolean);
   if (!xs.length) { el.innerHTML = ''; return; }
   const mn = Math.min(...xs), mx = Math.max(...xs), avg = xs.reduce((a, b) => a + b, 0) / xs.length, mine = computeRow(p).finalPrice;
-  const pos = mine < mn ? 'سعرك أرخص من الكل. تأكد إنك ما تبخس شغلك.' : mine > mx ? 'سعرك أغلى من الكل. لازم صورك ووصفك يوضحون ليش منتجك يستاهل.' : mine <= avg ? 'سعرك في الوسط، أقل من المتوسط شوي.' : 'سعرك في الوسط، أعلى من المتوسط شوي.';
+  const pos = mine < mn ? 'سعرك أرخص من الجميع. تأكد أنك لا تبخس عملك حقه.' : mine > mx ? 'سعرك أغلى من الجميع. يجب أن توضّح صورك ووصفك لماذا يستحق منتجك هذا السعر.' : mine <= avg ? 'سعرك في الوسط، وأقل من المتوسط قليلاً.' : 'سعرك في الوسط، وأعلى من المتوسط قليلاً.';
   const pct = mx > mn ? Math.min(100, Math.max(0, (mine - mn) / (mx - mn) * 100)) : 50;
   el.innerHTML = `<div class="bg-craft-50 rounded-xl p-3 space-y-2">
     <div class="flex justify-between text-sm"><span>أرخص: <b class="num">${money(mn)}</b></span><span>المتوسط: <b class="num">${money(avg)}</b></span><span>أغلى: <b class="num">${money(mx)}</b></span></div>
@@ -977,17 +978,17 @@ ACT.compAdd = () => { const p = prodById(CUR.params.id); p.competitors.push('');
 ACT.compAI = (b) => {
   const p = prodById(CUR.params.id); const xs = p.competitors.map(nz).filter(Boolean);
   if (!xs.length) { toast('اكتب سعر منتج منافس واحد على الأقل.'); return; }
-  aiRun({ prompt: rules() + '\n\n' + productContext(p) + `\n\nأسعار منتجات مشابهة شافها الحرفي في السوق: ${xs.join('، ')} ريال.\n\nالمطلوب: في أقل من 120 كلمة وبكلام بسيط: وين سعره من السوق؟ هل يرفع أو ينزل أو يثبت؟ وكيف يقنع الزبون إن منتجه يستاهل سعره (3 نقاط عملية).`, outId: 'out-comp', btn: b, kind: 'competitors', productId: p.id });
+  aiRun({ prompt: rules() + '\n\n' + productContext(p) + `\n\nأسعار منتجات مشابهة رآها الحرفي في السوق: ${xs.join('، ')} ريال.\n\nالمطلوب: في أقل من 120 كلمة وبأسلوب بسيط: أين يقع سعره من السوق؟ هل يرفعه أم يخفضه أم يبقيه؟ وكيف يقنع الزبون بأن منتجه يستحق سعره (3 نقاط عملية).`, outId: 'out-comp', btn: b, kind: 'competitors', productId: p.id });
 };
 ACT.priceReview = (b) => {
   const p = prodById(b.dataset.id);
-  aiRun({ prompt: rules() + '\n\n' + productContext(p) + '\n\nالمطلوب: قل للحرفي رأيك في سعره في أقل من 130 كلمة وبكلام بسيط: هل ربحه زين لهذا النوع من المنتجات؟ هل نسي تكلفة مهمة؟ اقترح 3 أسعار (أقل سعر – سعر مناسب – سعر للقطع المميزة) بالريال مع سبب قصير لكل واحد، ونصيحة وحدة تخلي الزبون يشوف منتجه أغلى.', outId: 'out-review', btn: b, kind: 'price_review', productId: p.id });
+  aiRun({ prompt: rules() + '\n\n' + productContext(p) + '\n\nالمطلوب: أخبر الحرفي برأيك في سعره في أقل من 130 كلمة وبأسلوب بسيط: هل ربحه جيد لهذا النوع من المنتجات؟ هل نسي تكلفة مهمة؟ اقترح 3 أسعار (أقل سعر – سعر مناسب – سعر للقطع المميزة) بالريال مع سبب قصير لكل منها، ونصيحة واحدة تجعل الزبون يرى منتجه أعلى قيمة.', outId: 'out-review', btn: b, kind: 'price_review', productId: p.id });
 };
 ACT.askDelete = (b) => {
-  $('del-zone').innerHTML = `<div class="card border-red-200 bg-red-50 space-y-2"><p class="font-bold text-red-800">متأكد تبي تحذف المنتج؟ ما تقدر ترجعه.</p><div class="grid grid-cols-2 gap-2"><button type="button" class="btn bg-red-600 text-white" data-act="doDelete" data-id="${b.dataset.id}">نعم، احذفه</button><button type="button" class="btn btn-soft" data-act="cancelDelete" data-id="${b.dataset.id}">لا، خله</button></div></div>`;
+  $('del-zone').innerHTML = `<div class="card border-red-200 bg-red-50 space-y-2"><p class="font-bold text-red-800">هل أنت متأكد من حذف المنتج؟ لا يمكن استرجاعه.</p><div class="grid grid-cols-2 gap-2"><button type="button" class="btn bg-red-600 text-white" data-act="doDelete" data-id="${b.dataset.id}">نعم، احذفه</button><button type="button" class="btn btn-soft" data-act="cancelDelete" data-id="${b.dataset.id}">لا، أبقِه</button></div></div>`;
 };
 ACT.cancelDelete = (b) => { $('del-zone').innerHTML = `<button type="button" class="btn w-full text-red-700 hover:bg-red-50" data-act="askDelete" data-id="${b.dataset.id}"><i class="fa-solid fa-trash"></i> احذف المنتج</button>`; };
-ACT.doDelete = (b) => { S.products = S.products.filter(p => p.id !== b.dataset.id); save(); toast('انحذف المنتج', true); go('products'); };
+ACT.doDelete = (b) => { S.products = S.products.filter(p => p.id !== b.dataset.id); save(); toast('تم حذف المنتج', true); go('products'); };
 
 /* تصغير صورة إلى صورة مصغّرة محفوظة */
 function thumbFromFile(file, max = 480, quality = 0.8) {
@@ -1011,7 +1012,7 @@ ROUTES.savedTexts = {
     return screen({
       title: 'نصوصي المحفوظة', sub: 'كل وصف أو خطة أو رد حفظته من المساعد.', back: 'more',
       body: S.texts.length ? `<div class="space-y-2">${S.texts.map(t => `<button type="button" class="card w-full text-start hover:bg-craft-50" ${goP('savedText', { id: t.id })}><div class="text-xs text-craft-600 font-bold">${esc(t.title)}${t.productId && prodById(t.productId) ? ' · ' + esc(prodById(t.productId).name) : ''} · ${fmtDay(t.at)}</div><div class="text-gray-700 mt-1 line-clamp-2">${esc(plain(t.text).slice(0, 160))}</div></button>`).join('')}</div>`
-        : '<div class="card text-center text-gray-500 py-8">ما حفظت شي للحين. اضغط "احفظ" تحت أي رد من المساعد.</div>',
+        : '<div class="card text-center text-gray-500 py-8">لم تحفظ شيئاً بعد. اضغط "احفظ" تحت أي رد من المساعد.</div>',
     });
   },
 };
@@ -1045,18 +1046,18 @@ ROUTES.home = {
       <div class="rounded-2xl bg-craft-700 text-white p-5 relative overflow-hidden">
         <div class="absolute inset-x-0 bottom-0 h-2" style="background:repeating-linear-gradient(90deg,#9e2b25 0 14px,#f3e6d0 14px 28px,#1f1a17 28px 42px)"></div>
         <div class="text-craft-200 font-bold">${greet}</div>
-        <div class="text-2xl font-extrabold mt-1">هلا ${esc(p.name || 'بالحرفي')} 👋</div>
+        <div class="text-2xl font-extrabold mt-1">أهلاً ${esc(p.name || 'بك')} 👋</div>
         ${p.craft ? `<div class="text-craft-100 mt-1">${esc(p.craft)}${p.region ? ' · ' + esc(p.region) : ''}</div>` : ''}
       </div>
-      <h2 class="text-xl font-extrabold text-craft-800">وش تبي تسوي اليوم؟</h2>
+      <h2 class="text-xl font-extrabold text-craft-800">ماذا تريد أن تفعل اليوم؟</h2>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <button type="button" class="big-action" data-act="${S.products.length ? 'goProducts' : 'newProduct'}"><span class="ic bg-amber-100 text-amber-700"><i class="fa-solid fa-coins"></i></span><span>أسعّر منتج<span class="block text-sm font-medium text-gray-500">بكم أبيع وكم ربحي؟</span></span></button>
-        <button type="button" class="big-action" data-go="description"><span class="ic bg-blue-100 text-blue-700"><i class="fa-solid fa-pen-nib"></i></span><span>أكتب إعلان<span class="block text-sm font-medium text-gray-500">وصف جاهز للنشر</span></span></button>
-        <button type="button" class="big-action" data-go="photographer"><span class="ic bg-purple-100 text-purple-700"><i class="fa-solid fa-wand-magic-sparkles"></i></span><span>أصوّر منتجي<span class="block text-sm font-medium text-gray-500">صورة إعلانية من صورة جوالك</span></span></button>
-        <button type="button" class="big-action" data-go="chat"><span class="ic bg-green-100 text-green-700"><i class="fa-solid fa-comments"></i></span><span>أستشير المساعد<span class="block text-sm font-medium text-gray-500">أي سؤال عن شغلك ومشروعك</span></span></button>
+        <button type="button" class="big-action" data-act="${S.products.length ? 'goProducts' : 'newProduct'}"><span class="ic bg-amber-100 text-amber-700"><i class="fa-solid fa-coins"></i></span><span>تسعير منتج<span class="block text-sm font-medium text-gray-500">بكم أبيع؟ وكم ربحي؟</span></span></button>
+        <button type="button" class="big-action" data-go="description"><span class="ic bg-blue-100 text-blue-700"><i class="fa-solid fa-pen-nib"></i></span><span>كتابة إعلان<span class="block text-sm font-medium text-gray-500">وصف جاهز للنشر</span></span></button>
+        <button type="button" class="big-action" data-go="photographer"><span class="ic bg-purple-100 text-purple-700"><i class="fa-solid fa-wand-magic-sparkles"></i></span><span>تصوير منتجي<span class="block text-sm font-medium text-gray-500">صورة إعلانية من صورة جوالك</span></span></button>
+        <button type="button" class="big-action" data-go="chat"><span class="ic bg-green-100 text-green-700"><i class="fa-solid fa-comments"></i></span><span>استشارة المساعد<span class="block text-sm font-medium text-gray-500">أي سؤال عن عملك ومشروعك</span></span></button>
       </div>
       ${cards.join('')}
-      <button type="button" class="card w-full text-start flex items-center gap-3 hover:bg-craft-50" data-go="feedback"><i class="fa-solid fa-comment-dots text-2xl text-craft-500"></i><span><b class="text-craft-800">رأيك يهمنا</b><span class="block text-sm text-gray-500">قل لنا وش عجبك ووش صعب عليك.</span></span></button>
+      <button type="button" class="card w-full text-start flex items-center gap-3 hover:bg-craft-50" data-go="feedback"><i class="fa-solid fa-comment-dots text-2xl text-craft-500"></i><span><b class="text-craft-800">رأيك يهمنا</b><span class="block text-sm text-gray-500">أخبرنا بما أعجبك وما صعب عليك.</span></span></button>
     </div>`;
   },
   after() { if (!S.settings.onboarded) ROUTES.onboard.after({ first: true }); },
@@ -1069,22 +1070,22 @@ ROUTES.onboard = {
   render({ first }) {
     const p = S.profile;
     return `<div class="fade-in space-y-4">
-      ${first ? `<div class="rounded-2xl bg-craft-700 text-white p-5"><div class="text-2xl font-extrabold">هلا والله 👋</div><p class="text-craft-100 mt-2 leading-relaxed">${esc(CONFIG.orgAbout)}</p><p class="text-craft-100 mt-2">عرّفنا عليك في دقيقة، عشان نعطيك نصايح تناسبك.</p></div>`
-      : screen({ title: 'ملفي', sub: 'معلوماتك تساعد المساعد يعطيك نصايح تناسبك.', back: 'more' })}
+      ${first ? `<div class="rounded-2xl bg-craft-700 text-white p-5"><div class="text-2xl font-extrabold">أهلاً وسهلاً 👋</div><p class="text-craft-100 mt-2 leading-relaxed">${esc(CONFIG.orgAbout)}</p><p class="text-craft-100 mt-2">عرّفنا بنفسك في دقيقة، لنقدم لك نصائح تناسبك.</p></div>`
+      : screen({ title: 'ملفي', sub: 'معلوماتك تساعد المساعد على تقديم نصائح تناسبك.', back: 'more' })}
       <div class="card space-y-4">
-        ${fInput({ id: 'o-name', label: 'وش نناديك؟', value: p.name, ph: 'مثال: أم محمد' })}
-        ${fInput({ id: 'o-craft', label: 'وش حرفتك أو شغلك؟', value: p.craft, ph: 'مثال: خوص، سدو، فخار، حلويات' })}
+        ${fInput({ id: 'o-name', label: 'بماذا نناديك؟', value: p.name, ph: 'مثال: أم محمد' })}
+        ${fInput({ id: 'o-craft', label: 'ما حرفتك أو عملك؟', value: p.craft, ph: 'مثال: خوص، سدو، فخار، حلويات' })}
         ${fSelect({ id: 'o-cat', label: 'التصنيف', options: CATEGORIES, value: p.category })}
         ${fSelect({ id: 'o-region', label: 'منطقتك', options: [['', 'اختر'], ...REGIONS], value: p.region })}
-        ${fInput({ id: 'o-store', label: 'اسم متجرك أو حسابك (إذا عندك)', value: p.store, ph: 'مثال: سدو الديرة' })}
+        ${fInput({ id: 'o-store', label: 'اسم متجرك أو حسابك (إن وُجد)', value: p.store, ph: 'مثال: سدو الديرة' })}
         <div class="grid grid-cols-2 gap-3">
           ${fInput({ id: 'o-wa', label: 'رقم الواتساب (اختياري)', value: p.whatsapp, ph: '05xxxxxxxx', type: 'tel' })}
-          ${fInput({ id: 'o-handle', label: 'حسابك في انستقرام (اختياري)', value: p.handle, ph: '@sadu.home' })}
+          ${fInput({ id: 'o-handle', label: 'حسابك في إنستغرام (اختياري)', value: p.handle, ph: '@sadu.home' })}
         </div>
-        <p class="hint">رقمك وحسابك يدخلون في النصوص اللي يكتبها المساعد لك، مثل الإعلانات والردود.</p>
+        <p class="hint">يستخدم المساعد رقمك وحسابك في النصوص التي يكتبها لك، مثل الإعلانات والردود.</p>
       </div>
-      <button type="button" class="btn btn-main w-full text-lg" data-act="saveProfile" data-first="${first ? 1 : ''}">${first ? 'يلا نبدأ' : 'احفظ'}</button>
-      ${first ? '<button type="button" class="btn w-full text-craft-600" data-act="skipOnboard">بعدين</button>' : ''}
+      <button type="button" class="btn btn-main w-full text-lg" data-act="saveProfile" data-first="${first ? 1 : ''}">${first ? 'لنبدأ' : 'احفظ'}</button>
+      ${first ? '<button type="button" class="btn w-full text-craft-600" data-act="skipOnboard">لاحقاً</button>' : ''}
     </div>`;
   },
   after() {},
@@ -1092,7 +1093,7 @@ ROUTES.onboard = {
 ACT.saveProfile = (btn) => {
   Object.assign(S.profile, { name: val('o-name'), craft: val('o-craft'), category: val('o-cat'), region: val('o-region'), store: val('o-store'), whatsapp: val('o-wa'), handle: val('o-handle') });
   S.settings.onboarded = true; save(); queueFeedback();
-  toast('انحفظ ✅', true);
+  toast('تم الحفظ ✅', true);
   go(btn.dataset.first ? 'home' : 'more');
 };
 ACT.skipOnboard = () => { S.settings.onboarded = true; save(); go('home'); };
@@ -1118,15 +1119,15 @@ ROUTES.market = {
   render() {
     const item = (r, icon, tone, label, sub) => has(r) ? `<button type="button" class="big-action" data-go="${r}"><span class="ic ${tone}"><i class="fa-solid ${icon}"></i></span><span>${label}<span class="block text-sm font-medium text-gray-500">${sub}</span></span></button>` : '';
     return screen({
-      title: 'مستشار التسويق', sub: 'المساعد يكتب لك ويخطط معك، وأنت تنسخ وتنشر.',
+      title: 'مستشار التسويق', sub: 'يكتب المساعد لك ويخطط معك، وأنت تنسخ وتنشر.',
       body: `<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         ${item('photographer', 'fa-wand-magic-sparkles', 'bg-purple-100 text-purple-700', 'المصوّر الذكي', 'صورة إعلانية لمنتجك')}
-        ${item('description', 'fa-pen-nib', 'bg-blue-100 text-blue-700', 'وصف المنتج', 'وصف يبيع، جاهز للنشر')}
-        ${item('marketing', 'fa-bullhorn', 'bg-amber-100 text-amber-700', 'خطة تسويق', 'وش تسوي هذا الشهر')}
-        ${item('replies', 'fa-reply', 'bg-green-100 text-green-700', 'الرد على الزبائن', 'ردود جاهزة للمفاصلة والأسئلة')}
+        ${item('description', 'fa-pen-nib', 'bg-blue-100 text-blue-700', 'وصف المنتج', 'وصف جذاب جاهز للنشر')}
+        ${item('marketing', 'fa-bullhorn', 'bg-amber-100 text-amber-700', 'خطة تسويق', 'ماذا تفعل هذا الشهر')}
+        ${item('replies', 'fa-reply', 'bg-green-100 text-green-700', 'الرد على الزبائن', 'ردود جاهزة على المساومة والأسئلة')}
         ${item('occasions', 'fa-calendar-days', 'bg-rose-100 text-rose-700', 'المناسبات', 'منشورات قبل كل مناسبة')}
-        ${item('story', 'fa-book-open', 'bg-craft-100 text-craft-700', 'قصتي', 'بايو وقصة قصيرة لك')}
-        ${item('ideas', 'fa-lightbulb', 'bg-yellow-100 text-yellow-700', 'أفكار منتجات', 'منتجات جديدة بنفس مهارتك')}
+        ${item('story', 'fa-book-open', 'bg-craft-100 text-craft-700', 'قصتي', 'نبذة وقصة قصيرة عنك')}
+        ${item('ideas', 'fa-lightbulb', 'bg-yellow-100 text-yellow-700', 'أفكار منتجات', 'منتجات جديدة بمهارتك نفسها')}
         ${item('logo', 'fa-signature', 'bg-slate-100 text-slate-700', 'اسم وشعار', 'اسم لمتجرك وشعار نصي')}
       </div>`,
     });
@@ -1143,13 +1144,13 @@ ROUTES.dataPage = {
       body: `
       <div class="card ${synced ? 'bg-green-50 border-green-200' : 'bg-amber-50 border-amber-200'}">
         <div class="font-extrabold ${synced ? 'text-green-800' : 'text-amber-900'}"><i class="fa-solid ${synced ? 'fa-cloud' : 'fa-mobile-screen'} ml-1"></i> ${synced ? 'بياناتك محفوظة في حسابك' : 'بياناتك محفوظة في هذا الجهاز فقط'}</div>
-        <p class="text-gray-700 mt-1 leading-relaxed">${synced ? 'منتجاتك ونصوصك المحفوظة تلحقك على أي جهاز تفتح منه الرابط بنفس حسابك. ما أحد غيرك يشوفها.' : 'إذا غيّرت جوالك أو مسحت بيانات المتصفح، تضيع. احفظ نسخة احتياطية من تحت بين فترة وثانية.'}</p>
+        <p class="text-gray-700 mt-1 leading-relaxed">${synced ? 'منتجاتك ونصوصك المحفوظة متاحة لك على أي جهاز تدخل منه بحسابك نفسه، ولا يراها أحد غيرك.' : 'إذا غيّرت جوالك أو مسحت بيانات المتصفح فستضيع. احفظ نسخة احتياطية من الأسفل بين حين وآخر.'}</p>
       </div>
       <div class="card space-y-3">
         <div class="font-extrabold text-craft-800">نسخة احتياطية</div>
-        <p class="hint mt-0">ملف فيه كل بياناتك. تقدر ترجعها منه على أي جهاز.</p>
+        <p class="hint mt-0">ملف يحتوي على جميع بياناتك، ويمكنك استرجاعها منه على أي جهاز.</p>
         <button type="button" class="btn btn-main w-full" data-act="backup"><i class="fa-solid fa-download"></i> احفظ نسخة احتياطية</button>
-        <label for="restore-file" class="btn btn-soft w-full cursor-pointer"><i class="fa-solid fa-upload"></i> رجّع من نسخة احتياطية</label>
+        <label for="restore-file" class="btn btn-soft w-full cursor-pointer"><i class="fa-solid fa-upload"></i> استرجع من نسخة احتياطية</label>
         <input type="file" id="restore-file" accept=".json,application/json" class="hidden">
       </div>
       <div class="card grid grid-cols-3 gap-2 text-center">
@@ -1165,25 +1166,25 @@ ROUTES.dataPage = {
       try {
         const d = JSON.parse(await f.text());
         if (!d || d.v !== 2) throw 0;
-        S = Object.assign(DEFAULT_STATE(), d); S.updatedAt = Date.now(); save(); applyScale(); toast('رجعت بياناتك ✅', true); go('home');
-      } catch { toast('الملف هذا مو نسخة احتياطية من المنصة.'); }
+        S = Object.assign(DEFAULT_STATE(), d); S.updatedAt = Date.now(); save(); applyScale(); toast('تم استرجاع بياناتك ✅', true); go('home');
+      } catch { toast('هذا الملف ليس نسخة احتياطية من المنصة.'); }
     });
   },
 };
-ACT.backup = () => offerFile(`نسخة_المنصة_${todayStr()}.json`, new Blob([JSON.stringify(S)], { type: 'application/json' }), 'انحفظت النسخة ✅');
+ACT.backup = () => offerFile(`نسخة_المنصة_${todayStr()}.json`, new Blob([JSON.stringify(S)], { type: 'application/json' }), 'تم حفظ النسخة ✅');
 
 /* ---------- الخصوصية ومن نحن ---------- */
 ROUTES.privacy = {
   nav: 'more',
   render() {
     return screen({
-      title: 'الخصوصية', sub: 'باختصار وبكلام واضح.', back: 'more',
+      title: 'الخصوصية', sub: 'باختصار ووضوح.', back: 'more',
       body: `<div class="card space-y-3 leading-relaxed">
-        <p><b>منتجاتك وأسعارك ونصوصك المحفوظة:</b> تنحفظ في جهازك وفي حسابك على خوادم محمية، عشان تلحقك على أي جهاز. ما يشوفها حرفي ثاني، وإدارة المنصة ما تطّلع عليها إلا إذا طلبت منها مساعدة أو ألزم نظام بذلك.</p>
-        <p><b>اللي يوصل لإدارة المنصة:</b> رأيك إذا أرسلته، وإجاباتك على أسئلة قياس الفايدة، وعدد مرات استخدام كل أداة (بدون محتوى ما تكتبه)، وحرفتك ومنطقتك واسمك اللي كتبته في ملفك.</p>
-        <p><b>المساعد الذكي والمصوّر الذكي:</b> لما تستخدمهم، يوصل سؤالك وبيانات المنتج أو الصورة اللي ترفعها لمزود الذكاء الاصطناعي عشان يجاوبك، وكل طلب ينحسب من رصيدك الشهري.</p>
-        <p><b>الدفع:</b> بيانات بطاقتك تروح لبوابة ميسّر مباشرة، وما نحفظها عندنا.</p>
-        <p><b>تبي تمسح بياناتك؟</b> كلّمنا من <a class="underline" href="/contact.html">صفحة التواصل</a>.</p>
+        <p><b>منتجاتك وأسعارك ونصوصك المحفوظة:</b> تُحفظ في جهازك وفي حسابك على خوادم محمية، لتصل إليها من أي جهاز. لا يراها أي حرفي آخر، ولا تطّلع عليها إدارة المنصة إلا إذا طلبت منها المساعدة أو ألزمها نظام بذلك.</p>
+        <p><b>ما يصل إلى إدارة المنصة:</b> رأيك إذا أرسلته، وعدد مرات استخدام كل أداة (دون محتوى ما تكتبه)، وحرفتك ومنطقتك واسمك الذي كتبته في ملفك.</p>
+        <p><b>المساعد الذكي والمصوّر الذكي:</b> عند استخدامهما يصل سؤالك وبيانات المنتج أو الصورة التي ترفعها إلى مزود الذكاء الاصطناعي ليجيبك، ويُحسب كل طلب من رصيدك الشهري.</p>
+        <p><b>الدفع:</b> تذهب بيانات بطاقتك إلى بوابة ميسّر مباشرة، ولا نحفظها لدينا.</p>
+        <p><b>تريد حذف بياناتك؟</b> راسلنا من <a class="underline" href="/contact.html">صفحة التواصل</a>.</p>
         <a class="btn btn-soft w-full" href="/privacy.html">سياسة الخصوصية كاملة</a>
       </div>`,
     });
@@ -1198,8 +1199,8 @@ ROUTES.about = {
         <div class="text-xl font-extrabold text-craft-800">${esc(CONFIG.platformName)}</div>
         <p>${esc(CONFIG.orgAbout)}</p>
         ${CONFIG.supportedBy ? `<p>المنصة بدعم <b>${esc(CONFIG.supportedBy)}</b>.</p>` : ''}
-        <p class="hint">المساعد الذكي في المنصة يعمل بـ Claude، والمصوّر الذكي بـ Gemini. نصايحهم تقديرية، راجع الأسعار قبل ما تعتمدها.</p>
-        ${CONFIG.contactWhatsapp ? `<a class="btn btn-wa w-full" target="_blank" rel="noopener" href="${esc(waLink('السلام عليكم، عندي سؤال عن المنصة', CONFIG.contactWhatsapp))}"><i class="fa-brands fa-whatsapp"></i> كلّم إدارة المنصة</a>` : ''}
+        <p class="hint">المساعد الذكي في المنصة يعمل بـ Claude، والمصوّر الذكي بـ Gemini. ونصائحهما تقديرية، فراجع الأسعار قبل اعتمادها.</p>
+        ${CONFIG.contactWhatsapp ? `<a class="btn btn-wa w-full" target="_blank" rel="noopener" href="${esc(waLink('السلام عليكم، لدي سؤال عن المنصة', CONFIG.contactWhatsapp))}"><i class="fa-brands fa-whatsapp"></i> تواصل مع إدارة المنصة</a>` : ''}
       </div>`,
     });
   },
@@ -1211,14 +1212,14 @@ ROUTES.feedback = {
   nav: 'more',
   render() {
     return screen({
-      title: 'ساعدنا نطوّر المنصة', sub: 'دقيقة وحدة من وقتك تفرق معنا كثير.', back: 'more',
+      title: 'ساعدنا في تطوير المنصة', sub: 'دقيقة واحدة من وقتك تُحدث فرقاً كبيراً.', back: 'more',
       body: `<div class="card space-y-4" id="fb-form">
         <div><span class="lbl">كيف تقيّم تجربتك؟</span><div id="fb-stars" class="flex gap-1">${[1, 2, 3, 4, 5].map(n => `<button type="button" class="star" data-star="${n}" aria-label="${n} من 5">★</button>`).join('')}</div></div>
-        <div><span class="lbl">أكثر أداة فادتك؟ <span class="font-normal text-gray-500 text-sm">(اختر أكثر من وحدة)</span></span><div class="flex flex-wrap gap-2" id="fb-tools">${FB_TOOLS.map(([k, l]) => `<button type="button" class="chip" data-tool="${k}" aria-pressed="false">${l}</button>`).join('')}</div></div>
-        ${fText({ id: 'fb-hard', label: 'وش اللي صعب عليك أو ما فهمته؟', ph: 'مثال: ما عرفت وش أكتب في الإيجار والكهرباء' })}
-        ${fText({ id: 'fb-idea', label: 'وش تتمنى نضيف للمنصة؟', ph: 'أي فكرة تسهّل شغلك' })}
+        <div><span class="lbl">ما الأدوات الأكثر فائدة لك؟ <span class="font-normal text-gray-500 text-sm">(يمكنك اختيار أكثر من أداة)</span></span><div class="flex flex-wrap gap-2" id="fb-tools">${FB_TOOLS.map(([k, l]) => `<button type="button" class="chip" data-tool="${k}" aria-pressed="false">${l}</button>`).join('')}</div></div>
+        ${fText({ id: 'fb-hard', label: 'ما الذي صعب عليك أو لم تفهمه؟', ph: 'مثال: لم أعرف ماذا أكتب في الإيجار والكهرباء' })}
+        ${fText({ id: 'fb-idea', label: 'ماذا تتمنى أن نضيف إلى المنصة؟', ph: 'أي فكرة تسهّل عملك' })}
         ${fInput({ id: 'fb-name', label: 'اسمك (اختياري)', value: S.profile.name })}
-        <p class="hint">رأيك يوصل لإدارة المنصة فقط.</p>
+        <p class="hint">يصل رأيك إلى إدارة المنصة فقط.</p>
         <button type="button" class="btn btn-main w-full text-lg" data-act="sendFeedback">أرسل رأيي</button>
       </div><div id="fb-result"></div>`,
     });
@@ -1233,7 +1234,7 @@ ROUTES.feedback = {
 ACT.sendFeedback = async (btn) => {
   const st = ROUTES.feedback._st;
   const entry = { at: new Date().toISOString(), rating: st.rating, tools: [...st.tools], hard: val('fb-hard').slice(0, 1500), idea: val('fb-idea').slice(0, 1500), name: val('fb-name').slice(0, 80) };
-  if (!entry.rating && !entry.hard && !entry.idea && !entry.tools.length) { toast('اختر نجوم أو اكتب رأيك أول.'); return; }
+  if (!entry.rating && !entry.hard && !entry.idea && !entry.tools.length) { toast('اختر عدد النجوم أو اكتب رأيك أولاً.'); return; }
   btn.disabled = true; btn.textContent = 'لحظة…';
   S.feedback.push(entry); saveLocal();
   let ok = false;
@@ -1241,8 +1242,8 @@ ACT.sendFeedback = async (btn) => {
   $('fb-form').classList.add('hidden');
   const tl = Object.fromEntries(FB_TOOLS);
   $('fb-result').innerHTML = ok
-    ? `<div class="card text-center py-8 space-y-2"><div class="text-5xl">🌟</div><p class="font-extrabold text-craft-800 text-lg">وصلنا رأيك، شكراً لك</p><p class="text-gray-500">تقدر ترسل رأي جديد في أي وقت بعد ما تجرب أكثر.</p><button type="button" class="btn btn-main mt-2" data-go="home">رجوع للرئيسية</button></div>`
-    : `<div class="card space-y-3"><p class="font-extrabold text-craft-800">ما قدرنا نرسل رأيك من هنا</p><p class="text-gray-600">انسخه وأرسله لصاحب المنصة على واتساب.</p><div id="fb-text" class="bg-gray-50 border rounded-xl p-3 whitespace-pre-wrap text-sm">${esc(`رأيي في ${CONFIG.platformName}\nالتقييم: ${entry.rating ? '★'.repeat(entry.rating) : '—'}\nأكثر أداة فادتني: ${entry.tools.map(t => tl[t]).join('، ') || '—'}\nاللي صعب علي: ${entry.hard || '—'}\nاللي أتمنى تضيفونه: ${entry.idea || '—'}${entry.name ? '\nالاسم: ' + entry.name : ''}`)}</div><button type="button" class="btn btn-main w-full" data-act="copyFb"><i class="fa-regular fa-copy"></i> انسخ رأيي</button></div>`;
+    ? `<div class="card text-center py-8 space-y-2"><div class="text-5xl">🌟</div><p class="font-extrabold text-craft-800 text-lg">وصلنا رأيك، شكراً لك</p><p class="text-gray-500">يمكنك إرسال رأي جديد في أي وقت بعد أن تجرب أكثر.</p><button type="button" class="btn btn-main mt-2" data-go="home">العودة إلى الرئيسية</button></div>`
+    : `<div class="card space-y-3"><p class="font-extrabold text-craft-800">تعذّر إرسال رأيك من هنا</p><p class="text-gray-600">انسخه وأرسله إلى صاحب المنصة عبر واتساب.</p><div id="fb-text" class="bg-gray-50 border rounded-xl p-3 whitespace-pre-wrap text-sm">${esc(`رأيي في ${CONFIG.platformName}\nالتقييم: ${entry.rating ? '★'.repeat(entry.rating) : '—'}\nالأدوات الأكثر فائدة: ${entry.tools.map(t => tl[t]).join('، ') || '—'}\nما صعب علي: ${entry.hard || '—'}\nما أتمنى إضافته: ${entry.idea || '—'}${entry.name ? '\nالاسم: ' + entry.name : ''}`)}</div><button type="button" class="btn btn-main w-full" data-act="copyFb"><i class="fa-regular fa-copy"></i> انسخ رأيي</button></div>`;
 };
 ACT.copyFb = () => copyText($('fb-text').textContent);
 
@@ -1264,15 +1265,15 @@ ROUTES.description = {
   render({ productId }) {
     const p = prodById(productId || S.settings.lastProduct) || null;
     return screen({
-      title: 'كلام يبيع منتجك', sub: 'المساعد يكتب لك وصف جاهز تنسخه وتنشره، أو ترسله على واتساب.', back: 'market',
+      title: 'وصف يبيع منتجك', sub: 'يكتب لك المساعد وصفاً جاهزاً تنسخه وتنشره، أو ترسله عبر واتساب.', back: 'market',
       body: `<div class="card space-y-4">
         ${productPicker('d-pick', p ? p.id : '')}
         ${fInput({ id: 'd-name', label: 'اسم المنتج', value: p ? p.name : '', ph: 'مثال: مبخرة خشب منقوشة' })}
-        ${fText({ id: 'd-feat', label: 'وش يميّز منتجك؟ ومن وش مصنوع؟', value: p ? p.details : '', ph: 'خشب طبيعي، نقش يدوي، صحن نحاس' })}
-        ${fSelect({ id: 'd-plat', label: 'وين بتنشر الوصف؟', options: [['store', 'متجر إلكتروني (سلة / زد)'], ['insta', 'انستقرام'], ['wa', 'واتساب'], ['snap', 'سناب أو تيك توك']] })}
-        <div><span class="lbl">أسلوب الكلام</span>${segGroup('d-tone', [['فخم وراقي', 'فخم وراقي'], ['ودّي وقريب', 'ودّي وقريب'], ['تراثي وأصيل', 'تراثي وأصيل']], 'تراثي وأصيل', 3)}</div>
-        <div><span class="lbl">اللغة</span>${segGroup('d-lang', [['ar', 'عربي'], ['en', 'إنجليزي (للسيّاح)'], ['both', 'الاثنين']], 'ar', 3)}</div>
-        <div class="img-only ${CAP.canImages ? '' : 'hidden'}"><label for="d-img" class="lbl">صورة المنتج (إذا تبي)</label><input type="file" id="d-img" accept="image/*" class="inp"></div>
+        ${fText({ id: 'd-feat', label: 'ما الذي يميّز منتجك؟ ومن أي شيء صُنع؟', value: p ? p.details : '', ph: 'خشب طبيعي، نقش يدوي، صحن نحاس' })}
+        ${fSelect({ id: 'd-plat', label: 'أين ستنشر الوصف؟', options: [['store', 'متجر إلكتروني (سلة / زد)'], ['insta', 'إنستغرام'], ['wa', 'واتساب'], ['snap', 'سناب شات أو تيك توك']] })}
+        <div><span class="lbl">أسلوب الكتابة</span>${segGroup('d-tone', [['فخم وراقي', 'فخم وراقي'], ['ودّي وقريب', 'ودّي وقريب'], ['تراثي وأصيل', 'تراثي وأصيل']], 'تراثي وأصيل', 3)}</div>
+        <div><span class="lbl">اللغة</span>${segGroup('d-lang', [['ar', 'عربي'], ['en', 'إنجليزي (للسيّاح)'], ['both', 'كلاهما']], 'ar', 3)}</div>
+        <div class="img-only ${CAP.canImages ? '' : 'hidden'}"><label for="d-img" class="lbl">صورة المنتج (اختياري)</label><input type="file" id="d-img" accept="image/*" class="inp"></div>
         <button type="button" class="btn btn-main w-full text-lg" id="d-btn" data-act="genDesc"><i class="fa-solid fa-pen-nib"></i> اكتب لي الوصف</button>
       </div>
       <div id="out-desc" class="hidden"></div>`,
@@ -1283,8 +1284,8 @@ ROUTES.description = {
 ACT.genDesc = (btn) => {
   const name = val('d-name'); if (!name) { toast('اكتب اسم المنتج.'); return; }
   const plat = val('d-plat'), lang = segVal('d-lang'), p = pickedProduct('d-pick');
-  const fmtRule = { insta: 'منشور انستقرام: 60 إلى 90 كلمة، رموز تعبيرية قليلة، و8 وسوم (هاشتاقات) مناسبة في النهاية.', wa: 'رسالة واتساب قصيرة أقل من 50 كلمة، ودودة، تنتهي بدعوة للطلب.', snap: 'نص قصير جداً للفيديو (3 جمل) + فكرة الفيديو في سطر.', store: 'وصف متجر إلكتروني: عنوان جذاب، فقرة قصيرة، ثم نقاط: المميزات، المقاس، الخامة، العناية بالمنتج.' }[plat];
-  const langRule = lang === 'en' ? 'اكتب الوصف بالإنجليزية فقط، بأسلوب يناسب السيّاح ويشرح قيمة الحرفة السعودية.' : lang === 'both' ? 'اكتب الوصف بالعربي، ثم تحته نسخة بالإنجليزية تحت عنوان ### English.' : 'اكتب بالعربي.';
+  const fmtRule = { insta: 'منشور إنستغرام: 60 إلى 90 كلمة، رموز تعبيرية قليلة، و8 وسوم (هاشتاقات) مناسبة في النهاية.', wa: 'رسالة واتساب قصيرة أقل من 50 كلمة، ودودة، تنتهي بدعوة للطلب.', snap: 'نص قصير جداً للفيديو (3 جمل) + فكرة الفيديو في سطر.', store: 'وصف متجر إلكتروني: عنوان جذاب، فقرة قصيرة، ثم نقاط: المميزات، المقاس، الخامة، العناية بالمنتج.' }[plat];
+  const langRule = lang === 'en' ? 'اكتب الوصف بالإنجليزية فقط، بأسلوب يناسب السيّاح ويشرح قيمة الحرفة الخليجية.' : lang === 'both' ? 'اكتب الوصف بالعربي، ثم تحته نسخة بالإنجليزية تحت عنوان ### English.' : 'اكتب بالعربي.';
   const reviews = S.reviews.filter(r => r.ok).slice(0, 2).map(r => `"${r.text}" (${r.customer || 'زبون'})`).join(' ، ');
   const f = $('d-img') && $('d-img').files[0];
   aiRun({
@@ -1298,36 +1299,36 @@ ROUTES.marketing = {
   nav: 'market',
   render() {
     return screen({
-      title: 'خطة تسويق لمنتجك', sub: 'قل لنا عن منتجك ومين يشتريه، والمساعد يكتب لك وش تسوي خلال شهر.', back: 'market',
+      title: 'خطة تسويق لمنتجك', sub: 'أخبرنا عن منتجك ومن يشتريه، ويكتب لك المساعد ما تفعله خلال شهر.', back: 'market',
       body: `<div class="card space-y-4">
-        ${fInput({ id: 'm-prod', label: 'وش تصنع؟', value: S.profile.craft || '', ph: 'مثال: منتجات السدو' })}
-        ${fText({ id: 'm-aud', label: 'مين يشتري منك عادة؟', ph: 'مثال: أمهات، عرايس، محبين التراث' })}
-        ${fInput({ id: 'm-budget', label: 'كم تقدر تصرف على الإعلان في الشهر؟', ph: 'مثال: 300 ريال، أو ولا ريال' })}
-        ${fSelect({ id: 'm-ch', label: 'وين تبيع أكثر؟', options: ['انستقرام', 'واتساب', 'سناب شات', 'تيك توك', 'متجر إلكتروني (سلة / زد)', 'المعارض والبازارات'] })}
+        ${fInput({ id: 'm-prod', label: 'ماذا تصنع؟', value: S.profile.craft || '', ph: 'مثال: منتجات السدو' })}
+        ${fText({ id: 'm-aud', label: 'من يشتري منك عادة؟', ph: 'مثال: الأمهات، العرائس، محبو التراث' })}
+        ${fInput({ id: 'm-budget', label: 'كم تستطيع أن تنفق على الإعلان شهرياً؟', ph: 'مثال: 300 ريال، أو لا شيء' })}
+        ${fSelect({ id: 'm-ch', label: 'أين تبيع أكثر؟', options: ['إنستغرام', 'واتساب', 'سناب شات', 'تيك توك', 'متجر إلكتروني (سلة / زد)', 'المعارض والبازارات'] })}
         <button type="button" class="btn btn-main w-full text-lg" data-act="genPlan"><i class="fa-solid fa-bullhorn"></i> اكتب لي الخطة</button>
       </div><div id="out-plan" class="hidden"></div>`,
     });
   },
 };
 ACT.genPlan = (btn) => {
-  if (!val('m-aud')) { toast('اكتب مين يشتري منك عادة.'); return; }
+  if (!val('m-aud')) { toast('اكتب من يشتري منك عادة.'); return; }
   const occ = nextOccasions().filter(o => o.days <= 40).map(o => `${o.name} بعد ${o.days} يوم`).join('، ');
   aiRun({
-    prompt: rules() + `\n\nالمطلوب: خطة تسويق لشهر واحد لحرفي يشتغل لحاله.\n- يصنع: ${val('m-prod') || 'منتجات يدوية'}\n- اللي يشترون منه: ${val('m-aud')}\n- يقدر يصرف على الإعلان في الشهر: ${val('m-budget') || 'غير محدد'}\n- يبيع أكثر في: ${val('m-ch')}\n${occ ? `- مناسبات قريبة: ${occ}\n` : ''}\nرتّب الخطة بهذه العناوين (كل عنوان في سطر يبدأ بـ ###):\n### وش نبي نوصل له\n### وين تصرف فلوس الإعلان (بالريال)\n### وش تسوي كل أسبوع (نقطتين أو ثلاث لكل أسبوع)\n### 5 أفكار منشورات جاهزة\n### كيف تعرف إن الخطة نجحت\nخلّها سهلة وبكلام بسيط، في حدود 300 كلمة.`,
+    prompt: rules() + `\n\nالمطلوب: خطة تسويق لشهر واحد لحرفي يعمل وحده.\n- يصنع: ${val('m-prod') || 'منتجات يدوية'}\n- الذين يشترون منه: ${val('m-aud')}\n- ميزانية الإعلان الشهرية: ${val('m-budget') || 'غير محددة'}\n- يبيع أكثر في: ${val('m-ch')}\n${occ ? `- مناسبات قريبة: ${occ}\n` : ''}\nرتّب الخطة بهذه العناوين (كل عنوان في سطر يبدأ بـ ###):\n### ماذا نريد أن نحقق\n### أين تنفق ميزانية الإعلان (بالريال)\n### ماذا تفعل كل أسبوع (نقطتان أو ثلاث لكل أسبوع)\n### 5 أفكار منشورات جاهزة\n### كيف تعرف أن الخطة نجحت\nاجعلها سهلة وبأسلوب بسيط، في حدود 300 كلمة.`,
     outId: 'out-plan', btn, kind: 'marketing', title: 'خطة تسويق',
   });
 };
 
 /* ---------- ردود الزبائن ---------- */
-const REPLY_CASES = ['يفاصل في السعر', 'يبي خصم', 'يسأل عن التوصيل والشحن', 'يسأل عن المقاس أو اللون', 'يبي طلب خاص بتصميمه', 'الطلب تأخر عليه', 'زبون زعلان من المنتج', 'سأل وما رد بعدها', 'يبي يشتري بالجملة'];
+const REPLY_CASES = ['يساوم في السعر', 'يطلب خصماً', 'يسأل عن التوصيل والشحن', 'يسأل عن المقاس أو اللون', 'يريد طلباً خاصاً بتصميمه', 'تأخر طلبه', 'زبون غير راضٍ عن المنتج', 'سأل ثم لم يرد', 'يريد الشراء بالجملة'];
 ROUTES.replies = {
   nav: 'market',
   render() {
     return screen({
-      title: 'كيف أرد على الزبون؟', sub: 'اختر الموقف، والمساعد يكتب لك ردود مؤدبة تحفظ حقك وسعرك.', back: 'market',
+      title: 'كيف أرد على الزبون؟', sub: 'اختر الموقف، ويكتب لك المساعد ردوداً مهذبة تحفظ حقك وسعرك.', back: 'market',
       body: `<div class="card space-y-4">
-        <div><span class="lbl">وش الموقف؟</span><div class="flex flex-wrap gap-2" id="rp-cases">${REPLY_CASES.map((c, i) => `<button type="button" class="chip ${i === 0 ? 'on' : ''}" data-case="${esc(c)}">${c}</button>`).join('')}</div></div>
-        ${fText({ id: 'rp-msg', label: 'وش قال الزبون بالضبط؟ (اختياري)', ph: 'مثال: غالي! بـ 150 أخذه' })}
+        <div><span class="lbl">ما الموقف؟</span><div class="flex flex-wrap gap-2" id="rp-cases">${REPLY_CASES.map((c, i) => `<button type="button" class="chip ${i === 0 ? 'on' : ''}" data-case="${esc(c)}">${c}</button>`).join('')}</div></div>
+        ${fText({ id: 'rp-msg', label: 'ماذا قال الزبون بالضبط؟ (اختياري)', ph: 'مثال: غالٍ! آخذه بـ 150' })}
         ${productPicker('rp-pick', '', 'عن أي منتج؟ (اختياري)')}
         <button type="button" class="btn btn-main w-full text-lg" data-act="genReplies"><i class="fa-solid fa-reply"></i> اكتب لي الردود</button>
       </div><div id="out-replies" class="hidden"></div>`,
@@ -1339,7 +1340,7 @@ ACT.genReplies = (btn) => {
   const c = ($('rp-cases').querySelector('.chip.on') || {}).dataset?.case || REPLY_CASES[0];
   const p = pickedProduct('rp-pick');
   aiRun({
-    prompt: rules() + `\n\nالمطلوب: الحرفي يبي يرد على زبون في واتساب أو انستقرام.\n- الموقف: ${c}\n${val('rp-msg') ? `- كلام الزبون: "${val('rp-msg')}"\n` : ''}${p ? productContext(p) + '\n' : ''}\nاكتب 3 ردود مختلفة جاهزة للنسخ (رد 1: لطيف ومرن، رد 2: واضح ويحفظ السعر، رد 3: يقترح بديل مثل هدية صغيرة أو شحن مجاني بدل الخصم). كل رد أقل من 40 كلمة، باللهجة السعودية المؤدبة. إذا كان الموقف عن السعر: لا تنصح بتخفيض تحت التكلفة أبداً${p ? ` (التكلفة ${r2(computeRow(p).totalCost)} ريال)` : ''}. بعد الردود أعط نصيحة وحدة قصيرة.`,
+    prompt: rules() + `\n\nالمطلوب: يريد الحرفي الرد على زبون في واتساب أو إنستغرام.\n- الموقف: ${c}\n${val('rp-msg') ? `- كلام الزبون: "${val('rp-msg')}"\n` : ''}${p ? productContext(p) + '\n' : ''}\nاكتب 3 ردود مختلفة جاهزة للنسخ (رد 1: لطيف ومرن، رد 2: واضح ويحفظ السعر، رد 3: يقترح بديلاً مثل هدية صغيرة أو شحن مجاني بدل الخصم). كل رد أقل من 40 كلمة، بعربية فصحى بسيطة ومهذبة. إذا كان الموقف عن السعر: لا تنصح بتخفيض تحت التكلفة أبداً${p ? ` (التكلفة ${r2(computeRow(p).totalCost)} ريال)` : ''}. بعد الردود قدّم نصيحة واحدة قصيرة.`,
     outId: 'out-replies', btn, kind: 'replies', title: 'رد على: ' + c, productId: p ? p.id : '',
   });
 };
@@ -1349,21 +1350,21 @@ ROUTES.story = {
   nav: 'market',
   render() {
     return screen({
-      title: 'قصتي', sub: 'الناس تشتري القصة قبل المنتج. جاوب على كم سؤال، والمساعد يكتب قصتك للبايو والمعارض.', back: 'market',
+      title: 'قصتي', sub: 'الناس تشتري القصة قبل المنتج. أجب عن بضعة أسئلة، ويكتب المساعد قصتك للنبذة والمعارض.', back: 'market',
       body: `<div class="card space-y-4">
-        ${fInput({ id: 'st-since', label: 'من متى وأنت تشتغل في حرفتك؟', ph: 'مثال: من 15 سنة' })}
-        ${fInput({ id: 'st-who', label: 'مين علّمك؟', ph: 'مثال: أمي وجدتي' })}
-        ${fText({ id: 'st-love', label: 'وش تحب في شغلك؟', ph: 'مثال: أحب أشوف الصوف يصير قطعة تعيش سنين' })}
-        ${fText({ id: 'st-special', label: 'وش يميّز شغلك عن غيرك؟', ph: 'مثال: ألوان طبيعية، كل قطعة لها اسم' })}
+        ${fInput({ id: 'st-since', label: 'منذ متى تعمل في حرفتك؟', ph: 'مثال: منذ 15 سنة' })}
+        ${fInput({ id: 'st-who', label: 'من علّمك؟', ph: 'مثال: أمي وجدتي' })}
+        ${fText({ id: 'st-love', label: 'ماذا تحب في عملك؟', ph: 'مثال: أحب أن أرى الصوف يتحول إلى قطعة تعيش سنوات' })}
+        ${fText({ id: 'st-special', label: 'ما الذي يميّز عملك عن غيرك؟', ph: 'مثال: ألوان طبيعية، كل قطعة لها اسم' })}
         <button type="button" class="btn btn-main w-full text-lg" data-act="genStory"><i class="fa-solid fa-book-open"></i> اكتب قصتي</button>
       </div><div id="out-story" class="hidden"></div>`,
     });
   },
 };
 ACT.genStory = (btn) => {
-  if (!val('st-since') && !val('st-love')) { toast('جاوب على سؤال واحد على الأقل.'); return; }
+  if (!val('st-since') && !val('st-love')) { toast('أجب عن سؤال واحد على الأقل.'); return; }
   aiRun({
-    prompt: rules() + `\n\nالمطلوب: اكتب قصة الحرفي من إجاباته (لا تخترع أحداث ما ذكرها):\n- من متى: ${val('st-since') || '—'}\n- مين علّمه: ${val('st-who') || '—'}\n- وش يحب في شغله: ${val('st-love') || '—'}\n- وش يميز شغله: ${val('st-special') || '—'}\n\nاكتب 3 أجزاء بهذه العناوين (كل عنوان يبدأ بـ ###):\n### بايو انستقرام (أقل من 150 حرف)\n### قصتي القصيرة (60 إلى 80 كلمة، للمتجر والمعارض)\n### جملة للبطاقة (سطر واحد يوضع مع المنتج)`,
+    prompt: rules() + `\n\nالمطلوب: اكتب قصة الحرفي من إجاباته (لا تخترع أحداثاً لم يذكرها):\n- منذ متى: ${val('st-since') || '—'}\n- من علّمه: ${val('st-who') || '—'}\n- ماذا يحب في عمله: ${val('st-love') || '—'}\n- ما يميز عمله: ${val('st-special') || '—'}\n\nاكتب 3 أجزاء بهذه العناوين (كل عنوان يبدأ بـ ###):\n### نبذة لإنستغرام (أقل من 150 حرفاً)\n### قصتي القصيرة (60 إلى 80 كلمة، للمتجر والمعارض)\n### جملة للبطاقة (سطر واحد يوضع مع المنتج)`,
     outId: 'out-story', btn, kind: 'story', title: 'قصتي',
   });
 };
@@ -1373,12 +1374,12 @@ ROUTES.ideas = {
   nav: 'market',
   render() {
     return screen({
-      title: 'أفكار منتجات جديدة', sub: 'من نفس مهارتك وخاماتك، منتجات مطلوبة وتنباع بسعر أحسن.', back: 'market',
+      title: 'أفكار منتجات جديدة', sub: 'منتجات مطلوبة تُباع بسعر أفضل، بمهارتك وخاماتك نفسها.', back: 'market',
       body: `<div class="card space-y-4">
-        ${fInput({ id: 'id-craft', label: 'وش حرفتك؟', value: S.profile.craft, ph: 'مثال: السدو' })}
-        ${fInput({ id: 'id-mat', label: 'وش الخامات اللي عندك؟', ph: 'مثال: صوف، قطن، خرز' })}
-        ${fInput({ id: 'id-who', label: 'مين تبي يشتري؟', ph: 'مثال: الشباب، الشركات، السيّاح' })}
-        <button type="button" class="btn btn-main w-full text-lg" data-act="genIdeas"><i class="fa-solid fa-lightbulb"></i> اقترح علي</button>
+        ${fInput({ id: 'id-craft', label: 'ما حرفتك؟', value: S.profile.craft, ph: 'مثال: السدو' })}
+        ${fInput({ id: 'id-mat', label: 'ما الخامات المتوفرة لديك؟', ph: 'مثال: صوف، قطن، خرز' })}
+        ${fInput({ id: 'id-who', label: 'لمن تريد أن تبيع؟', ph: 'مثال: الشباب، الشركات، السيّاح' })}
+        <button type="button" class="btn btn-main w-full text-lg" data-act="genIdeas"><i class="fa-solid fa-lightbulb"></i> اقترح عليّ</button>
       </div><div id="out-ideas" class="hidden"></div>`,
     });
   },
@@ -1386,7 +1387,7 @@ ROUTES.ideas = {
 ACT.genIdeas = (btn) => {
   if (!val('id-craft')) { toast('اكتب حرفتك.'); return; }
   aiRun({
-    prompt: rules() + `\n\nالمطلوب: اقترح 6 منتجات جديدة يقدر الحرفي يصنعها بنفس مهارته.\n- الحرفة: ${val('id-craft')}\n- الخامات: ${val('id-mat') || 'نفس خامات حرفته'}\n- يبي يبيع لـ: ${val('id-who') || 'عامة الناس'}\nلكل فكرة: اسم المنتج بخط عريض، ليش مطلوب (جملة)، كم تقريباً ياخذ وقت، ونطاق سعر تقديري بالريال. خلّ فيها أفكار عصرية تستخدم يومياً (مثل: حافظة جوال، غلاف دفتر، ميدالية) وأفكار للهدايا والمناسبات. اختم بنصيحة: كيف يجرب الفكرة بقطعة وحدة قبل ما يكثر.`,
+    prompt: rules() + `\n\nالمطلوب: اقترح 6 منتجات جديدة يستطيع الحرفي صنعها بمهارته نفسها.\n- الحرفة: ${val('id-craft')}\n- الخامات: ${val('id-mat') || 'خامات حرفته نفسها'}\n- يريد البيع لـ: ${val('id-who') || 'عامة الناس'}\nلكل فكرة: اسم المنتج بخط عريض، ولماذا هو مطلوب (جملة)، والوقت التقريبي لصنعه، ونطاق سعر تقديري بالريال. اجعل فيها أفكاراً عصرية تُستخدم يومياً (مثل: حافظة جوال، غلاف دفتر، ميدالية) وأفكاراً للهدايا والمناسبات. اختم بنصيحة: كيف يجرب الفكرة بقطعة واحدة قبل أن يُكثر منها.`,
     outId: 'out-ideas', btn, kind: 'ideas', title: 'أفكار منتجات',
   });
 };
@@ -1395,10 +1396,10 @@ ACT.genIdeas = (btn) => {
 const OCCASIONS = [
   { name: 'يوم التأسيس', g: [2, 22], tip: 'منتجات بطابع تراثي سعودي وتغليف بألوان التأسيس. ابدأ الإعلان قبلها بأسبوعين.' },
   { name: 'يوم العلم', g: [3, 11], tip: 'هدايا وإكسسوارات صغيرة باللون الأخضر، مناسبة للمدارس والجهات.' },
-  { name: 'اليوم الوطني', g: [9, 23], tip: 'أكثر موسم يطلب فيه الناس الأخضر والهوية الوطنية. الجهات تطلب توزيعات بكميات، جهّز بدري.' },
-  { name: 'رمضان', h: [9, 1], tip: 'فوانيس، صواني، مباخر، توزيعات وسلال رمضان. الطلب يبدأ قبل رمضان بشهر.' },
+  { name: 'اليوم الوطني', g: [9, 23], tip: 'أكثر موسم يطلب فيه الناس اللون الأخضر والهوية الوطنية. تطلب الجهات توزيعات بكميات كبيرة، فاستعد مبكراً.' },
+  { name: 'رمضان', h: [9, 1], tip: 'فوانيس، صوانٍ، مباخر، توزيعات وسلال رمضان. يبدأ الطلب قبل رمضان بشهر.' },
   { name: 'عيد الفطر', h: [10, 1], tip: 'العيديات والتوزيعات وهدايا العيد. أغلب الطلبات في العشر الأواخر من رمضان.' },
-  { name: 'عيد الأضحى', h: [12, 10], tip: 'هدايا العيد وتوزيعات الحجاج والعايدين.' },
+  { name: 'عيد الأضحى', h: [12, 10], tip: 'هدايا العيد وتوزيعات الحجاج والمعايدين.' },
 ];
 let hijriFmt = null;
 try { hijriFmt = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura-nu-latn', { month: 'numeric', day: 'numeric' }); } catch { hijriFmt = null; }
@@ -1425,22 +1426,22 @@ ROUTES.occasions = {
   render() {
     const list = nextOccasions();
     return screen({
-      title: 'المناسبات الجاية', sub: 'المواسم أكثر وقت يبيع فيه الحرفي. جهّز منتجاتك وإعلانك قبلها بوقت.', back: 'market',
-      body: `${productPicker('oc-pick', '', 'منتج تبي تعلن عنه (اختياري)')}
+      title: 'المناسبات القادمة', sub: 'المواسم أكثر أوقات البيع للحرفي. جهّز منتجاتك وإعلانك قبلها بوقت كافٍ.', back: 'market',
+      body: `${productPicker('oc-pick', '', 'منتج تريد الإعلان عنه (اختياري)')}
       <div class="space-y-3">${list.map((o, i) => `<div class="card space-y-2 ${o.days <= 30 ? 'border-amber-300 bg-amber-50' : ''}">
         <div class="flex justify-between items-center gap-2"><h2 class="font-extrabold text-craft-900 text-lg">${esc(o.name)}</h2><span class="text-sm font-bold ${o.days <= 30 ? 'text-amber-800' : 'text-gray-500'} num">${o.days === 0 ? 'اليوم' : `بعد ${o.days} يوم`} · ${fmtDay(o.date.getTime())}</span></div>
         <p class="text-gray-700">${esc(o.tip)}</p>
-        <button type="button" class="btn btn-soft btn-sm" data-act="genOccasion" data-i="${i}"><i class="fa-solid fa-wand-magic-sparkles"></i> اكتب لي منشور وفكرة عرض</button>
+        <button type="button" class="btn btn-soft btn-sm" data-act="genOccasion" data-i="${i}"><i class="fa-solid fa-wand-magic-sparkles"></i> اكتب لي منشوراً وفكرة عرض</button>
         <div id="out-occ-${i}" class="hidden"></div>
       </div>`).join('')}</div>
-      ${!hijriFmt ? '<p class="hint">جهازك ما يدعم التاريخ الهجري، فما ظهرت رمضان والأعياد.</p>' : ''}`,
+      ${!hijriFmt ? '<p class="hint">جهازك لا يدعم التاريخ الهجري، لذلك لم يظهر رمضان والأعياد.</p>' : ''}`,
     });
   },
 };
 ACT.genOccasion = (btn) => {
   const o = nextOccasions()[Number(btn.dataset.i)]; const p = pickedProduct('oc-pick');
   aiRun({
-    prompt: rules() + `\n\nالمطلوب: الحرفي يبي يستعد لمناسبة "${o.name}" (بعد ${o.days} يوم).\n${p ? productContext(p) + '\n' : `- حرفته: ${S.profile.craft || 'حرف يدوية'}\n`}اكتب:\n### فكرة عرض أو منتج خاص بالمناسبة (سطرين)\n### منشور جاهز (أقل من 70 كلمة مع 5 وسوم)\n### متى تنشر (3 مواعيد قبل المناسبة)`,
+    prompt: rules() + `\n\nالمطلوب: يريد الحرفي الاستعداد لمناسبة "${o.name}" (بعد ${o.days} يوم).\n${p ? productContext(p) + '\n' : `- حرفته: ${S.profile.craft || 'حرف يدوية'}\n`}اكتب:\n### فكرة عرض أو منتج خاص بالمناسبة (سطرين)\n### منشور جاهز (أقل من 70 كلمة مع 5 وسوم)\n### متى تنشر (3 مواعيد قبل المناسبة)`,
     outId: 'out-occ-' + btn.dataset.i, btn, kind: 'occasion', title: 'منشور: ' + o.name, productId: p ? p.id : '',
   });
 };
@@ -1462,12 +1463,12 @@ ROUTES.studio = {
     const p = prodById(productId);
     const range = (k, label, min, max) => `<label for="st-${k}" class="flex items-center gap-2"><span class="w-24 text-gray-600 text-sm">${label}</span><input type="range" id="st-${k}" data-st="${k}" min="${min}" max="${max}" value="${st[k]}" class="flex-1 accent-craft-600"><span id="val-${k}" class="w-12 text-left num text-gray-500 text-sm"></span></label>`;
     return screen({
-      title: 'عدّل صورة منتجك', sub: 'خلّ صورتك جاهزة للنشر: غيّر المقاس والإضاءة، وحط إطار واسم متجرك.', back: 'photographer',
+      title: 'عدّل صورة منتجك', sub: 'اجعل صورتك جاهزة للنشر: غيّر المقاس والإضاءة، وأضف إطاراً واسم متجرك.', back: 'photographer',
       body: `
       <div id="studio-drop" class="bg-gray-100 border-2 border-dashed border-craft-300 rounded-2xl min-h-[280px] flex items-center justify-center p-3 transition">
         <label id="studio-empty" for="studio-file" class="cursor-pointer flex flex-col items-center gap-2 text-center text-gray-500 p-6 ${st.img ? 'hidden' : ''}">
           <i class="fa-solid fa-image text-5xl text-craft-400"></i>
-          <span class="font-bold text-craft-700 text-lg">حط صورة منتجك هنا</span>
+          <span class="font-bold text-craft-700 text-lg">ضع صورة منتجك هنا</span>
           <span class="text-sm">اضغط واختر صورة من جوالك</span>
         </label>
         <div id="studio-stage" class="${st.img ? '' : 'hidden'} w-full flex items-center justify-center"><canvas id="studio-canvas" class="canvas-prev rounded-lg shadow-lg bg-white" aria-label="معاينة الصورة"></canvas></div>
@@ -1480,16 +1481,16 @@ ROUTES.studio = {
       </div>
       <div class="card space-y-3 studio-ctrl">
         <div class="font-extrabold text-craft-800"><i class="fa-solid fa-crop-simple ml-1"></i> مقاس الصورة</div>
-        ${segGroup('ratio', [['1:1', 'مربع (منشور)'], ['4:5', 'طولي (منشور)'], ['9:16', 'ستوري'], ['orig', 'مثل ما هي']], st.ratio)}
-        ${segGroup('fit', [['cover', 'تعبّي المساحة'], ['contain', 'تبان كاملة']], st.fit)}
+        ${segGroup('ratio', [['1:1', 'مربع (منشور)'], ['4:5', 'طولي (منشور)'], ['9:16', 'ستوري'], ['orig', 'كما هي']], st.ratio)}
+        ${segGroup('fit', [['cover', 'تملأ المساحة'], ['contain', 'تظهر كاملة']], st.fit)}
         <div class="flex items-center gap-2 flex-wrap"><span class="text-gray-600 text-sm">لون الخلفية:</span>${['#ffffff', '#fdf8f6', '#eaddd7', '#c8a27a', '#32221a'].map(c => `<button type="button" class="swatch ${st.bg === c ? 'on' : ''}" data-bg="${c}" style="background:${c}" aria-label="لون ${c}"></button>`).join('')}<input type="color" id="st-bg" value="${st.bg}" class="w-9 h-8 p-0 border border-gray-300 rounded cursor-pointer" aria-label="لون آخر"></div>
         ${range('zoom', 'تقريب', 100, 200)}
       </div>
       <div class="card space-y-3 studio-ctrl">
         <div class="font-extrabold text-craft-800"><i class="fa-solid fa-sun ml-1"></i> الإضاءة والألوان</div>
         <div class="flex flex-wrap gap-2">
-          <button type="button" class="chip" data-preset="auto">حسّنها لي ✨</button><button type="button" class="chip" data-preset="warm">دافي تراثي</button>
-          <button type="button" class="chip" data-preset="clean">فاتح ونظيف</button><button type="button" class="chip" data-preset="reset">رجّعها مثل ما كانت</button>
+          <button type="button" class="chip" data-preset="auto">حسّنها لي ✨</button><button type="button" class="chip" data-preset="warm">دافئ تراثي</button>
+          <button type="button" class="chip" data-preset="clean">فاتح ونظيف</button><button type="button" class="chip" data-preset="reset">أعِدها كما كانت</button>
         </div>
         ${range('b', 'الإضاءة', 50, 160)}${range('c', 'الحِدّة', 50, 160)}${range('s', 'قوة الألوان', 0, 180)}${range('w', 'دفء الألوان', -50, 50)}
       </div>
@@ -1501,14 +1502,14 @@ ROUTES.studio = {
         <div class="font-extrabold text-craft-800"><i class="fa-solid fa-font ml-1"></i> اكتب على الصورة</div>
         <input type="text" id="st-store" data-st="store" class="inp" value="${esc(st.store)}" placeholder="اسم متجرك أو حسابك" aria-label="اسم المتجر">
         <div class="flex gap-2"><input type="text" id="st-price" data-st="price" class="inp" value="${esc(st.price)}" placeholder="السعر، مثل: 245 ر.س" aria-label="السعر">${S.products.length ? `<button type="button" class="btn btn-soft btn-sm flex-shrink-0" data-act="studioPrice">من منتجاتي</button>` : ''}</div>
-        ${segGroup('pos', [['bottom', 'تحت'], ['top', 'فوق']], st.pos)}
+        ${segGroup('pos', [['bottom', 'أسفل'], ['top', 'أعلى']], st.pos)}
         ${segGroup('band', [['dark', 'خلفية غامقة'], ['light', 'خلفية فاتحة'], ['none', 'بدون خلفية']], st.band, 3)}
       </div>
       ${S.products.length ? `<div class="card space-y-3 studio-ctrl">
         <div class="font-extrabold text-craft-800"><i class="fa-solid fa-box-open ml-1"></i> احفظها كصورة لمنتج</div>
-        <div class="flex gap-2"><select id="st-prod" class="inp" data-picker="1">${productOptions(p ? p.id : S.settings.lastProduct, 'اختر منتج')}</select><button type="button" class="btn btn-main btn-sm flex-shrink-0" data-act="studioToProduct">احفظ</button></div>
+        <div class="flex gap-2"><select id="st-prod" class="inp" data-picker="1">${productOptions(p ? p.id : S.settings.lastProduct, 'اختر منتجاً')}</select><button type="button" class="btn btn-main btn-sm flex-shrink-0" data-act="studioToProduct">احفظ</button></div>
       </div>` : ''}
-      <button type="button" class="card w-full text-start flex items-center gap-3 hover:bg-craft-50 border-craft-400" data-go="photographer"><i class="fa-solid fa-wand-magic-sparkles text-2xl text-amber-500"></i><span><b class="text-craft-800">خلّ المصوّر الذكي يصوّر منتجك</b><span class="block text-sm text-gray-500">يحط منتجك في مكان احترافي (مجلس، صحراء، خلفية بيضاء…) من نفس صورتك.</span></span></button>`,
+      <button type="button" class="card w-full text-start flex items-center gap-3 hover:bg-craft-50 border-craft-400" data-go="photographer"><i class="fa-solid fa-wand-magic-sparkles text-2xl text-amber-500"></i><span><b class="text-craft-800">دع المصوّر الذكي يصوّر منتجك</b><span class="block text-sm text-gray-500">يضع منتجك في مكان احترافي (مجلس، صحراء، خلفية بيضاء…) انطلاقاً من صورتك نفسها.</span></span></button>`,
     });
   },
   onInput(e) {
@@ -1597,32 +1598,32 @@ function drawCaption(ctx, W, H, inset) {
 function loadStudioImage(src, file) {
   const img = new Image();
   img.onload = () => { if (st.url && st.url.startsWith('blob:') && st.url !== src) URL.revokeObjectURL(st.url); Object.assign(st, { img, url: src, file }); track('actions', 'photo_upload'); if (CUR.name === 'studio') { rerender(); } };
-  img.onerror = () => toast('الصورة ما انفتحت. جرّب صورة ثانية.');
+  img.onerror = () => toast('تعذّر فتح الصورة. جرّب صورة أخرى.');
   img.src = src;
 }
 function loadStudioFile(file) { if (!file || !/^image\//.test(file.type)) { toast('اختر صورة من جوالك.'); return; } loadStudioImage(URL.createObjectURL(file), file); }
 ACT.studioFromProduct = (b) => { const p = prodById(b.dataset.id); fetch(p.photo).then(r => r.blob()).then(bl => loadStudioImage(p.photo, bl)).catch(() => loadStudioImage(p.photo, null)); };
 ACT.studioPrice = () => { const sel = $('st-prod'); const p = (sel && prodById(sel.value)) || S.products[0]; if (!p) return; st.price = computeRow(p).rounded + ' ر.س'; $('st-price').value = st.price; scheduleStudio(); };
 ACT.studioExport = async (b) => {
-  if (!st.img) { toast('حط صورة منتجك أول.'); return; }
+  if (!st.img) { toast('ضع صورة منتجك أولاً.'); return; }
   renderStudio();
   const blob = await new Promise(res => studioCanvas().toBlob(res, 'image/jpeg', 0.92));
-  if (!blob) { toast('ما قدرنا نجهّز الصورة. جرّب مرة ثانية.'); return; }
+  if (!blob) { toast('تعذّر تجهيز الصورة. حاول مرة أخرى.'); return; }
   track('actions', 'image_export');
   const p = $('st-prod') ? prodById($('st-prod').value) : null;
-  offerFile(`${safeName(p ? p.name : (S.profile.store || 'منتجي'))}_${RATIO_NAMES[st.ratio]}.jpg`, blob, 'انحفظت الصورة ✅');
+  offerFile(`${safeName(p ? p.name : (S.profile.store || 'منتجي'))}_${RATIO_NAMES[st.ratio]}.jpg`, blob, 'تم حفظ الصورة ✅');
 };
 ACT.studioToProduct = () => {
-  if (!st.img) { toast('حط صورة منتجك أول.'); return; }
+  if (!st.img) { toast('ضع صورة منتجك أولاً.'); return; }
   const p = prodById(val('st-prod')); if (!p) { toast('اختر المنتج.'); return; }
-  renderStudio(); p.photo = thumbFromCanvas(studioCanvas()); save(); toast(`صارت صورة "${p.name}" ✅`, true);
+  renderStudio(); p.photo = thumbFromCanvas(studioCanvas()); save(); toast(`أصبحت صورة "${p.name}" ✅`, true);
 };
 
 /* ============================================================
    اسأل المساعد (محادثة)
    ============================================================ */
 const CHAT = { turns: [], view: [], busy: false, ctl: null, file: null, fileUrl: null };
-const STARTERS = ['شوف أسعار منتجاتي، مناسبة؟', 'زبون يفاصل في السعر، وش أقول؟', 'وش أحتاج عشان أبيع بشكل نظامي؟', 'كيف أستعد لمعرض أو بازار؟'];
+const STARTERS = ['هل أسعار منتجاتي مناسبة؟', 'زبون يساوم في السعر، ماذا أقول له؟', 'ماذا أحتاج لأبيع بشكل نظامي؟', 'كيف أستعد لمعرض أو بازار؟'];
 
 ROUTES.chat = {
   render() {
@@ -1630,14 +1631,14 @@ ROUTES.chat = {
       <div class="flex justify-between items-center mb-3"><h1 class="text-2xl font-extrabold text-craft-800">اسأل المساعد</h1><button type="button" class="btn btn-soft btn-sm" data-act="chatReset"><i class="fa-solid fa-rotate-right"></i> محادثة جديدة</button></div>
       <div id="chat-log" class="flex-1 space-y-3"></div>
       <div class="sticky bg-[#fdf8f6] pt-2 mt-3 space-y-2" style="bottom: calc(64px + env(safe-area-inset-bottom, 0px))">
-        <div id="chat-att" class="hidden items-center gap-3 p-2 bg-white rounded-xl w-fit border"><img id="chat-att-img" alt="المرفق" class="h-10 w-10 object-cover rounded"><span class="text-sm text-gray-600">بترسل الصورة مع سؤالك</span><button type="button" class="text-gray-400 hover:text-red-600" data-act="chatClearAtt" aria-label="إزالة الصورة"><i class="fa-solid fa-circle-xmark"></i></button></div>
+        <div id="chat-att" class="hidden items-center gap-3 p-2 bg-white rounded-xl w-fit border"><img id="chat-att-img" alt="المرفق" class="h-10 w-10 object-cover rounded"><span class="text-sm text-gray-600">ستُرسل الصورة مع سؤالك</span><button type="button" class="text-gray-400 hover:text-red-600" data-act="chatClearAtt" aria-label="إزالة الصورة"><i class="fa-solid fa-circle-xmark"></i></button></div>
         <div class="flex gap-2 items-end">
           <label for="chat-file" id="chat-attach" class="img-only ${CAP.canImages ? 'flex' : 'hidden'} cursor-pointer flex-shrink-0 bg-craft-100 hover:bg-craft-200 text-craft-700 w-12 h-12 rounded-xl border border-craft-300 items-center justify-center" title="أرسل صورة"><i class="fa-solid fa-camera text-lg"></i></label>
           <input type="file" id="chat-file" accept="${esc(CAP.imageTypes)}" class="hidden">
           <textarea id="chat-input" rows="1" class="inp flex-1 resize-none max-h-32" placeholder="اكتب سؤالك هنا…" aria-label="سؤالك"></textarea>
           <button type="button" id="chat-send" class="btn btn-main h-12 px-4 flex-shrink-0" data-act="chatSend"><i class="fa-solid fa-paper-plane"></i> <span id="chat-send-l">أرسل</span></button>
         </div>
-        <p class="text-xs text-gray-500 flex justify-between gap-2"><span>المساعد ممكن يغلط، تأكد من الأسعار قبل ما تعتمدها.</span><button type="button" data-go="plan" id="chat-left" class="flex-shrink-0 underline"></button></p>
+        <p class="text-xs text-gray-500 flex justify-between gap-2"><span>قد يخطئ المساعد، فتأكد من الأسعار قبل اعتمادها.</span><button type="button" data-go="plan" id="chat-left" class="flex-shrink-0 underline"></button></p>
       </div>
     </div>`;
   },
@@ -1656,7 +1657,7 @@ function bubbleHtml(m, i) {
 }
 function renderChatLog() {
   const log = $('chat-log'); if (!log) return;
-  const welcome = { role: 'assistant', text: `هلا والله ${S.profile.name ? S.profile.name + ' ' : ''}👋 أنا مساعدك.\nاسألني عن **سعر منتجك** أو **كيف تسوّق له** أو **كيف ترد على زبون**${CAP.canImages ? '، أو أرسل لي صورة منتجك وأقول لك كيف تصوّره أحسن' : ''}.\nأنا أشوف منتجاتك وأسعارك عشان أجاوبك صح.`, chips: STARTERS };
+  const welcome = { role: 'assistant', text: `أهلاً ${S.profile.name ? S.profile.name + ' ' : ''}👋 أنا مساعدك.\nاسألني عن **سعر منتجك** أو **طريقة تسويقه** أو **الرد على زبون**${CAP.canImages ? '، أو أرسل لي صورة منتجك وسأخبرك كيف تصوّره بشكل أفضل' : ''}.\nأطّلع على منتجاتك وأسعارك لأجيبك بدقة.`, chips: STARTERS };
   const items = [welcome, ...CHAT.view];
   log.innerHTML = items.map(bubbleHtml).join('');
   items.forEach((m, i) => { if (m.role === 'assistant' && i > 0 && !m.pending && m.text) { const slot = log.querySelector(`.chat-actions[data-i="${i}"]`); if (slot) slot.appendChild(outActions(m.text, { kind: 'chat' })); } });
@@ -1664,7 +1665,7 @@ function renderChatLog() {
 }
 function setChatBusy(on) {
   CHAT.busy = on; const l = $('chat-send-l'); if (!l) return;
-  l.textContent = on ? 'وقّف' : 'أرسل';
+  l.textContent = on ? 'إيقاف' : 'أرسل';
   $('chat-send').classList.toggle('bg-red-600', on);
 }
 ACT.chatStarter = (b) => sendChat(b.textContent);
@@ -1672,7 +1673,7 @@ ACT.chatSend = () => { if (CHAT.busy) { CHAT.ctl && CHAT.ctl.abort(); return; } 
 ACT.chatReset = () => { if (CHAT.busy) return; CHAT.turns = []; CHAT.view = []; renderChatLog(); };
 ACT.chatClearAtt = () => { CHAT.file = null; CHAT.fileUrl = null; $('chat-file').value = ''; $('chat-att').classList.add('hidden'); $('chat-att').classList.remove('flex'); };
 function allProductsContext() {
-  if (!S.products.length) return 'الحرفي ما أضاف منتجات للحين.';
+  if (!S.products.length) return 'لم يضف الحرفي منتجات بعد.';
   const vatNote = S.settings.vat ? `الحرفي مسجّل في ضريبة القيمة المضافة (${CONFIG.vatRate}%)، وأرباحه محسوبة قبل الضريبة.\n` : 'الحرفي غير مسجّل في ضريبة القيمة المضافة.\n';
   return vatNote + 'منتجات الحرفي:\n' + S.products.slice(0, 15).map(p => { const c = computeRow(p); return `- ${p.name || 'منتج'}: التكلفة ${r2(c.totalCost)} ريال، السعر ${r2(c.sellingPrice)} ريال${c.vatRate ? ` (${r2(c.finalPrice)} شامل الضريبة)` : ''}، الربح فوق التكلفة ${c.markup}%، ربحه من كل 100 ريال ${Math.round(c.realMargin)} ريال`; }).join('\n');
 }
@@ -1681,7 +1682,7 @@ async function sendChat(text) {
   const file = CHAT.file, fileUrl = CHAT.fileUrl;
   if ((!text && !file) || CHAT.busy) return;
   if (!aiReady()) return;
-  if (!text) text = 'قيّم صورة منتجي واقترح كيف أصوّره أحسن.';
+  if (!text) text = 'قيّم صورة منتجي واقترح كيف أصوّره بشكل أفضل.';
   ACT.chatClearAtt();
   track('actions', 'chat');
   CHAT.turns.push({ role: 'user', content: file ? text + '\n\n(أرفقتُ صورة للمنتج مع هذه الرسالة.)' : text });
@@ -1697,7 +1698,7 @@ async function sendChat(text) {
   try {
     const r = await CAP.sample([{ role: 'user', content: ctx }, ...CHAT.turns.slice(-20)], opts);
     reply.pending = false; reply.text = r.text; CHAT.turns.push({ role: 'assistant', content: r.text });
-    if (r.truncated) toast('الرد طويل وانقطع. قل له: كمّل.', true);
+    if (r.truncated) toast('الرد طويل وانقطع. اكتب له: أكمل.', true);
   } catch (e) {
     reply.pending = false;
     if (e && e.text && e.code !== 'refused') { reply.text = e.text; CHAT.turns.push({ role: 'assistant', content: e.text }); }
@@ -1723,10 +1724,10 @@ ROUTES.logo = {
     ROUTES.logo._d = ROUTES.logo._d || { name: S.profile.store || '', sub: S.profile.craft ? 'حرفة ' + S.profile.craft : '', theme: 'sadu', shape: 'circle' };
     const d = ROUTES.logo._d;
     return screen({
-      title: 'اسم وشعار لمتجرك', sub: 'ما عندك اسم؟ المساعد يقترح عليك. وبعدها صمّم شعار نصي بسيط تحطه في حساباتك.', back: 'market',
+      title: 'اسم وشعار لمتجرك', sub: 'ليس لديك اسم؟ يقترح عليك المساعد أسماء، ثم صمّم شعاراً نصياً بسيطاً لحساباتك.', back: 'market',
       body: `<div class="card space-y-3">
-        <div class="font-extrabold text-craft-800"><i class="fa-solid fa-wand-magic-sparkles ml-1"></i> اقترح علي أسماء</div>
-        ${fInput({ id: 'lg-about', label: 'وش تبي يعبّر عنه الاسم؟', ph: 'مثال: التراث، الجدة، الصحراء، البساطة' })}
+        <div class="font-extrabold text-craft-800"><i class="fa-solid fa-wand-magic-sparkles ml-1"></i> اقترح عليّ أسماء</div>
+        ${fInput({ id: 'lg-about', label: 'عمّ تريد أن يعبّر الاسم؟', ph: 'مثال: التراث، الجدة، الصحراء، البساطة' })}
         <button type="button" class="btn btn-soft w-full" data-act="genNames">اقترح 8 أسماء</button>
         <div id="out-names" class="hidden"></div>
       </div>
@@ -1761,31 +1762,31 @@ function drawLogo() {
 ACT.genNames = (btn) => {
   aiRun({
     json: true, outId: 'out-names', btn, kind: 'names',
-    prompt: rules() + `\n\nالمطلوب: اقترح 8 أسماء لمتجر حرفي.\n- الحرفة: ${S.profile.craft || 'حرف يدوية'}\n- المنطقة: ${S.profile.region || 'السعودية'}\n- يبي الاسم يعبّر عن: ${val('lg-about') || 'الأصالة والعمل اليدوي'}\nالأسماء قصيرة (كلمة أو كلمتين)، سهلة النطق، عربية، تصلح حساب انستقرام. أجب بـ JSON فقط: [{"name": "الاسم", "why": "ليش يناسب في جملة قصيرة"}]`,
+    prompt: rules() + `\n\nالمطلوب: اقترح 8 أسماء لمتجر حرفي.\n- الحرفة: ${S.profile.craft || 'حرف يدوية'}\n- المنطقة: ${S.profile.region || 'الخليج'}\n- يريد أن يعبّر الاسم عن: ${val('lg-about') || 'الأصالة والعمل اليدوي'}\nالأسماء قصيرة (كلمة أو كلمتان)، سهلة النطق، عربية، وتصلح اسماً لحساب إنستغرام. أجب بـ JSON فقط: [{"name": "الاسم", "why": "سبب مناسبته في جملة قصيرة"}]`,
     onJson(list, out) {
       if (!Array.isArray(list)) { toast(AI_ERR.invalid_json); return; }
-      out.innerHTML = `<div class="grid gap-2">${list.slice(0, 10).map(x => `<button type="button" class="text-start border border-craft-200 rounded-xl p-3 hover:bg-craft-50" data-act="pickName" data-name="${esc(x.name)}"><b class="text-craft-900">${esc(x.name)}</b><span class="block text-sm text-gray-600">${esc(x.why || '')}</span></button>`).join('')}</div><p class="hint">اضغط على الاسم عشان تجربه في الشعار.</p>`;
+      out.innerHTML = `<div class="grid gap-2">${list.slice(0, 10).map(x => `<button type="button" class="text-start border border-craft-200 rounded-xl p-3 hover:bg-craft-50" data-act="pickName" data-name="${esc(x.name)}"><b class="text-craft-900">${esc(x.name)}</b><span class="block text-sm text-gray-600">${esc(x.why || '')}</span></button>`).join('')}</div><p class="hint">اضغط على الاسم لتجربته في الشعار.</p>`;
     },
   });
 };
 ACT.pickName = (b) => { ROUTES.logo._d.name = b.dataset.name; $('lg-name').value = b.dataset.name; drawLogo(); $('logo-canvas').scrollIntoView({ behavior: 'smooth', block: 'center' }); };
-ACT.saveLogo = async () => { const blob = await new Promise(r => $('logo-canvas').toBlob(r, 'image/png')); track('actions', 'logo'); offerFile(`شعار_${safeName(ROUTES.logo._d.name)}.png`, blob, 'انحفظ الشعار ✅'); };
-ACT.useLogoName = () => { if (!ROUTES.logo._d.name) { toast('اكتب الاسم.'); return; } S.profile.store = ROUTES.logo._d.name; save(); toast('صار اسم متجرك ✅', true); };
+ACT.saveLogo = async () => { const blob = await new Promise(r => $('logo-canvas').toBlob(r, 'image/png')); track('actions', 'logo'); offerFile(`شعار_${safeName(ROUTES.logo._d.name)}.png`, blob, 'تم حفظ الشعار ✅'); };
+ACT.useLogoName = () => { if (!ROUTES.logo._d.name) { toast('اكتب الاسم.'); return; } S.profile.store = ROUTES.logo._d.name; save(); toast('أصبح هذا اسم متجرك ✅', true); };
 
 /* ============================================================
    لوحة صاحب المنصة: الآراء والاستخدام
    ============================================================ */
 async function readAll(col) { const snap = await CAP.db.collection(col).get(); return snap.docs.filter(d => d.exists).map(d => ({ id: d.id, ...(d.data() || {}) })); }
-function loadInto(id, fn) { fn().catch(() => { const el = $(id); if (el) el.innerHTML = '<div class="card text-center text-gray-500">ما قدرنا نجيب البيانات. جرّب بعدين.</div>'; }); }
+function loadInto(id, fn) { fn().catch(() => { const el = $(id); if (el) el.innerHTML = '<div class="card text-center text-gray-500">تعذّر جلب البيانات. حاول لاحقاً.</div>'; }); }
 const TAB_LABELS = { home: 'الرئيسية', products: 'منتجاتي', product: 'تسعير منتج', orders: 'الطلبات', chat: 'المساعد', more: 'المزيد', description: 'وصف المنتج', marketing: 'خطة التسويق', replies: 'ردود الزبائن', story: 'قصتي', ideas: 'أفكار منتجات', occasions: 'المناسبات', studio: 'تعديل الصور', imagePrompt: 'صورة بالذكاء الاصطناعي', cards: 'البطاقات', logo: 'اسم وشعار', sales: 'المبيعات', bazaar: 'البازار', customers: 'زبائني', lessons: 'الدروس', guide: 'التراخيص', catalog: 'المعرض', suppliers: 'الموردين', qa: 'اسأل الحرفيات', catalogMine: 'عرض منتجاتي', feedback: 'رأيك يهمنا', onboard: 'ملفي', orderEdit: 'تفاصيل طلب', saleEdit: 'تسجيل بيعة', customerEdit: 'تفاصيل زبون', reviews: 'آراء الزبائن', savedTexts: 'النصوص المحفوظة', savedText: 'نص محفوظ', dataPage: 'بياناتي', lesson: 'درس', badges: 'الشارات', impact: 'قياس الفايدة', bigOrders: 'الطلبات الكبيرة', privacy: 'الخصوصية', about: 'من نحن' };
 const ACTION_LABELS = { price_review: 'رأي المساعد في السعر', description: 'كتابة وصف', marketing: 'خطة تسويق', replies: 'ردود زبائن', story: 'قصتي', ideas: 'أفكار منتجات', occasion: 'منشور مناسبة', image_prompt: 'وصف صورة', chat: 'رسائل للمساعد', competitors: 'مقارنة أسعار', photo_upload: 'رفع صورة', card_quote: 'عرض سعر', card_certificate: 'شهادة صنع يدوي', card_thanks: 'بطاقة شكر', card_qr: 'بطاقة QR', card_label: 'ملصق', names: 'اقتراح أسماء', customer_msg: 'رسالة زبون', image_export: 'حفظ صورة معدّلة', excel: 'Excel', csv: 'ملف المتجر', order: 'طلب جديد', sale: 'بيعة', bazaar: 'بازار', catalog: 'نشر في المعرض', logo: 'شعار', qa: 'سؤال للمجتمع' };
 ROUTES.owner = {
   nav: 'more',
   render({ tab = 'fb' }) {
-    if (!CAP.isOwner) return screen({ title: 'لوحة صاحب المنصة', back: 'more', body: '<div class="card text-gray-600">هذي الصفحة لصاحب المنصة فقط.</div>' });
+    if (!CAP.isOwner) return screen({ title: 'لوحة صاحب المنصة', back: 'more', body: '<div class="card text-gray-600">هذه الصفحة لصاحب المنصة فقط.</div>' });
     return screen({
-      title: 'لوحة صاحب المنصة', sub: 'تظهر لك فقط. البيانات تتحدث كل ما فتحت الصفحة.', back: 'more',
-      body: `<div id="ow-body">${loaderHtml('نجيب البيانات…')}</div>`,
+      title: 'لوحة صاحب المنصة', sub: 'تظهر لك وحدك، وتتحدّث البيانات كلما فتحت الصفحة.', back: 'more',
+      body: `<div id="ow-body">${loaderHtml('جارٍ جلب البيانات…')}</div>`,
     });
   },
   after({ tab = 'fb' }) {
@@ -1798,7 +1799,7 @@ ROUTES.owner = {
 };
 function bars(totals, labels) {
   const items = Object.entries(totals).filter(([k]) => labels[k]).map(([k, n]) => [labels[k], n]).filter(x => x[1] > 0).sort((a, b) => b[1] - a[1]).slice(0, 12);
-  if (!items.length) return '<p class="hint">ما فيه بيانات للحين.</p>';
+  if (!items.length) return '<p class="hint">لا توجد بيانات بعد.</p>';
   const mx = Math.max(...items.map(i => i[1]));
   return items.map(([l, n]) => `<div class="text-sm"><div class="flex justify-between mb-0.5"><span class="text-gray-700">${esc(l)}</span><b class="num">${n}</b></div><div class="h-2 rounded-full bg-craft-100 overflow-hidden"><div class="h-full bg-craft-500" style="width:${(n / mx * 100).toFixed(1)}%"></div></div></div>`).join('');
 }
@@ -1820,8 +1821,8 @@ function drawFeedbackAdmin(docs) {
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3"><div class="card space-y-2"><h3 class="font-extrabold text-craft-800">أكثر الصفحات زيارة</h3>${bars(tabs, TAB_LABELS)}</div><div class="card space-y-2"><h3 class="font-extrabold text-craft-800">أكثر الأدوات استخداماً</h3>${bars(actions, ACTION_LABELS)}</div></div>
     <h3 class="font-extrabold text-craft-800">آخر الآراء</h3>
-    ${entries.slice(0, 60).map(e => `<div class="card text-sm space-y-1"><div class="flex justify-between gap-2 flex-wrap"><b class="text-craft-800">${esc(e.who)}${e.craft ? ' · ' + esc(e.craft) : ''}</b><span class="text-gray-500">${e.rating ? '★'.repeat(e.rating) + ' · ' : ''}${fmtDay(e.at)}</span></div>${(e.tools || []).length ? `<p><b>فادته:</b> ${esc(e.tools.join('، '))}</p>` : ''}${e.hard ? `<p><b>صعب عليه:</b> ${esc(e.hard)}</p>` : ''}${e.idea ? `<p><b>يتمنى:</b> ${esc(e.idea)}</p>` : ''}</div>`).join('') || '<p class="hint">ما أرسل أحد رأي مكتوب للحين.</p>'}
-  </div>` : '<div class="card text-center text-gray-500 py-8">ما فيه بيانات من المجرّبين للحين. شارك الرابط معهم بصلاحية "مساهم".</div>';
+    ${entries.slice(0, 60).map(e => `<div class="card text-sm space-y-1"><div class="flex justify-between gap-2 flex-wrap"><b class="text-craft-800">${esc(e.who)}${e.craft ? ' · ' + esc(e.craft) : ''}</b><span class="text-gray-500">${e.rating ? '★'.repeat(e.rating) + ' · ' : ''}${fmtDay(e.at)}</span></div>${(e.tools || []).length ? `<p><b>استفاد من:</b> ${esc(e.tools.join('، '))}</p>` : ''}${e.hard ? `<p><b>صعب عليه:</b> ${esc(e.hard)}</p>` : ''}${e.idea ? `<p><b>يتمنى:</b> ${esc(e.idea)}</p>` : ''}</div>`).join('') || '<p class="hint">لم يرسل أحد رأياً مكتوباً بعد.</p>'}
+  </div>` : '<div class="card text-center text-gray-500 py-8">لا توجد بيانات من المستخدمين بعد.</div>';
 }
 /* ============================================================
    بدء التشغيل
@@ -1844,7 +1845,7 @@ initTTS();
   if (s) {
     $('ai-dot').className = 'w-2 h-2 rounded-full bg-green-400'; $('ai-pill-text').textContent = 'المساعد جاهز'; if (window.PLAT) PLAT.emit();
     try { const lim = await s.limits(); if (lim && lim.images) { CAP.canImages = true; CAP.imageTypes = lim.images.mediaTypes.join(','); } } catch {}
-  } else lockAI('المساعد ما تفعّل في الموقع للحين. باقي الأدوات تشتغل عادي.');
+  } else lockAI('المساعد غير مفعّل في الموقع حتى الآن. بقية الأدوات تعمل كالمعتاد.');
   CAP.ready = true;
   if (db && CAP.uid && !CAP.isOwner && CAP.canWrite !== false) {
     FB.ref = db.doc('feedback/' + CAP.uid);

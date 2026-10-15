@@ -47,19 +47,19 @@
 <header class="bg-craft-700 text-white">
   <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center gap-3">
     <div class="font-extrabold text-lg"><i class="fa-solid fa-chart-pie ml-1"></i> لوحة المالك</div>
-    <a href="/" class="btn bg-craft-800 text-white">رجوع للمنصة</a>
+    <a href="/" class="btn bg-craft-800 text-white">العودة إلى المنصة</a>
   </div>
 </header>
 <main class="max-w-5xl mx-auto px-4 py-4 space-y-4">
   <div id="test-banner" class="hidden card bg-amber-50 border-amber-200 text-amber-900 text-sm"><i class="fa-solid fa-flask ml-1"></i> ميسّر في وضع التجربة: المدفوعات الحالية تجريبية ولا تُحسب في الإيرادات.</div>
   <nav class="flex gap-2 overflow-x-auto pb-1" id="tabs">
     <button class="tab on" data-tab="overview">نظرة عامة</button>
-    <button class="tab" data-tab="users">الحرفيين</button>
+    <button class="tab" data-tab="users">الحرفيون</button>
     <button class="tab" data-tab="payments">المدفوعات</button>
     <button class="tab" data-tab="plans">الأسعار والحدود</button>
     <button class="tab" data-tab="pages">نصوص الصفحات</button>
   </nav>
-  <div id="view" class="space-y-3"><div class="card text-center text-gray-500">نحمّل…</div></div>
+  <div id="view" class="space-y-3"><div class="card text-center text-gray-500">جارٍ التحميل…</div></div>
 </main>
 <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-4 py-2 rounded-xl text-sm font-bold opacity-0 transition-opacity pointer-events-none z-50"></div>
 
@@ -103,7 +103,7 @@ function barChart(rows, key, label) {
   return `<div class="card space-y-2">
     <div class="flex justify-between"><b class="text-craft-800">${label}</b><span class="text-sm text-gray-500 num">${n(total)} خلال 30 يوم</span></div>
     ${rows.length ? `<div class="bars" role="img" aria-label="${esc(label)} يومياً">${rows.map((r) => `<div tabindex="0"><i style="height:${((r[key] || 0) / mx) * 100}%"></i><span class="tip">${esc(r.day.slice(5))}: ${n(r[key] || 0)}</span></div>`).join('')}</div>
-    <div class="flex justify-between text-xs text-gray-400 num"><span>${esc(rows[0].day.slice(5))}</span><span>${esc(rows[rows.length - 1].day.slice(5))}</span></div>` : '<p class="text-sm text-gray-500">ما فيه استخدام للحين.</p>'}
+    <div class="flex justify-between text-xs text-gray-400 num"><span>${esc(rows[0].day.slice(5))}</span><span>${esc(rows[rows.length - 1].day.slice(5))}</span></div>` : '<p class="text-sm text-gray-500">لا يوجد استخدام بعد.</p>'}
   </div>`;
 }
 
@@ -116,12 +116,12 @@ function renderOverview() {
   const byProd = s.revenue_by_product || {};
   $('view').innerHTML = `
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-      ${kpi(n(s.users_total), 'كل الحرفيين', `<div class="text-xs text-gray-500 mt-1">+${n(s.users_new_30)} آخر 30 يوم</div>`)}
-      ${kpi(n(s.pro_active), 'مشترك المحترف الآن', s.pro_ending_7 ? `<div class="text-xs text-amber-700 mt-1">${n(s.pro_ending_7)} ينتهي خلال 7 أيام</div>` : '')}
+      ${kpi(n(s.users_total), 'جميع الحرفيين', `<div class="text-xs text-gray-500 mt-1">+${n(s.users_new_30)} آخر 30 يوم</div>`)}
+      ${kpi(n(s.pro_active), 'مشتركو المحترف حالياً', s.pro_ending_7 ? `<div class="text-xs text-amber-700 mt-1">${n(s.pro_ending_7)} ينتهي خلال 7 أيام</div>` : '')}
       ${kpi(sar(s.revenue_month), 'إيرادات هذا الشهر')}
-      ${kpi(sar(s.revenue_total), 'كل الإيرادات', s.revenue_test ? `<div class="text-xs text-gray-500 mt-1">تجريبي: ${sar(s.revenue_test)}</div>` : '')}
+      ${kpi(sar(s.revenue_total), 'إجمالي الإيرادات', s.revenue_test ? `<div class="text-xs text-gray-500 mt-1">تجريبي: ${sar(s.revenue_test)}</div>` : '')}
     </div>
-    ${s.payments_review ? `<div class="card bg-red-50 border-red-200 text-red-800"><i class="fa-solid fa-triangle-exclamation ml-1"></i> فيه ${n(s.payments_review)} عملية مدفوعة ما تفعّلت تلقائياً (مثلاً المبلغ ما طابق السعر). شوفها في <button class="underline font-bold" data-go-tab="payments">المدفوعات</button> وفعّلها يدوياً من الحرفيين.</div>` : ''}
+    ${s.payments_review ? `<div class="card bg-red-50 border-red-200 text-red-800"><i class="fa-solid fa-triangle-exclamation ml-1"></i> توجد ${n(s.payments_review)} عملية مدفوعة لم تُفعَّل تلقائياً (مثلاً لم يطابق المبلغ السعر). راجعها في <button class="underline font-bold" data-go-tab="payments">المدفوعات</button> وفعّلها يدوياً من الحرفيين.</div>` : ''}
     <div class="grid md:grid-cols-2 gap-3">
       ${barChart(s.ai_daily || [], 'chat', 'طلبات المساعد يومياً')}
       ${barChart(s.ai_daily || [], 'image', 'صور المصوّر يومياً')}
@@ -132,7 +132,7 @@ function renderOverview() {
         <table><tbody>
           <tr><td>طلبات المساعد</td><td class="num">${n(chat.count)}${chat.failed ? ` <span class="text-red-600">(${n(chat.failed)} فشلت)</span>` : ''}</td></tr>
           <tr><td>توكنز داخلة / خارجة</td><td class="num">${n(chat.input_tokens)} / ${n(chat.output_tokens)}</td></tr>
-          <tr><td>صور المصوّر</td><td class="num">${n(img.count)}${img.failed ? ` <span class="text-red-600">(${n(img.failed)} فشلت ورجع رصيدها)</span>` : ''}</td></tr>
+          <tr><td>صور المصوّر</td><td class="num">${n(img.count)}${img.failed ? ` <span class="text-red-600">(${n(img.failed)} فشلت وأُعيد رصيدها)</span>` : ''}</td></tr>
           <tr><td><b>التكلفة التقديرية</b></td><td class="num"><b>${cost.toLocaleString('en-US', { maximumFractionDigits: 2 })} ر.س</b></td></tr>
         </tbody></table>
         <details class="text-sm"><summary class="cursor-pointer text-craft-600">أسعار التقدير (عدّلها حسب فاتورتك)</summary>
@@ -147,20 +147,20 @@ function renderOverview() {
       </div>
       <div class="card space-y-2">
         <b class="text-craft-800">الإيرادات حسب الباقة</b>
-        ${Object.keys(byProd).length ? `<table><tbody>${Object.entries(byProd).map(([k, v]) => `<tr><td>${esc(PRODUCT_NAMES[k] || k)}</td><td class="num">${sar(v)}</td></tr>`).join('')}</tbody></table>` : '<p class="text-sm text-gray-500">ما فيه مدفوعات حقيقية للحين.</p>'}
+        ${Object.keys(byProd).length ? `<table><tbody>${Object.entries(byProd).map(([k, v]) => `<tr><td>${esc(PRODUCT_NAMES[k] || k)}</td><td class="num">${sar(v)}</td></tr>`).join('')}</tbody></table>` : '<p class="text-sm text-gray-500">لا توجد مدفوعات حقيقية بعد.</p>'}
       </div>
     </div>`;
   $('r-save').onclick = () => {
     const v = (id) => Number($(id).value) || 0;
     try { localStorage.setItem(RATES_KEY, JSON.stringify({ inUsd: v('r-in'), outUsd: v('r-out'), imgUsd: v('r-img'), fx: v('r-fx') || 3.75 })); } catch {}
-    renderOverview(); toast('انحفظت ✅');
+    renderOverview(); toast('تم الحفظ ✅');
   };
 }
 
 async function renderUsers(q = '') {
   $('view').innerHTML = `<div class="card space-y-3">
-    <div class="flex gap-2"><input class="inp" id="u-q" placeholder="ابحث بالإيميل أو الاسم" value="${esc(q)}"><button class="btn btn-main" id="u-go">ابحث</button></div>
-    <div id="u-list" class="overflow-x-auto"><p class="text-gray-500">نحمّل…</p></div></div>`;
+    <div class="flex gap-2"><input class="inp" id="u-q" placeholder="ابحث بالبريد الإلكتروني أو الاسم" value="${esc(q)}"><button class="btn btn-main" id="u-go">ابحث</button></div>
+    <div id="u-list" class="overflow-x-auto"><p class="text-gray-500">جارٍ التحميل…</p></div></div>`;
   $('u-go').onclick = () => renderUsers($('u-q').value.trim());
   $('u-q').onkeydown = (e) => { if (e.key === 'Enter') renderUsers($('u-q').value.trim()); };
   const { users } = await api('/api/admin?view=users&q=' + encodeURIComponent(q));
@@ -174,29 +174,29 @@ async function renderUsers(q = '') {
       <button class="btn btn-soft" data-u="${u.user_id}" data-a="grant" data-m="12" title="منح سنة محترف">+سنة</button>
       <button class="btn btn-soft" data-u="${u.user_id}" data-a="images" title="إضافة صور">+صور</button>
       ${u.plan === 'pro' ? `<button class="btn btn-red" data-u="${u.user_id}" data-a="revoke">إيقاف</button>` : ''}
-    </div></td></tr>`).join('')}</tbody></table>` : '<p class="text-gray-500">ما فيه نتائج.</p>';
+    </div></td></tr>`).join('')}</tbody></table>` : '<p class="text-gray-500">لا توجد نتائج.</p>';
   $('u-list').querySelectorAll('[data-a]').forEach((b) => b.onclick = async () => {
     const a = b.dataset.a, user_id = b.dataset.u;
     let body = { action: a, user_id };
-    if (a === 'grant') { if (!confirm(`تمنح هذا الحرفي ${b.dataset.m === '12' ? 'سنة' : 'شهر'} محترف مجاناً؟`)) return; body.months = Number(b.dataset.m); }
-    if (a === 'images') { const c = prompt('كم صورة تضيف؟ (اكتب رقم سالب للخصم)', '20'); if (!c) return; body.count = Number(c); }
-    if (a === 'revoke' && !confirm('توقف اشتراك المحترف لهذا الحرفي الآن؟')) return;
+    if (a === 'grant') { if (!confirm(`هل تمنح هذا الحرفي ${b.dataset.m === '12' ? 'سنة' : 'شهراً'} من المحترف مجاناً؟`)) return; body.months = Number(b.dataset.m); }
+    if (a === 'images') { const c = prompt('كم صورة تريد إضافتها؟ (اكتب رقماً سالباً للخصم)', '20'); if (!c) return; body.count = Number(c); }
+    if (a === 'revoke' && !confirm('هل توقف اشتراك المحترف لهذا الحرفي الآن؟')) return;
     b.disabled = true;
-    try { await api('/api/admin', body); toast('تم ✅'); renderUsers($('u-q').value.trim()); } catch (e) { b.disabled = false; toast('ما تم: ' + (e.code || '')); }
+    try { await api('/api/admin', body); toast('تم ✅'); renderUsers($('u-q').value.trim()); } catch (e) { b.disabled = false; toast('لم يتم: ' + (e.code || '')); }
   });
 }
 
 async function renderPayments() {
-  $('view').innerHTML = '<div class="card"><p class="text-gray-500">نحمّل…</p></div>';
+  $('view').innerHTML = '<div class="card"><p class="text-gray-500">جارٍ التحميل…</p></div>';
   const { payments } = await api('/api/admin?view=payments');
-  const NOTES = { amount_mismatch: 'المبلغ ما طابق السعر', unknown_product: 'باقة غير معروفة', no_user: 'بدون حساب' };
+  const NOTES = { amount_mismatch: 'المبلغ لا يطابق السعر', unknown_product: 'باقة غير معروفة', no_user: 'بلا حساب' };
   $('view').innerHTML = `<div class="card overflow-x-auto">${payments.length ? `<table><thead><tr><th>التاريخ</th><th>الحرفي</th><th>الباقة</th><th>المبلغ</th><th>الحالة</th></tr></thead><tbody>${payments.map((p) => `
     <tr><td class="text-sm">${esc(day(p.created_at))}</td>
     <td class="text-sm break-all" dir="ltr" style="text-align:right">${esc(p.email || '—')}</td>
     <td class="text-sm">${esc(PRODUCT_NAMES[p.product] || p.product)}${p.method ? `<div class="text-xs text-gray-500">${esc(p.method)}</div>` : ''}</td>
     <td class="num text-sm">${sar(p.amount)}${p.live === false ? ' <span class="pill bg-amber-100 text-amber-800">تجربة</span>' : ''}</td>
-    <td class="text-sm">${p.applied_at ? '<span class="pill bg-green-100 text-green-800">تفعّل</span>' : p.status === 'paid' ? `<span class="pill bg-red-100 text-red-700">يحتاج مراجعة</span><div class="text-xs text-red-700 mt-1">${esc(NOTES[p.note] || p.note || '')}</div>` : `<span class="pill bg-gray-100 text-gray-600">${esc(p.status)}</span>`}
-      <div class="text-[10px] text-gray-400 break-all" dir="ltr">${esc(p.id)}</div></td></tr>`).join('')}</tbody></table>` : '<p class="text-gray-500">ما فيه مدفوعات للحين.</p>'}</div>`;
+    <td class="text-sm">${p.applied_at ? '<span class="pill bg-green-100 text-green-800">مفعّل</span>' : p.status === 'paid' ? `<span class="pill bg-red-100 text-red-700">يحتاج مراجعة</span><div class="text-xs text-red-700 mt-1">${esc(NOTES[p.note] || p.note || '')}</div>` : `<span class="pill bg-gray-100 text-gray-600">${esc(p.status)}</span>`}
+      <div class="text-[10px] text-gray-400 break-all" dir="ltr">${esc(p.id)}</div></td></tr>`).join('')}</tbody></table>` : '<p class="text-gray-500">لا توجد مدفوعات بعد.</p>'}</div>`;
 }
 
 function renderPlans() {
@@ -214,7 +214,7 @@ function renderPlans() {
         ${pr.images_20 ? f('im-amount', 'باقة الصور', pr.images_20.amount / 100) : ''}
         ${pr.images_20 ? f('im-count', 'عدد صور الباقة', pr.images_20.images) : ''}
       </div>
-      <p class="text-xs text-gray-500">السعر يشمل ضريبة القيمة المضافة إذا كنت مسجل فيها. التغيير ما يأثر على اشتراكات مدفوعة قبل.</p>
+      <p class="text-xs text-gray-500">يشمل السعر ضريبة القيمة المضافة إذا كنت مسجّلاً فيها. لا يؤثر التغيير على الاشتراكات المدفوعة سابقاً.</p>
     </div></div>
     <button class="btn btn-main mt-3" id="plans-save"><i class="fa-solid fa-floppy-disk"></i> احفظ الأسعار والحدود</button>`;
   $('plans-save').onclick = async () => {
@@ -226,19 +226,19 @@ function renderPlans() {
         pro_yearly: $('py-amount') ? { amount: Math.round(v('py-amount') * 100) } : undefined,
         images_20: $('im-amount') ? { amount: Math.round(v('im-amount') * 100), images: v('im-count') } : undefined,
       } } };
-    try { const r = await api('/api/admin', body); DATA.plans = r.plans; toast('انحفظت ✅'); } catch (e) { toast('قيمة غير صحيحة: ' + (e.code || '')); }
+    try { const r = await api('/api/admin', body); DATA.plans = r.plans; toast('تم الحفظ ✅'); } catch (e) { toast('قيمة غير صحيحة: ' + (e.code || '')); }
   };
 }
 
 function renderPages() {
   const pg = DATA.pages || {};
   const NAMES = { terms: 'الشروط والأحكام', privacy: 'سياسة الخصوصية', refund: 'سياسة الاسترجاع', contact: 'تواصل معنا' };
-  $('view').innerHTML = `<div class="card space-y-2 text-sm text-gray-600">اترك الخانة فاضية عشان يظهر النص الافتراضي المكتوب في الصفحة. إذا كتبت نص هنا يظهر بدله. سطر يبدأ بـ "## " يصير عنوان، والأسطر اللي تبدأ بـ "- " تصير قائمة، واترك سطر فاضي بين الفقرات. بيانات المنشأة (الاسم والسجل والإيميل) تعدّلها في ملف site-info.js.</div>
-    ${Object.entries(NAMES).map(([k, l]) => `<div class="card space-y-2"><div class="flex justify-between items-center"><b class="text-craft-800">${l}</b><a class="text-sm underline text-craft-600" href="/${k}.html" target="_blank">شوف الصفحة</a></div><textarea class="inp" rows="8" id="pg-${k}">${esc(pg[k] || '')}</textarea></div>`).join('')}
+  $('view').innerHTML = `<div class="card space-y-2 text-sm text-gray-600">اترك الخانة فارغة ليظهر النص الافتراضي المكتوب في الصفحة، وإذا كتبت نصاً هنا فسيظهر بدلاً منه. السطر الذي يبدأ بـ "## " يصبح عنواناً، والأسطر التي تبدأ بـ "- " تصبح قائمة، واترك سطراً فارغاً بين الفقرات. بيانات المنشأة (الاسم والسجل والإيميل) تعدّلها في ملف site-info.js.</div>
+    ${Object.entries(NAMES).map(([k, l]) => `<div class="card space-y-2"><div class="flex justify-between items-center"><b class="text-craft-800">${l}</b><a class="text-sm underline text-craft-600" href="/${k}.html" target="_blank">عرض الصفحة</a></div><textarea class="inp" rows="8" id="pg-${k}">${esc(pg[k] || '')}</textarea></div>`).join('')}
     <button class="btn btn-main" id="pages-save"><i class="fa-solid fa-floppy-disk"></i> احفظ النصوص</button>`;
   $('pages-save').onclick = async () => {
     const pages = {}; Object.keys(NAMES).forEach((k) => (pages[k] = $('pg-' + k).value));
-    try { await api('/api/admin', { action: 'pages', pages }); DATA.pages = pages; toast('انحفظت ✅'); } catch { toast('ما انحفظت'); }
+    try { await api('/api/admin', { action: 'pages', pages }); DATA.pages = pages; toast('تم الحفظ ✅'); } catch { toast('لم يتم الحفظ'); }
   };
 }
 
@@ -251,7 +251,7 @@ async function show(tab) {
     if (tab === 'payments') await renderPayments();
     if (tab === 'plans') renderPlans();
     if (tab === 'pages') renderPages();
-  } catch (e) { $('view').innerHTML = `<div class="card text-red-700">ما قدرنا نجيب البيانات (${esc(e.code || e.message)}).</div>`; }
+  } catch (e) { $('view').innerHTML = `<div class="card text-red-700">تعذّر جلب البيانات (${esc(e.code || e.message)}).</div>`; }
 }
 document.addEventListener('click', (e) => {
   const t = e.target.closest('[data-tab],[data-go-tab]'); if (!t) return;
@@ -264,14 +264,14 @@ document.addEventListener('click', (e) => {
     await new Promise((res, rej) => { const s = document.createElement('script'); s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js'; s.onload = res; s.onerror = rej; document.head.appendChild(s); });
     SB = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, { auth: { persistSession: true, autoRefreshToken: true, flowType: 'pkce' } });
     const { data } = await SB.auth.getSession();
-    if (!data || !data.session) { $('view').innerHTML = '<div class="card">ادخل حسابك من <a class="underline" href="/">المنصة</a> أول، ثم ارجع هنا.</div>'; return; }
+    if (!data || !data.session) { $('view').innerHTML = '<div class="card">سجّل الدخول من <a class="underline" href="/">المنصة</a> أولاً، ثم عد إلى هنا.</div>'; return; }
     DATA = await api('/api/admin?view=stats');
     if (DATA.testMode) $('test-banner').classList.remove('hidden');
     show('overview');
   } catch (e) {
     $('view').innerHTML = e.code === 'not_granted'
-      ? '<div class="card">هذي الصفحة لصاحب المنصة فقط. تأكد إن إيميلك مكتوب في ADMIN_EMAILS في إعدادات Cloudflare.</div>'
-      : `<div class="card text-red-700">ما قدرنا نفتح اللوحة (${esc(e.code || e.message)}).</div>`;
+      ? '<div class="card">هذه الصفحة لصاحب المنصة فقط. تأكد أن بريدك مكتوب في ADMIN_EMAILS في إعدادات Cloudflare.</div>'
+      : `<div class="card text-red-700">تعذّر فتح اللوحة (${esc(e.code || e.message)}).</div>`;
   }
 })();
 </script>
