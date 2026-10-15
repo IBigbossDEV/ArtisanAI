@@ -50,8 +50,9 @@ function phSetFile(file, url) {
 }
 
 ROUTES.photographer = {
-  nav: 'more',
-  render() {
+  nav: 'photographer',
+  render(params = {}) {
+    if (params.productId && prodById(params.productId)) S.settings.lastProduct = params.productId;
     if (!PH.file && st.file && !PH.cleared) { phSetFile(st.file, st.url); PH.fromStudio = true; }
     const p = prodById(S.settings.lastProduct);
     const left = PLAT.left('image');
@@ -66,7 +67,7 @@ ROUTES.photographer = {
         <p class="hint">${esc(r.label)}</p>
       </div>`).join('');
     return screen({
-      title: 'المصوّر الذكي', sub: 'ارفع صورة لمنتجك من جوالك، واختر المكان، والمصوّر يطلّع لك صورة إعلانية لنفس منتجك.', back: 'more',
+      title: 'المصوّر الذكي', sub: 'ارفع صورة لمنتجك من جوالك، واختر المكان، والمصوّر يطلّع لك صورة إعلانية لنفس منتجك.',
       body: `
       <div class="card flex items-center justify-between gap-3 ${left ? '' : 'bg-amber-50 border-amber-200'}">
         <span class="text-gray-700"><i class="fa-solid fa-images ml-1 text-craft-500"></i> رصيدك: <b class="num">${left}</b> صورة</span>
@@ -98,6 +99,7 @@ ROUTES.photographer = {
         ${segGroup('ph-ratio', [['1:1', 'مربع'], ['4:5', 'طولي'], ['9:16', 'ستوري']], PH.ratio, 3)}
       </div>
       <button type="button" id="ph-go" class="btn btn-main w-full text-lg" data-act="phGenerate"><i class="fa-solid fa-wand-magic-sparkles"></i> ${PH.busy ? 'وقّف' : 'صوّر منتجي'}</button>
+      <button type="button" class="btn btn-soft w-full" data-go="studio"><i class="fa-solid fa-sliders"></i> عندك صورة جاهزة؟ عدّلها بنفسك (مقاس، إضاءة، إطار)</button>
       <p class="hint">كل صورة تنحسب من رصيدك. إذا ما طلعت صورة ما ينخصم شي. المصوّر ممكن يغيّر تفاصيل بسيطة، تأكد إن المنتج يشبه منتجك قبل ما تنشر.</p>
       <div id="ph-out" class="space-y-3">${PH.busy ? phLoader() : ''}${results}</div>`,
     });

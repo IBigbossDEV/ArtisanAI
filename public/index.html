@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>منصة الحرفي السعودي</title>
-<meta name="description" content="منصة تساعد الحرفيين والأسر المنتجة في السعودية يسعّرون منتجاتهم، ويسوّقونها، ويتابعون طلباتهم، مع مساعد ذكي ومصوّر ذكي.">
+<meta name="description" content="دعم واستشارات للحرفيين والأسر المنتجة في السعودية بالذكاء الاصطناعي: تسعير، تسويق، ومصوّر ذكي لمنتجاتك.">
 <meta name="theme-color" content="#6b4c3a">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
@@ -18,8 +18,6 @@
   }
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=Reem+Kufi:wght@500;700&display=swap" rel="stylesheet">
@@ -102,13 +100,14 @@
     <div class="max-w-3xl mx-auto px-4 py-3 flex justify-between items-center gap-3">
       <button type="button" data-go="home" class="flex items-center gap-2 min-w-0 text-start">
         <i class="fa-solid fa-hands-holding-circle text-xl text-craft-200"></i>
-        <span id="app-title" class="text-lg sm:text-xl font-bold truncate">منصة الحرفي السعودي</span>
+        <span id="app-title" class="text-base sm:text-xl font-bold truncate">منصة الحرفي السعودي</span>
       </button>
       <div class="flex items-center gap-2 flex-shrink-0">
         <span id="ai-pill" class="hidden sm:inline-flex items-center gap-1.5 text-xs font-medium bg-craft-800 text-craft-200 rounded-full px-2.5 py-1">
           <span id="ai-dot" class="w-2 h-2 rounded-full bg-craft-400"></span><span id="ai-pill-text">جاري تشغيل المساعد…</span>
         </span>
         <button type="button" data-go="plan" class="bg-amber-500 hover:bg-amber-600 text-craft-900 rounded-lg px-2.5 py-1.5 font-bold text-sm flex items-center gap-1"><i class="fa-solid fa-crown"></i><span id="plan-btn-label">اشترك</span></button>
+        <button type="button" data-go="more" class="bg-craft-800 hover:bg-craft-900 rounded-lg px-2.5 py-1.5 text-sm" aria-label="حسابي"><i class="fa-solid fa-user"></i></button>
         <button type="button" id="font-btn" class="bg-craft-800 hover:bg-craft-900 rounded-lg px-2.5 py-1.5 font-bold text-sm" aria-label="حجم الخط">أ<span class="text-xs">+</span></button>
       </div>
     </div>
@@ -137,9 +136,9 @@
     <div class="max-w-3xl mx-auto flex">
       <button type="button" class="nav-item" data-go="home" data-nav="home"><span class="nav-pill"><i class="fa-solid fa-house"></i></span>الرئيسية</button>
       <button type="button" class="nav-item" data-go="products" data-nav="products"><span class="nav-pill"><i class="fa-solid fa-box-open"></i></span>منتجاتي</button>
-      <button type="button" class="nav-item relative" data-go="orders" data-nav="orders"><span class="nav-pill"><i class="fa-solid fa-clipboard-list"></i></span>الطلبات<span id="nav-orders-badge" class="badge-dot hidden absolute top-1 left-1/2 -translate-x-[-0.9rem]"></span></button>
       <button type="button" class="nav-item" data-go="chat" data-nav="chat"><span class="nav-pill"><i class="fa-solid fa-comments"></i></span>المساعد</button>
-      <button type="button" class="nav-item" data-go="more" data-nav="more"><span class="nav-pill"><i class="fa-solid fa-grip"></i></span>المزيد</button>
+      <button type="button" class="nav-item" data-go="photographer" data-nav="photographer"><span class="nav-pill"><i class="fa-solid fa-wand-magic-sparkles"></i></span>المصوّر</button>
+      <button type="button" class="nav-item" data-go="market" data-nav="market"><span class="nav-pill"><i class="fa-solid fa-bullhorn"></i></span>التسويق</button>
     </div>
   </nav>
 
@@ -159,7 +158,7 @@ const CONFIG = {
   platformName: 'منصة الحرفي السعودي',
   orgName: 'الحرفيين',                     // يظهر في عنوان المجتمع: "مجتمع الحرفيين"
   supportedBy: '',                        // اسم جهة داعمة تظهر في "من نحن" (اتركه فاضي إذا ما فيه)
-  orgAbout: 'منصة تساعد الحرفيين والحرفيات والأسر المنتجة يسعّرون منتجاتهم صح، ويسوّقونها، ويتابعون طلباتهم ومبيعاتهم.',
+  orgAbout: 'مستشارك الذكي في الحرفة: يساعدك تسعّر منتجاتك صح، وتسوّق لها، وتصوّرها صور احترافية.',
   contactWhatsapp: '',                      // رقم واتساب إدارة المنصة (اختياري)
 };
 
@@ -432,7 +431,14 @@ function rules() {
 - إذا سُئلت عن موضوع خارج الحرف والمشاريع الصغيرة، اعتذر بلطف في جملة وارجع لمنتج الحرفي.
 - لا تقدم استشارات قانونية أو ضريبية ملزمة؛ انصح بمراجعة الجهات الرسمية.
 - لا تخترع آراء زبائن أو أرقام مبيعات أو شهادات غير حقيقية.
-- احترم التراث والهوية السعودية، وأبرز قيمة العمل اليدوي.`;
+- احترم التراث والهوية السعودية، وأبرز قيمة العمل اليدوي.
+
+معلومات عامة عن الأنظمة (آخر تحديث أكتوبر 2026، قلها كمعلومة عامة وانصح بالتأكد من الجهة الرسمية):
+- صدر نظام الحرف والصناعات اليدوية، وفيه مهلة لتصحيح الأوضاع من 23 مايو 2026 إلى 23 مايو 2027.
+- اللي يمارس الحرفة لأغراض تجارية أو يتاجر بالمنتجات الحرفية يحتاج "ترخيص ممارس حرفي" من هيئة التراث، ويُسجَّل في السجل الوطني للحرفيين. وفيه ترخيص منفصل لمحلات بيع المنتجات الحرفية التراثية. كانت الرخص تصدر عبر منصة "أبدع" التابعة لوزارة الثقافة، والإجراء ممكن يتحدث مع النظام الجديد.
+- وثيقة العمل الحر (منصة العمل الحر freelance.sa من وزارة الموارد البشرية): مجانية، مدتها سنة وتتجدد، للسعوديين من 18 سنة بحساب النفاذ الوطني، وفيها فئة الأسر المنتجة (الأكل والحلويات، الخياطة، الأعمال اليدوية والحرفية، العطور والبخور). تفيد في فتح حساب بنكي للنشاط، وتوثيق المتجر الإلكتروني، وبوابات الدفع، وبرامج الدعم والتمويل.
+- ضريبة القيمة المضافة: التسجيل إلزامي إذا المبيعات السنوية 375 ألف ريال أو أكثر، واختياري بين 187,500 و375 ألف ريال، وغير مطلوب تحت ذلك (هيئة الزكاة والضريبة والجمارك zatca.gov.sa).
+- الأكل ومنتجات العناية والعطور لها اشتراطات خاصة في التصنيع والتغليف والملصق: انصح بسؤال البلدية والهيئة العامة للغذاء والدواء (sfda.gov.sa).`;
 }
 
 /* ---------- تشغيل المساعد وعرض الرد ---------- */
@@ -594,8 +600,7 @@ document.addEventListener('segchange', e => { const r = ROUTES[CUR.name]; if (r 
 const goP = (name, params) => `data-go="${name}" data-p='${esc(JSON.stringify(params))}'`;
 
 function updateBadges() {
-  const due = S.orders.filter(o => o.status !== 'done' && o.due && daysUntil(o.due) !== null && daysUntil(o.due) <= 2).length;
-  const b = $('nav-orders-badge'); b.textContent = due; b.classList.toggle('hidden', !due);
+
 }
 
 /* ---------- حفظ ملف للجهاز ---------- */
@@ -674,11 +679,7 @@ ROUTES.products = {
         </div>
         <div class="space-y-3">${cards}</div>
         <p class="hint">الإطار الأحمر يعني ربحك قليل في هالمنتج.</p>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          <button type="button" class="btn btn-green" data-act="exportExcel"><i class="fa-solid fa-file-excel"></i> احفظ قائمة الأسعار Excel</button>
-          <button type="button" class="btn btn-soft" data-act="exportCsv"><i class="fa-solid fa-store"></i> ملف للمتجر الإلكتروني</button>
-        </div>
-        <button type="button" class="btn btn-soft w-full" data-go="catalogMine"><i class="fa-solid fa-store"></i> اعرض منتجاتي في معرض ${esc(CONFIG.orgName)}</button>`
+        <button type="button" class="btn btn-soft w-full" data-go="chat"><i class="fa-solid fa-comments"></i> اسأل المساعد عن أسعارك</button>`
       : `<div class="card text-center py-10 text-gray-500"><i class="fa-solid fa-box-open text-5xl text-craft-300 mb-3"></i><p class="font-bold">ما أضفت منتجات للحين</p><p class="text-sm mt-1">أضف أول منتج، ونحسب لك سعره وربحك.</p></div>`}
       `,
     });
@@ -792,11 +793,8 @@ ROUTES.product = {
 
       <div class="grid grid-cols-2 gap-2">
         <button type="button" class="btn btn-soft" ${goP('description', { productId: p.id })}><i class="fa-solid fa-pen-nib"></i> اكتب وصف</button>
-        <button type="button" class="btn btn-soft" ${goP('orderEdit', { productId: p.id })}><i class="fa-solid fa-clipboard-list"></i> سجّل طلب</button>
-        <button type="button" class="btn btn-soft" ${goP('studio', { productId: p.id })}><i class="fa-solid fa-camera-retro"></i> عدّل الصورة</button>
-        <button type="button" class="btn btn-soft" ${goP('cards', { productId: p.id })}><i class="fa-solid fa-id-card"></i> بطاقات وملصقات</button>
+        <button type="button" class="btn btn-soft" ${goP('photographer', { productId: p.id })}><i class="fa-solid fa-wand-magic-sparkles"></i> صوّره بالمصوّر الذكي</button>
       </div>
-      <button type="button" class="btn btn-green w-full" data-act="exportOne" data-id="${p.id}"><i class="fa-solid fa-file-excel"></i> احفظ تسعيرة هالمنتج Excel</button>
       <div id="del-zone"><button type="button" class="btn w-full text-red-700 hover:bg-red-50" data-act="askDelete" data-id="${p.id}"><i class="fa-solid fa-trash"></i> احذف المنتج</button></div>
       `,
     });
@@ -992,38 +990,6 @@ function thumbFromCanvas(canvas, max = 480) {
   c.getContext('2d').drawImage(canvas, 0, 0, c.width, c.height); return c.toDataURL('image/jpeg', 0.8);
 }
 
-/* ---------- التصدير ---------- */
-function buildSheet(rows) {
-  const headers = ['اسم المنتج', 'المواد (ر.س)', 'ساعات العمل', 'أجر الساعة (ر.س)', 'الإيجار والكهرباء على القطعة (ر.س)', 'الشحن (ر.س)', 'الشحن داخل السعر؟', 'الربح فوق التكلفة (%)', 'نسبة المتجر أو الدفع (%)', 'قطعة فريدة؟', 'كل التكاليف (ر.س)', 'الربح (ر.س)', 'سعر البيع (ر.س)', 'ربحك من كل 100 ريال', 'سعر المحلات (ر.س)', 'سعر الكميات للقطعة (ر.س)'];
-  const data = [headers];
-  rows.forEach(p => { const c = computeRow(p); data.push([p.name || 'منتج', c.materials, c.hours, c.wage, c.overhead, c.shipping, c.shipIn ? 'نعم' : 'لا، على الزبون', c.markup, c.fee, p.unique ? `نعم (+${nz(p.uniqueExtra)}%)` : 'لا', r2(c.totalCost), r2(c.profitValue), r2(c.sellingPrice), Math.round(c.realMargin), r2(c.shopPrice), r2(c.bulkPrice)]); });
-  const ws = XLSX.utils.aoa_to_sheet(data);
-  ws['!cols'] = headers.map((h, i) => ({ wch: i === 0 ? 26 : Math.max(12, h.length) }));
-  return ws;
-}
-function saveWorkbook(sheets, filename) {
-  if (typeof XLSX === 'undefined') { toast('ما قدرنا نجهّز ملف Excel. افتح الصفحة من جديد.'); return; }
-  const wb = XLSX.utils.book_new();
-  sheets.forEach(([name, ws]) => XLSX.utils.book_append_sheet(wb, ws, name));
-  wb.Workbook = { Views: [{ RTL: true }] };
-  const bytes = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-  track('actions', 'excel');
-  offerFile(filename, new Blob([bytes]), 'انحفظ الملف ✅');
-}
-ACT.exportExcel = () => { if (!S.products.length) { toast('أضف منتج أول.'); return; } saveWorkbook([['أسعار منتجاتي', buildSheet(S.products)]], 'أسعار_منتجاتي.xlsx'); };
-ACT.exportOne = (b) => { const p = prodById(b.dataset.id); saveWorkbook([['التسعيرة', buildSheet([p])]], `تسعيرة_${safeName(p.name)}.xlsx`); };
-ACT.exportCsv = () => {
-  if (!S.products.length) { toast('أضف منتج أول.'); return; }
-  const q = (s) => `"${String(s ?? '').replace(/"/g, '""').replace(/\r?\n/g, ' ')}"`;
-  const lines = [['اسم المنتج', 'السعر', 'الوصف', 'النوع', 'رمز المنتج'].map(q).join(',')];
-  S.products.forEach(p => {
-    const desc = (S.texts.find(t => t.productId === p.id && t.kind === 'description') || {}).text || p.details || '';
-    lines.push([p.name, computeRow(p).rounded, plain(desc), p.craft || S.profile.craft, p.id].map(q).join(','));
-  });
-  track('actions', 'csv');
-  offerFile('منتجاتي_للمتجر.csv', new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv' }), 'انحفظ الملف ✅ ارفعه في متجرك وطابق الأعمدة');
-};
-
 /* ---------- النصوص المحفوظة ---------- */
 ROUTES.savedTexts = {
   nav: 'more',
@@ -1058,31 +1024,9 @@ ROUTES.home = {
     const hour = new Date().getHours();
     const greet = hour < 12 ? 'صباح الخير' : 'مساء الخير';
     const cards = [];
-    // طلبات قريبة
-    if (has('orders')) {
-      const open = S.orders.filter(o => o.status !== 'done').sort((a, b) => String(a.due || '9').localeCompare(String(b.due || '9')));
-      const soon = open.filter(o => o.due && daysUntil(o.due) <= 3);
-      if (open.length) cards.push(`<div class="card space-y-2">
-        <div class="flex justify-between items-center"><h2 class="font-extrabold text-craft-800"><i class="fa-solid fa-clipboard-list ml-1"></i> طلباتك المفتوحة (${open.length})</h2><button type="button" class="text-sm font-bold text-craft-600 underline" data-go="orders">كلها</button></div>
-        ${(soon.length ? soon : open).slice(0, 3).map(orderMini).join('')}
-      </div>`);
-    }
-    // ملخص الشهر
-    if (has('sales') && S.sales.length) {
-      const m = monthKey(todayStr()); const ms = S.sales.filter(s => monthKey(s.date) === m);
-      const total = ms.reduce((a, s) => a + nz(s.price) * nz(s.qty), 0);
-      cards.push(`<button type="button" class="card w-full text-start flex items-center justify-between hover:bg-craft-50" data-go="sales"><div><div class="text-sm text-gray-500 font-bold">مبيعاتك في ${monthName(m)}</div><div class="text-2xl font-extrabold text-craft-800 num">${money(total)}</div></div><div class="text-sm text-gray-500">${ms.length} بيعة <i class="fa-solid fa-chevron-left mr-1"></i></div></button>`);
-    }
     // المناسبة الجاية
     const occ = nextOccasions().find(o => o.days <= 45);
     if (occ) cards.push(`<button type="button" class="card w-full text-start bg-amber-50 border-amber-200 hover:bg-amber-100" data-go="occasions"><div class="text-sm font-bold text-amber-800"><i class="fa-solid fa-calendar-day ml-1"></i> ${occ.days === 0 ? 'اليوم' : `بعد ${occ.days} يوم`}: ${esc(occ.name)}</div><div class="text-gray-700 mt-1">${esc(occ.tip)}</div><div class="text-sm font-bold text-craft-700 mt-2">جهّز منشورك <i class="fa-solid fa-chevron-left mr-1"></i></div></button>`);
-    // متابعة الأثر
-    if (has('impact') && impactDue()) cards.push(`<button type="button" class="card w-full text-start bg-green-50 border-green-200 hover:bg-green-100" data-go="impact"><div class="font-extrabold text-green-800"><i class="fa-solid fa-seedling ml-1"></i> كيف صار وضعك مع المنصة؟</div><div class="text-gray-700 mt-1">3 أسئلة سريعة تساعدنا نطوّر المنصة.</div></button>`);
-    // درس اليوم
-    if (has('lessons')) { const l = lessonOfDay(); if (l) cards.push(`<button type="button" class="card w-full text-start hover:bg-craft-50" ${goP('lesson', { id: l.id })}><div class="text-sm font-bold text-craft-600"><i class="fa-solid fa-lightbulb ml-1"></i> درس الدقيقة</div><div class="font-extrabold text-craft-900 mt-1">${esc(l.title)}</div></button>`); }
-    // الشارات
-    if (has('badges')) { const b = badgeList(); const got = b.filter(x => x.got).length; cards.push(`<button type="button" class="card w-full text-start hover:bg-craft-50" data-go="badges"><div class="flex justify-between items-center"><span class="font-extrabold text-craft-800"><i class="fa-solid fa-medal ml-1 text-amber-500"></i> شاراتك</span><span class="text-sm font-bold text-gray-500 num">${got} من ${b.length}</span></div><div class="h-2 rounded-full bg-craft-100 mt-2 overflow-hidden"><div class="h-full bg-amber-400" style="width:${(got / b.length * 100).toFixed(0)}%"></div></div></button>`); }
-
     return `<div class="fade-in space-y-4">
       <div class="rounded-2xl bg-craft-700 text-white p-5 relative overflow-hidden">
         <div class="absolute inset-x-0 bottom-0 h-2" style="background:repeating-linear-gradient(90deg,#9e2b25 0 14px,#f3e6d0 14px 28px,#1f1a17 28px 42px)"></div>
@@ -1094,9 +1038,8 @@ ROUTES.home = {
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <button type="button" class="big-action" data-act="${S.products.length ? 'goProducts' : 'newProduct'}"><span class="ic bg-amber-100 text-amber-700"><i class="fa-solid fa-coins"></i></span><span>أسعّر منتج<span class="block text-sm font-medium text-gray-500">بكم أبيع وكم ربحي؟</span></span></button>
         <button type="button" class="big-action" data-go="description"><span class="ic bg-blue-100 text-blue-700"><i class="fa-solid fa-pen-nib"></i></span><span>أكتب إعلان<span class="block text-sm font-medium text-gray-500">وصف جاهز للنشر</span></span></button>
-        <button type="button" class="big-action" data-go="studio"><span class="ic bg-purple-100 text-purple-700"><i class="fa-solid fa-camera-retro"></i></span><span>أعدّل صورة<span class="block text-sm font-medium text-gray-500">مقاس، إضاءة، إطار</span></span></button>
-        ${has('orderEdit') ? `<button type="button" class="big-action" data-go="orderEdit"><span class="ic bg-green-100 text-green-700"><i class="fa-solid fa-clipboard-list"></i></span><span>أسجّل طلب<span class="block text-sm font-medium text-gray-500">زبون، عربون، موعد</span></span></button>`
-        : `<button type="button" class="big-action" data-go="chat"><span class="ic bg-green-100 text-green-700"><i class="fa-solid fa-comments"></i></span><span>أسأل المساعد<span class="block text-sm font-medium text-gray-500">أي سؤال عن شغلك</span></span></button>`}
+        <button type="button" class="big-action" data-go="photographer"><span class="ic bg-purple-100 text-purple-700"><i class="fa-solid fa-wand-magic-sparkles"></i></span><span>أصوّر منتجي<span class="block text-sm font-medium text-gray-500">صورة إعلانية من صورة جوالك</span></span></button>
+        <button type="button" class="big-action" data-go="chat"><span class="ic bg-green-100 text-green-700"><i class="fa-solid fa-comments"></i></span><span>أستشير المساعد<span class="block text-sm font-medium text-gray-500">أي سؤال عن شغلك ومشروعك</span></span></button>
       </div>
       ${cards.join('')}
       <button type="button" class="card w-full text-start flex items-center gap-3 hover:bg-craft-50" data-go="feedback"><i class="fa-solid fa-comment-dots text-2xl text-craft-500"></i><span><b class="text-craft-800">رأيك يهمنا</b><span class="block text-sm text-gray-500">قل لنا وش عجبك ووش صعب عليك.</span></span></button>
@@ -1110,7 +1053,7 @@ ACT.goProducts = () => go('products');
 ROUTES.onboard = {
   nav: 'more',
   render({ first }) {
-    const p = S.profile, b = S.impact.baseline || {};
+    const p = S.profile;
     return `<div class="fade-in space-y-4">
       ${first ? `<div class="rounded-2xl bg-craft-700 text-white p-5"><div class="text-2xl font-extrabold">هلا والله 👋</div><p class="text-craft-100 mt-2 leading-relaxed">${esc(CONFIG.orgAbout)}</p><p class="text-craft-100 mt-2">عرّفنا عليك في دقيقة، عشان نعطيك نصايح تناسبك.</p></div>`
       : screen({ title: 'ملفي', sub: 'معلوماتك تساعد المساعد يعطيك نصايح تناسبك.', back: 'more' })}
@@ -1124,16 +1067,8 @@ ROUTES.onboard = {
           ${fInput({ id: 'o-wa', label: 'رقم الواتساب (اختياري)', value: p.whatsapp, ph: '05xxxxxxxx', type: 'tel' })}
           ${fInput({ id: 'o-handle', label: 'حسابك في انستقرام (اختياري)', value: p.handle, ph: '@sadu.home' })}
         </div>
-        <p class="hint">رقمك يظهر فقط في البطاقات اللي تصممها بنفسك، أو في المعرض إذا اخترت تعرض منتجاتك.</p>
+        <p class="hint">رقمك وحسابك يدخلون في النصوص اللي يكتبها المساعد لك، مثل الإعلانات والردود.</p>
       </div>
-      ${!b.at ? `<details class="more card p-0" ${first ? 'open' : ''}>
-        <summary>سؤالين يساعدونا نقيس فايدة المنصة لك (اختياري) <i class="fa-solid fa-chevron-down chev"></i></summary>
-        <div class="px-4 pb-4 space-y-3">
-          ${fInput({ id: 'b-price', label: 'بكم تبيع قطعتك الأشهر الحين؟ (ر.س)', type: 'number', ph: '150' })}
-          ${fInput({ id: 'b-sales', label: 'كم قطعة تبيع في الشهر تقريباً؟', type: 'number', ph: '10' })}
-          <div><span class="lbl">كم أنت واثق إن سعرك صح؟</span>${segGroup('b-conf', [['1', '1'], ['2', '2'], ['3', '3'], ['4', '4'], ['5', '5']], '', 5)}<p class="hint">1 = مو واثق أبداً، 5 = واثق جداً</p></div>
-        </div>
-      </details>` : ''}
       <button type="button" class="btn btn-main w-full text-lg" data-act="saveProfile" data-first="${first ? 1 : ''}">${first ? 'يلا نبدأ' : 'احفظ'}</button>
       ${first ? '<button type="button" class="btn w-full text-craft-600" data-act="skipOnboard">بعدين</button>' : ''}
     </div>`;
@@ -1142,7 +1077,6 @@ ROUTES.onboard = {
 };
 ACT.saveProfile = (btn) => {
   Object.assign(S.profile, { name: val('o-name'), craft: val('o-craft'), category: val('o-cat'), region: val('o-region'), store: val('o-store'), whatsapp: val('o-wa'), handle: val('o-handle') });
-  if ($('b-price') && (val('b-price') || val('b-sales') || segVal('b-conf'))) S.impact.baseline = { price: nz(val('b-price')), sales: nz(val('b-sales')), conf: Number(segVal('b-conf')) || 0, at: Date.now() };
   S.settings.onboarded = true; save(); queueFeedback();
   toast('انحفظ ✅', true);
   go(btn.dataset.first ? 'home' : 'more');
@@ -1155,16 +1089,31 @@ ROUTES.more = {
     const tile = (r, icon, label, params) => has(r) ? `<button type="button" class="tile" ${params ? goP(r, params) : `data-go="${r}"`}><i class="fa-solid ${icon}"></i><span class="text-sm leading-tight">${label}</span></button>` : '';
     const group = (title, tiles) => { const t = tiles.join(''); return t ? `<section><h2 class="font-extrabold text-craft-800 mb-2">${title}</h2><div class="grid grid-cols-3 sm:grid-cols-4 gap-2">${t}</div></section>` : ''; };
     return screen({
-      title: 'المزيد', sub: 'كل أدوات المنصة في مكان واحد.',
+      title: 'حسابي', sub: 'اشتراكك وبياناتك وإعداداتك.',
       body: `<div class="space-y-5">
-        ${group('التسويق', [tile('description', 'fa-pen-nib', 'وصف المنتج'), tile('marketing', 'fa-bullhorn', 'خطة تسويق'), tile('replies', 'fa-reply', 'ردود الزبائن'), tile('story', 'fa-book-open', 'قصتي'), tile('ideas', 'fa-lightbulb', 'أفكار منتجات'), tile('occasions', 'fa-calendar-days', 'المناسبات')])}
-        ${group('الصور والبطاقات', [tile('photographer', 'fa-wand-magic-sparkles', 'المصوّر الذكي'), tile('studio', 'fa-camera-retro', 'تعديل الصور'), tile('imagePrompt', 'fa-file-pen', 'وصف صورة احترافية'), tile('cards', 'fa-id-card', 'بطاقات وملصقات'), tile('logo', 'fa-signature', 'اسم وشعار')])}
-        ${group('البيع', [tile('orders', 'fa-clipboard-list', 'الطلبات'), tile('sales', 'fa-sack-dollar', 'المبيعات'), tile('bazaar', 'fa-shop', 'وضع البازار'), tile('customers', 'fa-users', 'زبائني'), tile('reviews', 'fa-star', 'آراء زبائني')])}
-        ${group('تعلّم', [tile('lessons', 'fa-graduation-cap', 'دروس قصيرة'), tile('badges', 'fa-medal', 'شاراتي'), tile('guide', 'fa-scale-balanced', 'التراخيص والأنظمة')])}
-        ${group('مجتمع ' + esc(CONFIG.orgName), [tile('catalog', 'fa-store', 'معرض المنتجات'), tile('suppliers', 'fa-truck-ramp-box', 'الموردين والشراء الجماعي'), tile('qa', 'fa-people-group', 'اسأل الحرفيات'), tile('bigOrders', 'fa-boxes-packing', 'الطلبات الكبيرة')])}
         ${group('حسابي', [tile('plan', 'fa-crown', 'اشتراكي'), tile('onboard', 'fa-user', 'ملفي', { first: false }), tile('savedTexts', 'fa-bookmark', 'نصوصي المحفوظة'), tile('dataPage', 'fa-database', 'بياناتي'), tile('feedback', 'fa-comment-dots', 'رأيك يهمنا'), tile('privacy', 'fa-shield-halved', 'الخصوصية'), tile('about', 'fa-circle-info', 'من نحن')])}
         ${CAP.isOwner ? group('لصاحب المنصة', [tile('owner', 'fa-chart-pie', 'آراء واستخدام'), `<a class="tile" href="/admin.html"><i class="fa-solid fa-sack-dollar"></i><span class="text-sm leading-tight">المشتركين والإيرادات</span></a>`]) : ''}
         <nav class="flex flex-wrap justify-center gap-x-4 gap-y-2 text-sm text-craft-600 pt-2"><a class="underline" href="/terms.html">الشروط والأحكام</a><a class="underline" href="/privacy.html">الخصوصية</a><a class="underline" href="/refund.html">الاسترجاع</a><a class="underline" href="/contact.html">تواصل معنا</a></nav>
+      </div>`,
+    });
+  },
+};
+
+/* ---------- مستشار التسويق ---------- */
+ROUTES.market = {
+  render() {
+    const item = (r, icon, tone, label, sub) => has(r) ? `<button type="button" class="big-action" data-go="${r}"><span class="ic ${tone}"><i class="fa-solid ${icon}"></i></span><span>${label}<span class="block text-sm font-medium text-gray-500">${sub}</span></span></button>` : '';
+    return screen({
+      title: 'مستشار التسويق', sub: 'المساعد يكتب لك ويخطط معك، وأنت تنسخ وتنشر.',
+      body: `<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        ${item('photographer', 'fa-wand-magic-sparkles', 'bg-purple-100 text-purple-700', 'المصوّر الذكي', 'صورة إعلانية لمنتجك')}
+        ${item('description', 'fa-pen-nib', 'bg-blue-100 text-blue-700', 'وصف المنتج', 'وصف يبيع، جاهز للنشر')}
+        ${item('marketing', 'fa-bullhorn', 'bg-amber-100 text-amber-700', 'خطة تسويق', 'وش تسوي هذا الشهر')}
+        ${item('replies', 'fa-reply', 'bg-green-100 text-green-700', 'الرد على الزبائن', 'ردود جاهزة للمفاصلة والأسئلة')}
+        ${item('occasions', 'fa-calendar-days', 'bg-rose-100 text-rose-700', 'المناسبات', 'منشورات قبل كل مناسبة')}
+        ${item('story', 'fa-book-open', 'bg-craft-100 text-craft-700', 'قصتي', 'بايو وقصة قصيرة لك')}
+        ${item('ideas', 'fa-lightbulb', 'bg-yellow-100 text-yellow-700', 'أفكار منتجات', 'منتجات جديدة بنفس مهارتك')}
+        ${item('logo', 'fa-signature', 'bg-slate-100 text-slate-700', 'اسم وشعار', 'اسم لمتجرك وشعار نصي')}
       </div>`,
     });
   },
@@ -1180,7 +1129,7 @@ ROUTES.dataPage = {
       body: `
       <div class="card ${synced ? 'bg-green-50 border-green-200' : 'bg-amber-50 border-amber-200'}">
         <div class="font-extrabold ${synced ? 'text-green-800' : 'text-amber-900'}"><i class="fa-solid ${synced ? 'fa-cloud' : 'fa-mobile-screen'} ml-1"></i> ${synced ? 'بياناتك محفوظة في حسابك' : 'بياناتك محفوظة في هذا الجهاز فقط'}</div>
-        <p class="text-gray-700 mt-1 leading-relaxed">${synced ? 'منتجاتك وطلباتك ومبيعاتك تلحقك على أي جهاز تفتح منه الرابط بنفس حسابك. ما أحد غيرك يشوفها.' : 'إذا غيّرت جوالك أو مسحت بيانات المتصفح، تضيع. احفظ نسخة احتياطية من تحت بين فترة وثانية.'}</p>
+        <p class="text-gray-700 mt-1 leading-relaxed">${synced ? 'منتجاتك ونصوصك المحفوظة تلحقك على أي جهاز تفتح منه الرابط بنفس حسابك. ما أحد غيرك يشوفها.' : 'إذا غيّرت جوالك أو مسحت بيانات المتصفح، تضيع. احفظ نسخة احتياطية من تحت بين فترة وثانية.'}</p>
       </div>
       <div class="card space-y-3">
         <div class="font-extrabold text-craft-800">نسخة احتياطية</div>
@@ -1191,8 +1140,8 @@ ROUTES.dataPage = {
       </div>
       <div class="card grid grid-cols-3 gap-2 text-center">
         <div><div class="text-2xl font-extrabold text-craft-800 num">${S.products.length}</div><div class="text-sm text-gray-500">منتج</div></div>
-        <div><div class="text-2xl font-extrabold text-craft-800 num">${S.orders.length}</div><div class="text-sm text-gray-500">طلب</div></div>
-        <div><div class="text-2xl font-extrabold text-craft-800 num">${S.sales.length}</div><div class="text-sm text-gray-500">بيعة</div></div>
+        <div><div class="text-2xl font-extrabold text-craft-800 num">${S.texts.length}</div><div class="text-sm text-gray-500">نص محفوظ</div></div>
+        <div><div class="text-2xl font-extrabold text-craft-800 num">${S.products.filter(p => p.photo).length}</div><div class="text-sm text-gray-500">صورة منتج</div></div>
       </div>`,
     });
   },
@@ -1216,9 +1165,8 @@ ROUTES.privacy = {
     return screen({
       title: 'الخصوصية', sub: 'باختصار وبكلام واضح.', back: 'more',
       body: `<div class="card space-y-3 leading-relaxed">
-        <p><b>منتجاتك وأسعارك وطلباتك ومبيعاتك وزبائنك:</b> تنحفظ في جهازك وفي حسابك على خوادم محمية، عشان تلحقك على أي جهاز. ما يشوفها حرفي ثاني، وإدارة المنصة ما تطّلع عليها إلا إذا طلبت منها مساعدة أو ألزم نظام بذلك.</p>
+        <p><b>منتجاتك وأسعارك ونصوصك المحفوظة:</b> تنحفظ في جهازك وفي حسابك على خوادم محمية، عشان تلحقك على أي جهاز. ما يشوفها حرفي ثاني، وإدارة المنصة ما تطّلع عليها إلا إذا طلبت منها مساعدة أو ألزم نظام بذلك.</p>
         <p><b>اللي يوصل لإدارة المنصة:</b> رأيك إذا أرسلته، وإجاباتك على أسئلة قياس الفايدة، وعدد مرات استخدام كل أداة (بدون محتوى ما تكتبه)، وحرفتك ومنطقتك واسمك اللي كتبته في ملفك.</p>
-        <p><b>اللي يشوفه الحرفيين الثانيين:</b> فقط اللي تختار تنشره بنفسك: منتجاتك في المعرض، أسئلتك وأجوبتك، ونصايح الموردين.</p>
         <p><b>المساعد الذكي والمصوّر الذكي:</b> لما تستخدمهم، يوصل سؤالك وبيانات المنتج أو الصورة اللي ترفعها لمزود الذكاء الاصطناعي عشان يجاوبك، وكل طلب ينحسب من رصيدك الشهري.</p>
         <p><b>الدفع:</b> بيانات بطاقتك تروح لبوابة ميسّر مباشرة، وما نحفظها عندنا.</p>
         <p><b>تبي تمسح بياناتك؟</b> كلّمنا من <a class="underline" href="/contact.html">صفحة التواصل</a>.</p>
@@ -1244,7 +1192,7 @@ ROUTES.about = {
 };
 
 /* ---------- رأيك يهمنا ---------- */
-const FB_TOOLS = [['products', 'التسعير'], ['description', 'وصف المنتج'], ['marketing', 'خطة التسويق'], ['studio', 'تعديل الصور'], ['chat', 'المساعد'], ['orders', 'الطلبات'], ['sales', 'المبيعات'], ['cards', 'البطاقات'], ['community', 'المجتمع']];
+const FB_TOOLS = [['products', 'التسعير'], ['chat', 'المساعد'], ['photographer', 'المصوّر الذكي'], ['description', 'وصف المنتج'], ['marketing', 'خطة التسويق'], ['replies', 'الرد على الزبائن'], ['occasions', 'المناسبات'], ['logo', 'اسم وشعار']];
 ROUTES.feedback = {
   nav: 'more',
   render() {
@@ -1298,11 +1246,11 @@ const pickedProduct = (pickerId) => { const el = $(pickerId); return el ? prodBy
 
 /* ---------- وصف المنتج ---------- */
 ROUTES.description = {
-  nav: 'more',
+  nav: 'market',
   render({ productId }) {
     const p = prodById(productId || S.settings.lastProduct) || null;
     return screen({
-      title: 'كلام يبيع منتجك', sub: 'المساعد يكتب لك وصف جاهز تنسخه وتنشره، أو ترسله على واتساب.', back: 'more',
+      title: 'كلام يبيع منتجك', sub: 'المساعد يكتب لك وصف جاهز تنسخه وتنشره، أو ترسله على واتساب.', back: 'market',
       body: `<div class="card space-y-4">
         ${productPicker('d-pick', p ? p.id : '')}
         ${fInput({ id: 'd-name', label: 'اسم المنتج', value: p ? p.name : '', ph: 'مثال: مبخرة خشب منقوشة' })}
@@ -1333,10 +1281,10 @@ ACT.genDesc = (btn) => {
 
 /* ---------- خطة التسويق ---------- */
 ROUTES.marketing = {
-  nav: 'more',
+  nav: 'market',
   render() {
     return screen({
-      title: 'خطة تسويق لمنتجك', sub: 'قل لنا عن منتجك ومين يشتريه، والمساعد يكتب لك وش تسوي خلال شهر.', back: 'more',
+      title: 'خطة تسويق لمنتجك', sub: 'قل لنا عن منتجك ومين يشتريه، والمساعد يكتب لك وش تسوي خلال شهر.', back: 'market',
       body: `<div class="card space-y-4">
         ${fInput({ id: 'm-prod', label: 'وش تصنع؟', value: S.profile.craft || '', ph: 'مثال: منتجات السدو' })}
         ${fText({ id: 'm-aud', label: 'مين يشتري منك عادة؟', ph: 'مثال: أمهات، عرايس، محبين التراث' })}
@@ -1359,10 +1307,10 @@ ACT.genPlan = (btn) => {
 /* ---------- ردود الزبائن ---------- */
 const REPLY_CASES = ['يفاصل في السعر', 'يبي خصم', 'يسأل عن التوصيل والشحن', 'يسأل عن المقاس أو اللون', 'يبي طلب خاص بتصميمه', 'الطلب تأخر عليه', 'زبون زعلان من المنتج', 'سأل وما رد بعدها', 'يبي يشتري بالجملة'];
 ROUTES.replies = {
-  nav: 'more',
+  nav: 'market',
   render() {
     return screen({
-      title: 'كيف أرد على الزبون؟', sub: 'اختر الموقف، والمساعد يكتب لك ردود مؤدبة تحفظ حقك وسعرك.', back: 'more',
+      title: 'كيف أرد على الزبون؟', sub: 'اختر الموقف، والمساعد يكتب لك ردود مؤدبة تحفظ حقك وسعرك.', back: 'market',
       body: `<div class="card space-y-4">
         <div><span class="lbl">وش الموقف؟</span><div class="flex flex-wrap gap-2" id="rp-cases">${REPLY_CASES.map((c, i) => `<button type="button" class="chip ${i === 0 ? 'on' : ''}" data-case="${esc(c)}">${c}</button>`).join('')}</div></div>
         ${fText({ id: 'rp-msg', label: 'وش قال الزبون بالضبط؟ (اختياري)', ph: 'مثال: غالي! بـ 150 أخذه' })}
@@ -1384,10 +1332,10 @@ ACT.genReplies = (btn) => {
 
 /* ---------- قصتي ---------- */
 ROUTES.story = {
-  nav: 'more',
+  nav: 'market',
   render() {
     return screen({
-      title: 'قصتي', sub: 'الناس تشتري القصة قبل المنتج. جاوب على كم سؤال، والمساعد يكتب قصتك للبايو والمعارض.', back: 'more',
+      title: 'قصتي', sub: 'الناس تشتري القصة قبل المنتج. جاوب على كم سؤال، والمساعد يكتب قصتك للبايو والمعارض.', back: 'market',
       body: `<div class="card space-y-4">
         ${fInput({ id: 'st-since', label: 'من متى وأنت تشتغل في حرفتك؟', ph: 'مثال: من 15 سنة' })}
         ${fInput({ id: 'st-who', label: 'مين علّمك؟', ph: 'مثال: أمي وجدتي' })}
@@ -1408,10 +1356,10 @@ ACT.genStory = (btn) => {
 
 /* ---------- أفكار منتجات جديدة ---------- */
 ROUTES.ideas = {
-  nav: 'more',
+  nav: 'market',
   render() {
     return screen({
-      title: 'أفكار منتجات جديدة', sub: 'من نفس مهارتك وخاماتك، منتجات مطلوبة وتنباع بسعر أحسن.', back: 'more',
+      title: 'أفكار منتجات جديدة', sub: 'من نفس مهارتك وخاماتك، منتجات مطلوبة وتنباع بسعر أحسن.', back: 'market',
       body: `<div class="card space-y-4">
         ${fInput({ id: 'id-craft', label: 'وش حرفتك؟', value: S.profile.craft, ph: 'مثال: السدو' })}
         ${fInput({ id: 'id-mat', label: 'وش الخامات اللي عندك؟', ph: 'مثال: صوف، قطن، خرز' })}
@@ -1459,11 +1407,11 @@ function nextOccasions() {
   occCache = { key, list }; return list;
 }
 ROUTES.occasions = {
-  nav: 'more',
+  nav: 'market',
   render() {
     const list = nextOccasions();
     return screen({
-      title: 'المناسبات الجاية', sub: 'المواسم أكثر وقت يبيع فيه الحرفي. جهّز منتجاتك وإعلانك قبلها بوقت.', back: 'more',
+      title: 'المناسبات الجاية', sub: 'المواسم أكثر وقت يبيع فيه الحرفي. جهّز منتجاتك وإعلانك قبلها بوقت.', back: 'market',
       body: `${productPicker('oc-pick', '', 'منتج تبي تعلن عنه (اختياري)')}
       <div class="space-y-3">${list.map((o, i) => `<div class="card space-y-2 ${o.days <= 30 ? 'border-amber-300 bg-amber-50' : ''}">
         <div class="flex justify-between items-center gap-2"><h2 class="font-extrabold text-craft-900 text-lg">${esc(o.name)}</h2><span class="text-sm font-bold ${o.days <= 30 ? 'text-amber-800' : 'text-gray-500'} num">${o.days === 0 ? 'اليوم' : `بعد ${o.days} يوم`} · ${fmtDay(o.date.getTime())}</span></div>
@@ -1494,13 +1442,13 @@ let studioRaf = 0;
 const studioCanvas = () => $('studio-canvas');
 
 ROUTES.studio = {
-  nav: 'more',
+  nav: 'photographer',
   render({ productId }) {
     if (!st.store) st.store = S.profile.handle || S.profile.store || '';
     const p = prodById(productId);
     const range = (k, label, min, max) => `<label for="st-${k}" class="flex items-center gap-2"><span class="w-24 text-gray-600 text-sm">${label}</span><input type="range" id="st-${k}" data-st="${k}" min="${min}" max="${max}" value="${st[k]}" class="flex-1 accent-craft-600"><span id="val-${k}" class="w-12 text-left num text-gray-500 text-sm"></span></label>`;
     return screen({
-      title: 'عدّل صورة منتجك', sub: 'خلّ صورتك جاهزة للنشر: غيّر المقاس والإضاءة، وحط إطار واسم متجرك.', back: 'more',
+      title: 'عدّل صورة منتجك', sub: 'خلّ صورتك جاهزة للنشر: غيّر المقاس والإضاءة، وحط إطار واسم متجرك.', back: 'photographer',
       body: `
       <div id="studio-drop" class="bg-gray-100 border-2 border-dashed border-craft-300 rounded-2xl min-h-[280px] flex items-center justify-center p-3 transition">
         <label id="studio-empty" for="studio-file" class="cursor-pointer flex flex-col items-center gap-2 text-center text-gray-500 p-6 ${st.img ? 'hidden' : ''}">
@@ -1656,53 +1604,11 @@ ACT.studioToProduct = () => {
   renderStudio(); p.photo = thumbFromCanvas(studioCanvas()); save(); toast(`صارت صورة "${p.name}" ✅`, true);
 };
 
-/* ---------- صورة بالذكاء الاصطناعي (وصف للتوليد) ---------- */
-ROUTES.imagePrompt = {
-  nav: 'more',
-  render() {
-    const p = prodById(S.settings.lastProduct);
-    return screen({
-      title: 'تبي صورة احترافية بالذكاء الاصطناعي؟', sub: 'المساعد يكتب لك وصف للصورة اللي تتمناها. تنسخه وتلصقه في أي برنامج يصنع صور، أو تصوّر نفس الفكرة بجوالك.', back: 'studio',
-      body: `<div class="card space-y-4">
-        ${productPicker('ip-pick', p ? p.id : '')}
-        ${fInput({ id: 'ip-name', label: 'اسم المنتج', value: p ? p.name : '' })}
-        ${fText({ id: 'ip-det', label: 'شكل منتجك وألوانه', value: p ? p.details : '', ph: 'مثال: صوف أحمر وأسود وأبيض بنقوش السدو' })}
-        ${fSelect({ id: 'ip-scene', label: 'وين تبي يظهر منتجك؟', options: ['مجلس عربي قديم بإضاءة دافئة', 'صحراء رملية عند الغروب', 'خلفية بيضاء نظيفة', 'بيت طيني وأبواب خشبية', 'بيت حديث وهادي', 'مغلّف كهدية فخمة', 'خضرة ونخيل'] })}
-        ${st.img && CAP.canImages ? '<p class="hint"><i class="fa-solid fa-image ml-1"></i> بنرسل للمساعد الصورة اللي في "تعديل الصور" عشان يوصف منتجك صح.</p>' : ''}
-        <button type="button" class="btn btn-main w-full text-lg" data-act="genImgPrompt"><i class="fa-solid fa-wand-magic-sparkles"></i> اكتب وصف الصورة</button>
-      </div><div id="out-ip" class="hidden"></div>`,
-    });
-  },
-  onChange(e) { fillFromProduct(e, { 'ip-name': 'name', 'ip-det': 'details' }); },
-};
-ACT.genImgPrompt = (btn) => {
-  const name = val('ip-name'); if (!name) { toast('اكتب اسم المنتج.'); return; }
-  const ratioTxt = { '1:1': 'square 1:1', '4:5': 'portrait 4:5', '9:16': 'vertical 9:16', orig: '4:3' }[st.ratio];
-  const useImg = !!(st.file && CAP.canImages);
-  aiRun({
-    json: true, outId: 'out-ip', btn, kind: 'image_prompt', images: useImg ? st.file : undefined,
-    prompt: rules() + `\n\nالمطلوب: وصف لصورة إعلانية مثالية لمنتج حرفي سعودي، يلصقه الحرفي في برنامج يصنع صور، مع نصائح لتصوير نفس المشهد بالجوال.\n- المنتج: ${name}\n- شكله وألوانه: ${val('ip-det') || 'غير محدد'}\n- المكان: ${val('ip-scene')}\n- المقاس: ${ratioTxt}\n${useImg ? '- أرفق الحرفي صورة حالية للمنتج: صف المنتج كما يظهر فيها بدقة.\n' : ''}\nأجب بكائن JSON واحد فقط:\n{"scene_ar": "فكرة الصورة بالعربي في جملتين", "prompt_en": "English prompt, 70-110 words: the product first with exact appearance, setting, props, lighting, camera angle, mood, aspect ratio. Photorealistic product photography. No text, no logos, no faces.", "prompt_ar": "نفس الوصف بالعربي", "tips": ["4 أو 5 نصائح قصيرة لتصوير نفس المشهد بالجوال في البيت"]}`,
-    onJson(r, out) {
-      if (!r || !r.prompt_en) { toast(AI_ERR.invalid_json); return; }
-      out.innerHTML = `<div class="card space-y-4">
-        <div><div class="font-extrabold text-craft-800 mb-1">فكرة الصورة</div><p class="text-gray-700" id="ip-scene-ar"></p></div>
-        <div><div class="flex justify-between items-center mb-1"><span class="font-extrabold text-craft-800">الوصف بالإنجليزي <span class="font-normal text-gray-500 text-sm">(نتيجة أحسن)</span></span><button type="button" class="btn btn-soft btn-sm" data-act="copyEl" data-el="ip-en"><i class="fa-regular fa-copy"></i> نسخ</button></div><div id="ip-en" dir="ltr" lang="en" class="bg-gray-50 border rounded-xl p-3 text-left text-sm break-words"></div></div>
-        <div><div class="flex justify-between items-center mb-1"><span class="font-extrabold text-craft-800">الوصف بالعربي</span><button type="button" class="btn btn-soft btn-sm" data-act="copyEl" data-el="ip-ar"><i class="fa-regular fa-copy"></i> نسخ</button></div><div id="ip-ar" class="bg-gray-50 border rounded-xl p-3 text-sm break-words"></div></div>
-        <div><div class="font-extrabold text-craft-800 mb-1"><i class="fa-solid fa-mobile-screen ml-1"></i> تبي تصوّرها بنفسك؟ سوّ كذا:</div><ul id="ip-tips" class="list-disc pr-5 space-y-1 text-gray-700"></ul></div>
-        <p class="hint border-t pt-2">الصق الوصف في أي برنامج يصنع الصور، أو صوّر نفس الفكرة بجوالك وعدّلها في "تعديل الصور".</p>
-      </div>`;
-      $('ip-scene-ar').textContent = String(r.scene_ar || ''); $('ip-en').textContent = String(r.prompt_en || ''); $('ip-ar').textContent = String(r.prompt_ar || '');
-      (Array.isArray(r.tips) ? r.tips : []).forEach(t => { const li = document.createElement('li'); li.textContent = String(t); $('ip-tips').appendChild(li); });
-    },
-  });
-};
-ACT.copyEl = (b) => copyText($(b.dataset.el).textContent);
-
 /* ============================================================
    اسأل المساعد (محادثة)
    ============================================================ */
 const CHAT = { turns: [], view: [], busy: false, ctl: null, file: null, fileUrl: null };
-const STARTERS = ['شوف أسعار منتجاتي، مناسبة؟', 'كيف أصوّر منتجي بالجوال صح؟', 'زبون يفاصل في السعر، وش أقول؟', 'كيف أستعد لمعرض أو بازار؟'];
+const STARTERS = ['شوف أسعار منتجاتي، مناسبة؟', 'زبون يفاصل في السعر، وش أقول؟', 'وش أحتاج عشان أبيع بشكل نظامي؟', 'كيف أستعد لمعرض أو بازار؟'];
 
 ROUTES.chat = {
   render() {
@@ -1769,8 +1675,7 @@ async function sendChat(text) {
   $('chat-input').value = ''; $('chat-input').style.height = 'auto';
   renderChatLog(); setChatBusy(true);
   CHAT.ctl = new AbortController();
-  const openOrders = S.orders.filter(o => o.status !== 'done').length;
-  const ctx = rules() + '\n\nفي المحادثة: الرد قصير (أقل من 150 كلمة) إلا إذا طُلب التفصيل، واختم بسؤال واحد أو خطوة تالية واحدة.\n\n' + allProductsContext() + (openOrders ? `\nعنده ${openOrders} طلبات مفتوحة.` : '') + '\n\nالرسائل التالية هي المحادثة مع الحرفي. أجب على آخر رسالة.';
+  const ctx = rules() + '\n\nفي المحادثة: الرد قصير (أقل من 150 كلمة) إلا إذا طُلب التفصيل، واختم بسؤال واحد أو خطوة تالية واحدة.\n\n' + allProductsContext() + '\n\nالرسائل التالية هي المحادثة مع الحرفي. أجب على آخر رسالة.';
   const idx = CHAT.view.length; // ترتيب الفقاعة مع رسالة الترحيب
   const opts = { cache: false, signal: CHAT.ctl.signal, onText: ({ text }) => { reply.pending = false; reply.text = text; const el = $('bub-' + idx); if (el) el.innerHTML = md(text); } };
   if (file && CAP.canImages) opts.images = file;
@@ -1789,559 +1694,21 @@ async function sendChat(text) {
   }
 }
 
-/* ============================================================
-   الطلبات
-   ============================================================ */
-const STATUS = { new: 'جديد', working: 'أشتغل عليه', ready: 'جاهز', done: 'تم التسليم' };
-const orderTotal = (o) => nz(o.unitPrice) * (nz(o.qty) || 1);
-function orderMini(o) {
-  const d = o.due ? daysUntil(o.due) : null;
-  const dueTxt = d === null ? '' : d < 0 ? `<span class="text-red-700 font-bold">متأخر ${-d} يوم</span>` : d === 0 ? '<span class="text-red-700 font-bold">اليوم</span>' : d === 1 ? '<span class="text-amber-700 font-bold">بكرة</span>' : `<span class="text-gray-500">بعد ${d} يوم</span>`;
-  return `<button type="button" class="w-full text-start border border-craft-100 rounded-xl p-3 flex justify-between items-center gap-2 hover:bg-craft-50 bg-white" ${goP('orderEdit', { id: o.id })}>
-    <span class="min-w-0"><b class="text-craft-900 block truncate">${esc(o.customer || 'زبون')} · ${esc(o.productName || 'طلب')} ×${nz(o.qty) || 1}</b><span class="text-sm">${dueTxt}${o.due ? ` · ${fmtDay(o.due)}` : ''}</span></span>
-    <span class="text-xs font-bold rounded-full px-2 py-1 status-${o.status} flex-shrink-0">${STATUS[o.status]}</span>
-  </button>`;
-}
-ROUTES.orders = {
-  render({ tab = 'open' }) {
-    const list = S.orders.filter(o => tab === 'open' ? o.status !== 'done' : o.status === 'done')
-      .sort((a, b) => tab === 'open' ? String(a.due || '9').localeCompare(String(b.due || '9')) : (b.doneAt || 0) - (a.doneAt || 0));
-    const open = S.orders.filter(o => o.status !== 'done');
-    const owed = open.reduce((a, o) => a + orderTotal(o) - nz(o.deposit), 0);
-    return screen({
-      title: 'الطلبات', sub: 'سجّل كل طلب: مين الزبون، وش طلب، كم دفع عربون، ومتى التسليم.',
-      body: `<button type="button" class="btn btn-main w-full text-lg" data-go="orderEdit"><i class="fa-solid fa-plus"></i> سجّل طلب جديد</button>
-      ${open.length ? `<div class="grid grid-cols-2 gap-3"><div class="card text-center"><div class="text-sm text-gray-500 font-bold">طلبات مفتوحة</div><div class="text-2xl font-extrabold text-craft-800 num">${open.length}</div></div><div class="card text-center"><div class="text-sm text-gray-500 font-bold">باقي لك عند الزبائن</div><div class="text-2xl font-extrabold text-craft-800 num">${money(owed)}</div></div></div>` : ''}
-      <div class="grid grid-cols-2 gap-2"><button type="button" class="seg ${tab === 'open' ? 'on' : ''}" ${goP('orders', { tab: 'open' })}>المفتوحة</button><button type="button" class="seg ${tab === 'done' ? 'on' : ''}" ${goP('orders', { tab: 'done' })}>المسلّمة</button></div>
-      <div class="space-y-2">${list.length ? list.map(orderMini).join('') : `<div class="card text-center text-gray-500 py-8">${tab === 'open' ? 'ما عندك طلبات مفتوحة.' : 'ما سلّمت طلبات للحين.'}</div>`}</div>`,
-    });
-  },
-};
-ROUTES.orderEdit = {
-  nav: 'orders',
-  render({ id, productId }) {
-    const o = S.orders.find(x => x.id === id) || { id: '', customer: '', phone: '', productId: productId || '', productName: '', qty: 1, basePrice: '', unitPrice: '', rush: false, custom: false, deposit: '', due: '', status: 'new', notes: '' };
-    if (!o.id && o.productId) { const p = prodById(o.productId); if (p) { o.productName = p.name; o.basePrice = computeRow(p).rounded; o.unitPrice = o.basePrice; } }
-    ROUTES.orderEdit._o = JSON.parse(JSON.stringify(o));
-    const custOpts = S.customers.map(c => `<option value="${esc(c.name)}">`).join('');
-    return screen({
-      title: o.id ? 'تفاصيل الطلب' : 'طلب جديد', back: 'orders',
-      body: `<div class="card space-y-4">
-        <div class="grid grid-cols-2 gap-3">
-          <div><label for="oe-cust" class="lbl">اسم الزبون</label><input id="oe-cust" class="inp" list="cust-list" value="${esc(o.customer)}" placeholder="مثال: نورة"><datalist id="cust-list">${custOpts}</datalist></div>
-          ${fInput({ id: 'oe-phone', label: 'جواله (اختياري)', value: o.phone, type: 'tel', ph: '05xxxxxxxx' })}
-        </div>
-        ${S.products.length ? `<div><label for="oe-prod" class="lbl">وش طلب؟</label><select id="oe-prod" class="inp">${productOptions(o.productId, 'منتج غير موجود في منتجاتي')}</select></div>` : ''}
-        <div id="oe-pname-wrap" class="${o.productId ? 'hidden' : ''}">${fInput({ id: 'oe-pname', label: 'اسم المنتج المطلوب', value: o.productName, ph: 'مثال: مبخرة بتصميم خاص' })}</div>
-        <div class="grid grid-cols-2 gap-3">
-          ${fInput({ id: 'oe-qty', label: 'الكمية', value: o.qty, type: 'number' })}
-          ${fInput({ id: 'oe-base', label: 'سعر القطعة العادي (ر.س)', value: o.basePrice, type: 'number' })}
-        </div>
-        <div><span class="lbl">مستعجل؟</span>${segGroup('oe-rush', [['0', 'لا، عادي'], ['1', 'مستعجل (+25%)']], o.rush ? '1' : '0')}</div>
-        <div><span class="lbl">تصميم خاص للزبون؟</span>${segGroup('oe-custom', [['0', 'لا'], ['1', 'نعم (+15%)']], o.custom ? '1' : '0')}</div>
-        <p class="hint -mt-2">الطلب المستعجل والتصميم الخاص ياخذون من وقتك أكثر، فمن حقك تزيد السعر.</p>
-        <div class="grid grid-cols-2 gap-3">
-          ${fInput({ id: 'oe-deposit', label: 'العربون اللي دفعه (ر.س)', value: o.deposit, type: 'number', ph: '0' })}
-          ${fInput({ id: 'oe-due', label: 'موعد التسليم', value: o.due, type: 'date' })}
-        </div>
-        <div><span class="lbl">وين وصل الطلب؟</span>${segGroup('oe-status', Object.entries(STATUS), o.status, 2)}</div>
-        ${fText({ id: 'oe-notes', label: 'ملاحظات', value: o.notes, ph: 'اللون، المقاس، العنوان…' })}
-        <div id="oe-sum" class="bg-craft-700 text-white rounded-2xl p-4 space-y-1"></div>
-        <button type="button" class="btn btn-main w-full text-lg" data-act="saveOrder"><i class="fa-solid fa-floppy-disk"></i> احفظ الطلب</button>
-      </div>
-      ${o.id ? `<div class="card space-y-2">
-        <div class="font-extrabold text-craft-800">أرسل للزبون</div>
-        <div class="grid grid-cols-2 gap-2">
-          <a class="btn btn-wa" target="_blank" rel="noopener" id="oe-wa" href="#"><i class="fa-brands fa-whatsapp"></i> تأكيد الطلب</a>
-          <button type="button" class="btn btn-soft" ${goP('cards', { type: 'quote', orderId: o.id })}><i class="fa-solid fa-file-invoice"></i> عرض سعر كصورة</button>
-        </div>
-        ${o.status !== 'done' ? `<button type="button" class="btn btn-green w-full" data-act="deliverOrder" data-id="${o.id}"><i class="fa-solid fa-circle-check"></i> سلّمت الطلب واستلمت المبلغ</button>` : ''}
-        ${o.status === 'done' ? `<div class="grid grid-cols-2 gap-2"><button type="button" class="btn btn-soft" ${goP('cards', { type: 'thanks', orderId: o.id })}><i class="fa-solid fa-heart"></i> بطاقة شكر</button><a class="btn btn-soft" target="_blank" rel="noopener" href="${esc(waLink(reviewRequestText(o.customer), o.phone))}"><i class="fa-solid fa-star"></i> اطلب رأيه</a></div>` : ''}
-      </div>
-      <div id="del-zone"><button type="button" class="btn w-full text-red-700 hover:bg-red-50" data-act="askDelOrder" data-id="${o.id}"><i class="fa-solid fa-trash"></i> احذف الطلب</button></div>` : ''}`,
-    });
-  },
-  after() { orderRecalc(); },
-  onInput() { orderRecalc(); },
-  onChange(e) {
-    if (e.target.id === 'oe-prod') {
-      const p = prodById(e.target.value);
-      $('oe-pname-wrap').classList.toggle('hidden', !!p);
-      if (p) { $('oe-base').value = computeRow(p).rounded; $('oe-pname').value = p.name; }
-      orderRecalc();
-    }
-  },
-  onSeg() { orderRecalc(); },
-};
-function readOrderForm() {
-  const o = ROUTES.orderEdit._o;
-  const pid = $('oe-prod') ? $('oe-prod').value : '';
-  const p = prodById(pid);
-  const base = nz(val('oe-base')), rush = segVal('oe-rush') === '1', custom = segVal('oe-custom') === '1';
-  const unit = r2(base * (1 + (rush ? 0.25 : 0) + (custom ? 0.15 : 0)));
-  return Object.assign({}, o, { customer: val('oe-cust'), phone: val('oe-phone'), productId: p ? p.id : '', productName: p ? p.name : val('oe-pname'), qty: nz(val('oe-qty')) || 1, basePrice: base, unitPrice: unit, rush, custom, deposit: nz(val('oe-deposit')), due: val('oe-due'), status: segVal('oe-status'), notes: val('oe-notes') });
-}
-function orderMessage(o) {
-  return `هلا ${o.customer || ''} 🌸\nتم تسجيل طلبك:\n• ${o.productName || 'المنتج'} × ${o.qty}\n• المجموع: ${money(orderTotal(o))}${o.deposit ? `\n• العربون: ${money(o.deposit)}\n• الباقي عند الاستلام: ${money(orderTotal(o) - o.deposit)}` : ''}${o.due ? `\n• موعد التسليم: ${fmtDay(o.due)}` : ''}\nشكراً لثقتك 🤍${S.profile.store ? `\n${S.profile.store}` : ''}`;
-}
-const reviewRequestText = (name) => `هلا ${name || ''} 🌸 إن شاء الله عجبك المنتج؟\nيسعدني لو ترسل لي رأيك بكلمتين أو صورة للمنتج عندك، ولو تسمح أنشر رأيك في حسابي 🤍${S.profile.store ? `\n${S.profile.store}` : ''}`;
-function orderRecalc() {
-  const o = readOrderForm(); const sum = $('oe-sum'); if (!sum) return;
-  const tot = orderTotal(o);
-  sum.innerHTML = `<div class="flex justify-between"><span>سعر القطعة${o.rush || o.custom ? ' بعد الزيادة' : ''}</span><b class="num">${money(o.unitPrice)}</b></div>
-    <div class="flex justify-between text-lg"><span class="font-bold">المجموع</span><b class="num">${money(tot)}</b></div>
-    ${o.deposit ? `<div class="flex justify-between text-craft-100"><span>العربون</span><b class="num">${money(o.deposit)}</b></div><div class="flex justify-between"><span class="font-bold">الباقي عند الاستلام</span><b class="num">${money(tot - o.deposit)}</b></div>` : '<p class="text-sm text-craft-100">نصيحة: خذ عربون (ربع أو نص المبلغ) قبل ما تبدأ، خصوصاً في الطلبات الخاصة.</p>'}`;
-  const wa = $('oe-wa'); if (wa) wa.href = waLink(orderMessage(o), o.phone);
-}
-function upsertCustomer(name, phone) {
-  if (!name && !phone) return;
-  const np = normPhone(phone);
-  let c = S.customers.find(x => (np && normPhone(x.phone) === np) || (name && x.name === name));
-  if (!c) { c = { id: uid(), name: name || 'زبون', phone: phone || '', notes: '', createdAt: Date.now() }; S.customers.push(c); }
-  else { if (name) c.name = name; if (phone) c.phone = phone; }
-  return c;
-}
-ACT.saveOrder = () => {
-  const o = readOrderForm();
-  if (!o.customer && !o.productName) { toast('اكتب اسم الزبون أو المنتج.'); return; }
-  if (!o.id) { o.id = uid(); o.createdAt = Date.now(); S.orders.push(o); track('actions', 'order'); }
-  else { const i = S.orders.findIndex(x => x.id === o.id); S.orders[i] = o; }
-  upsertCustomer(o.customer, o.phone);
-  save(); toast('انحفظ الطلب ✅', true); go('orderEdit', { id: o.id });
-};
-ACT.deliverOrder = (b) => {
-  const o = S.orders.find(x => x.id === b.dataset.id); if (!o) return;
-  Object.assign(o, readOrderForm(), { status: 'done', doneAt: Date.now() });
-  S.sales.push({ id: uid(), date: todayStr(), productId: o.productId, productName: o.productName, qty: o.qty, price: o.unitPrice, method: 'transfer', channel: 'طلب', customer: o.customer, orderId: o.id });
-  upsertCustomer(o.customer, o.phone);
-  save(); toast('مبروك! انسجلت البيعة ✅', true); go('orderEdit', { id: o.id });
-};
-ACT.askDelOrder = (b) => { $('del-zone').innerHTML = `<div class="card border-red-200 bg-red-50 space-y-2"><p class="font-bold text-red-800">متأكد تحذف الطلب؟</p><div class="grid grid-cols-2 gap-2"><button type="button" class="btn bg-red-600 text-white" data-act="delOrder" data-id="${b.dataset.id}">احذفه</button><button type="button" class="btn btn-soft" ${goP('orderEdit', { id: b.dataset.id })}>لا</button></div></div>`; };
-ACT.delOrder = (b) => { S.orders = S.orders.filter(o => o.id !== b.dataset.id); save(); go('orders'); };
-
-/* ============================================================
-   المبيعات
-   ============================================================ */
-const METHODS = [['cash', 'كاش'], ['transfer', 'تحويل'], ['card', 'بطاقة']];
-function saleProfit(s) { const p = prodById(s.productId); return p ? (nz(s.price) - computeRow(p).totalCost) * nz(s.qty) : null; }
-ROUTES.sales = {
-  nav: 'more',
-  render({ month }) {
-    const m = month || monthKey(todayStr());
-    const ms = S.sales.filter(s => monthKey(s.date) === m).sort((a, b) => String(b.date).localeCompare(String(a.date)));
-    const total = ms.reduce((a, s) => a + nz(s.price) * nz(s.qty), 0);
-    const profits = ms.map(saleProfit).filter(x => x !== null);
-    const byProd = {}; ms.forEach(s => { const k = s.productName || 'منتج'; byProd[k] = (byProd[k] || 0) + nz(s.qty); });
-    const top = Object.entries(byProd).sort((a, b) => b[1] - a[1])[0];
-    const months = []; { const d = parseDay(m + '-01'); for (let i = 5; i >= 0; i--) { const x = new Date(d.getFullYear(), d.getMonth() - i, 1); months.push(`${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, '0')}`); } }
-    const mt = months.map(k => S.sales.filter(s => monthKey(s.date) === k).reduce((a, s) => a + nz(s.price) * nz(s.qty), 0));
-    const mx = Math.max(1, ...mt);
-    const prevM = months[4], nextD = parseDay(m + '-01'); const nextM = `${new Date(nextD.getFullYear(), nextD.getMonth() + 1, 1).getFullYear()}-${String(new Date(nextD.getFullYear(), nextD.getMonth() + 1, 1).getMonth() + 1).padStart(2, '0')}`;
-    return screen({
-      title: 'دفتر المبيعات', sub: 'سجّل كل بيعة بضغطة، وتعرف دخلك وأكثر منتج يبيع.', back: 'more',
-      body: `<div class="grid grid-cols-2 gap-2"><button type="button" class="btn btn-main" data-go="saleEdit"><i class="fa-solid fa-plus"></i> سجّل بيعة</button><button type="button" class="btn btn-dark" data-go="bazaar"><i class="fa-solid fa-shop"></i> وضع البازار</button></div>
-      <div class="flex items-center justify-between"><button type="button" class="btn btn-soft btn-sm" ${goP('sales', { month: prevM })} aria-label="الشهر اللي قبل"><i class="fa-solid fa-chevron-right"></i></button><b class="text-craft-800 text-lg">${monthName(m)}</b><button type="button" class="btn btn-soft btn-sm" ${goP('sales', { month: nextM })} ${m >= monthKey(todayStr()) ? 'disabled' : ''} aria-label="الشهر اللي بعد"><i class="fa-solid fa-chevron-left"></i></button></div>
-      <div class="grid grid-cols-2 gap-3">
-        <div class="card text-center"><div class="text-sm text-gray-500 font-bold">دخلك</div><div class="text-2xl font-extrabold text-craft-800 num">${money(total)}</div><div class="text-xs text-gray-500">${ms.length} بيعة</div></div>
-        <div class="card text-center"><div class="text-sm text-gray-500 font-bold">ربحك التقريبي</div><div class="text-2xl font-extrabold text-green-700 num">${profits.length ? money(profits.reduce((a, b) => a + b, 0)) : '—'}</div><div class="text-xs text-gray-500">${profits.length < ms.length ? 'للمنتجات المسعّرة فقط' : 'بعد التكاليف'}</div></div>
-      </div>
-      ${top ? `<div class="card bg-amber-50 border-amber-200"><i class="fa-solid fa-trophy text-amber-500 ml-1"></i> أكثر منتج بعته: <b>${esc(top[0])}</b> (${top[1]} قطعة)</div>` : ''}
-      <div class="card"><div class="font-extrabold text-craft-800 mb-3">آخر 6 شهور</div>
-        <div class="flex items-end gap-2 h-36" role="img" aria-label="مبيعات آخر 6 شهور">${months.map((k, i) => `<div class="flex-1 flex flex-col items-center justify-end h-full gap-1"><span class="text-[11px] text-gray-500 num">${mt[i] ? Math.round(mt[i]) : ''}</span><div class="w-full rounded-t-md ${k === m ? 'bg-craft-600' : 'bg-craft-300'}" style="height:${Math.max(2, mt[i] / mx * 100)}%"></div><span class="text-[11px] text-gray-600">${new Date(Number(k.slice(0, 4)), Number(k.slice(5)) - 1, 1).toLocaleDateString('ar-u-nu-latn', { month: 'short' })}</span></div>`).join('')}</div>
-      </div>
-      <div class="space-y-2">${ms.map(s => `<button type="button" class="card w-full text-start flex justify-between items-center gap-2 hover:bg-craft-50 py-3" ${goP('saleEdit', { id: s.id })}><span class="min-w-0"><b class="block truncate">${esc(s.productName || 'منتج')} ×${nz(s.qty)}</b><span class="text-sm text-gray-500">${fmtDay(s.date)} · ${(METHODS.find(x => x[0] === s.method) || [])[1] || ''}${s.channel ? ' · ' + esc(s.channel) : ''}${s.customer ? ' · ' + esc(s.customer) : ''}</span></span><b class="num text-craft-800 flex-shrink-0">${money(nz(s.price) * nz(s.qty))}</b></button>`).join('') || '<div class="card text-center text-gray-500 py-6">ما فيه مبيعات في هالشهر.</div>'}</div>
-      ${S.sales.length ? '<button type="button" class="btn btn-green w-full" data-act="exportSales"><i class="fa-solid fa-file-excel"></i> احفظ المبيعات Excel</button>' : ''}`,
-    });
-  },
-};
-ROUTES.saleEdit = {
-  nav: 'more',
-  render({ id }) {
-    const s = S.sales.find(x => x.id === id) || { id: '', date: todayStr(), productId: S.settings.lastProduct, productName: '', qty: 1, price: '', method: 'cash', channel: '', customer: '' };
-    const p = prodById(s.productId); if (!s.id && p && !s.price) s.price = computeRow(p).rounded;
-    return screen({
-      title: s.id ? 'تعديل البيعة' : 'بيعة جديدة', back: 'sales',
-      body: `<div class="card space-y-4">
-        ${S.products.length ? `<div><label for="se-prod" class="lbl">وش بعت؟</label><select id="se-prod" class="inp">${productOptions(p ? p.id : '', 'منتج ثاني')}</select></div>` : ''}
-        <div id="se-pname-wrap" class="${p ? 'hidden' : ''}">${fInput({ id: 'se-pname', label: 'اسم المنتج', value: s.productName })}</div>
-        <div class="grid grid-cols-2 gap-3">${fInput({ id: 'se-qty', label: 'الكمية', value: s.qty, type: 'number' })}${fInput({ id: 'se-price', label: 'سعر القطعة (ر.س)', value: s.price, type: 'number' })}</div>
-        <div><span class="lbl">كيف دفع؟</span>${segGroup('se-method', METHODS, s.method, 3)}</div>
-        <div class="grid grid-cols-2 gap-3">${fInput({ id: 'se-date', label: 'التاريخ', value: s.date, type: 'date' })}${fSelect({ id: 'se-ch', label: 'وين بعت؟', options: ['', 'واتساب', 'انستقرام', 'متجر إلكتروني', 'بازار أو معرض', 'محل', 'طلب', 'ثاني'], value: s.channel })}</div>
-        ${fInput({ id: 'se-cust', label: 'اسم الزبون (اختياري)', value: s.customer })}
-        <button type="button" class="btn btn-main w-full text-lg" data-act="saveSale" data-id="${s.id}"><i class="fa-solid fa-floppy-disk"></i> احفظ</button>
-        ${s.id ? `<button type="button" class="btn w-full text-red-700 hover:bg-red-50" data-act="delSale" data-id="${s.id}"><i class="fa-solid fa-trash"></i> احذف البيعة</button>` : ''}
-      </div>`,
-    });
-  },
-  onChange(e) { if (e.target.id === 'se-prod') { const p = prodById(e.target.value); $('se-pname-wrap').classList.toggle('hidden', !!p); if (p) $('se-price').value = computeRow(p).rounded; } },
-};
-ACT.saveSale = (b) => {
-  const pid = $('se-prod') ? $('se-prod').value : ''; const p = prodById(pid);
-  const s = { id: b.dataset.id || uid(), date: val('se-date') || todayStr(), productId: p ? p.id : '', productName: p ? p.name : val('se-pname'), qty: nz(val('se-qty')) || 1, price: nz(val('se-price')), method: segVal('se-method'), channel: val('se-ch'), customer: val('se-cust') };
-  if (!s.price) { toast('اكتب سعر القطعة.'); return; }
-  const i = S.sales.findIndex(x => x.id === s.id); if (i >= 0) S.sales[i] = s; else { S.sales.push(s); track('actions', 'sale'); }
-  if (s.customer) upsertCustomer(s.customer, '');
-  save(); toast('انسجلت البيعة ✅', true); go('sales', { month: monthKey(s.date) });
-};
-ACT.delSale = (b) => { S.sales = S.sales.filter(s => s.id !== b.dataset.id); save(); go('sales'); };
-ACT.exportSales = () => {
-  const data = [['التاريخ', 'المنتج', 'الكمية', 'سعر القطعة (ر.س)', 'المجموع (ر.س)', 'الربح التقريبي (ر.س)', 'طريقة الدفع', 'وين بعت', 'الزبون']];
-  [...S.sales].sort((a, b) => String(a.date).localeCompare(String(b.date))).forEach(s => { const pr = saleProfit(s); data.push([s.date, s.productName, nz(s.qty), nz(s.price), r2(nz(s.price) * nz(s.qty)), pr === null ? '' : r2(pr), (METHODS.find(x => x[0] === s.method) || [])[1] || '', s.channel || '', s.customer || '']); });
-  const ws = XLSX.utils.aoa_to_sheet(data); ws['!cols'] = data[0].map((h, i) => ({ wch: i === 1 ? 24 : 14 }));
-  saveWorkbook([['المبيعات', ws]], 'مبيعاتي.xlsx');
-};
-
-/* ---------- وضع البازار ---------- */
-ROUTES.bazaar = {
-  nav: 'more',
-  render() {
-    const bz = S.bazaar;
-    if (!bz) return screen({
-      title: 'وضع البازار', sub: 'وقت المعرض أو البازار: كل ما بعت قطعة اضغط عليها، ونحسب لك الكاش والتحويل والباقي من البضاعة.', back: 'sales',
-      body: S.products.length ? `<div class="card space-y-4">
-        ${fInput({ id: 'bz-name', label: 'اسم البازار أو المعرض', ph: 'مثال: بازار الجمعة' })}
-        <div><span class="lbl">وش جبت معك؟ وكم قطعة؟</span><div class="space-y-2">${S.products.map(p => `<div class="flex items-center gap-2"><input type="checkbox" id="bz-c-${p.id}" class="w-5 h-5 accent-craft-600" checked><label for="bz-c-${p.id}" class="flex-1 font-bold">${esc(p.name || 'منتج')} <span class="text-sm text-gray-500 font-normal num">${computeRow(p).rounded} ر.س</span></label><input type="number" min="0" inputmode="numeric" id="bz-q-${p.id}" class="inp num w-24" placeholder="العدد" aria-label="عدد القطع"></div>`).join('')}</div></div>
-        <button type="button" class="btn btn-main w-full text-lg" data-act="bazaarStart"><i class="fa-solid fa-play"></i> ابدأ البازار</button>
-      </div>` : `<div class="card text-center py-8 space-y-3"><p class="text-gray-600">أضف منتجاتك وأسعارها أول.</p><button type="button" class="btn btn-main" data-act="newProduct">أضف منتج</button></div>`,
-    });
-    const sold = (pid) => bz.sales.filter(s => s.productId === pid).length;
-    const sum = (m) => bz.sales.filter(s => !m || s.method === m).reduce((a, s) => a + s.price, 0);
-    return screen({
-      title: esc(bz.name || 'البازار'), sub: `بدأ ${new Date(bz.startedAt).toLocaleTimeString('ar-u-nu-latn', { hour: 'numeric', minute: '2-digit' })}`, back: 'sales',
-      body: `<div class="card bg-craft-700 text-white text-center"><div class="text-craft-200 font-bold">المجموع</div><div class="text-4xl font-extrabold num">${money(sum())}</div><div class="flex justify-center gap-4 mt-2 text-sm"><span>كاش <b class="num">${money(sum('cash'))}</b></span><span>تحويل <b class="num">${money(sum('transfer'))}</b></span><span>بطاقة <b class="num">${money(sum('card'))}</b></span></div></div>
-      <div><span class="lbl">الزبون الحين يدفع:</span>${segGroup('bz-method', METHODS, bz.method || 'cash', 3)}</div>
-      <div class="grid grid-cols-2 gap-3">${bz.items.map(it => { const p = prodById(it.productId) || { name: it.name }; const left = it.stock ? it.stock - sold(it.productId) : null; return `<button type="button" class="card text-center hover:bg-craft-50 active:bg-craft-100 ${left === 0 ? 'opacity-50' : ''}" data-act="bazaarSell" data-id="${it.productId}"><div class="font-extrabold text-craft-900">${esc(p.name || it.name)}</div><div class="text-craft-700 font-bold num">${money(it.price)}</div><div class="text-sm text-gray-500 mt-1">بعت <b class="num">${sold(it.productId)}</b>${left !== null ? ` · باقي <b class="num">${left}</b>` : ''}</div><div class="mt-2 text-sm font-bold text-white bg-craft-600 rounded-lg py-1.5">+1 بعت</div></button>`; }).join('')}</div>
-      ${bz.sales.length ? '<button type="button" class="btn btn-soft w-full" data-act="bazaarUndo"><i class="fa-solid fa-rotate-left"></i> تراجع عن آخر بيعة</button>' : ''}
-      <button type="button" class="btn btn-dark w-full text-lg" data-act="bazaarEnd"><i class="fa-solid fa-flag-checkered"></i> خلّص البازار</button>`,
-    });
-  },
-  onSeg({ id, value }) { if (id === 'bz-method' && S.bazaar) { S.bazaar.method = value; saveLocal(); } },
-};
-ACT.bazaarStart = () => {
-  const items = S.products.filter(p => $('bz-c-' + p.id).checked).map(p => ({ productId: p.id, name: p.name, price: computeRow(p).rounded, stock: nz(val('bz-q-' + p.id)) || 0 }));
-  if (!items.length) { toast('اختر منتج واحد على الأقل.'); return; }
-  S.bazaar = { name: val('bz-name') || 'بازار', startedAt: Date.now(), items, sales: [], method: 'cash' }; save(); track('actions', 'bazaar'); rerender();
-};
-ACT.bazaarSell = (b) => { const it = S.bazaar.items.find(x => x.productId === b.dataset.id); S.bazaar.sales.push({ productId: it.productId, price: it.price, method: S.bazaar.method || 'cash', at: Date.now() }); save(); rerender(); if (navigator.vibrate) try { navigator.vibrate(30); } catch {} };
-ACT.bazaarUndo = () => { S.bazaar.sales.pop(); save(); rerender(); };
-ACT.bazaarEnd = () => {
-  const bz = S.bazaar; const day = todayStr();
-  const groups = {};
-  bz.sales.forEach(s => { const k = s.productId + '|' + s.method; (groups[k] = groups[k] || { ...s, qty: 0 }).qty++; });
-  Object.values(groups).forEach(g => { const it = bz.items.find(x => x.productId === g.productId); S.sales.push({ id: uid(), date: day, productId: g.productId, productName: it ? it.name : '', qty: g.qty, price: g.price, method: g.method, channel: 'بازار: ' + bz.name }); });
-  const total = bz.sales.reduce((a, s) => a + s.price, 0), n = bz.sales.length;
-  S.bazaar = null; save();
-  openModal(`<div class="text-center space-y-2 py-2"><div class="text-5xl">🎉</div><h2 class="text-xl font-extrabold text-craft-800">خلص البازار</h2><p class="text-gray-700">بعت <b class="num">${n}</b> قطعة بمجموع <b class="num">${money(total)}</b>.</p><p class="hint">انسجلت كلها في دفتر المبيعات.</p><button type="button" class="btn btn-main w-full mt-2" data-act="closeModal">تم</button></div>`);
-  go('sales');
-};
-
-/* ============================================================
-   زبائني وآراء الزبائن
-   ============================================================ */
-function customerStats(c) {
-  const ss = S.sales.filter(s => s.customer && s.customer === c.name);
-  const last = ss.map(s => s.date).sort().pop();
-  return { count: ss.length, total: ss.reduce((a, s) => a + nz(s.price) * nz(s.qty), 0), last };
-}
-ROUTES.customers = {
-  nav: 'more',
-  render() {
-    const list = S.customers.map(c => ({ c, st: customerStats(c) })).sort((a, b) => String(b.st.last || '').localeCompare(String(a.st.last || '')));
-    return screen({
-      title: 'زبائني', sub: 'الزبون اللي اشترى مرة يشتري مرة ثانية إذا تذكرته. هنا قائمة زبائنك ورسايل جاهزة لهم.', back: 'more',
-      body: `<button type="button" class="btn btn-main w-full" data-go="customerEdit"><i class="fa-solid fa-user-plus"></i> أضف زبون</button>
-      <div class="space-y-2">${list.map(({ c, st }) => `<button type="button" class="card w-full text-start flex justify-between items-center gap-2 hover:bg-craft-50 py-3" ${goP('customerEdit', { id: c.id })}><span class="min-w-0"><b class="block truncate">${esc(c.name)}</b><span class="text-sm text-gray-500">${st.count ? `${st.count} مرة · آخر شراء ${fmtDay(st.last)}` : 'ما اشترى للحين'}</span></span><b class="num text-craft-800 flex-shrink-0">${st.total ? money(st.total) : ''}</b></button>`).join('') || '<div class="card text-center text-gray-500 py-6">الزبائن ينضافون هنا تلقائياً لما تسجّل طلب أو بيعة باسم الزبون.</div>'}</div>
-      <button type="button" class="card w-full text-start flex items-center gap-3 hover:bg-craft-50" data-go="reviews"><i class="fa-solid fa-star text-2xl text-amber-500"></i><span><b class="text-craft-800">آراء زبائني</b><span class="block text-sm text-gray-500">اجمع آراءهم الحقيقية واستخدمها في إعلاناتك.</span></span></button>`,
-    });
-  },
-};
-ROUTES.customerEdit = {
-  nav: 'more',
-  render({ id }) {
-    const c = S.customers.find(x => x.id === id) || { id: '', name: '', phone: '', notes: '' };
-    const st = c.id ? customerStats(c) : null;
-    const occ = nextOccasions()[0];
-    return screen({
-      title: c.id ? esc(c.name) : 'زبون جديد', back: 'customers',
-      body: `<div class="card space-y-4">
-        ${fInput({ id: 'ce-name', label: 'الاسم', value: c.name })}
-        ${fInput({ id: 'ce-phone', label: 'الجوال', value: c.phone, type: 'tel', ph: '05xxxxxxxx' })}
-        ${fText({ id: 'ce-notes', label: 'ملاحظات', value: c.notes, ph: 'وش يحب؟ ألوانه؟ مقاساته؟' })}
-        <button type="button" class="btn btn-main w-full" data-act="saveCustomer" data-id="${c.id}"><i class="fa-solid fa-floppy-disk"></i> احفظ</button>
-      </div>
-      ${c.id ? `${st.count ? `<div class="card"><b>${st.count}</b> مرة اشترى بمجموع <b class="num">${money(st.total)}</b> · آخر شراء ${fmtDay(st.last)}</div>` : ''}
-      <div class="card space-y-2">
-        <div class="font-extrabold text-craft-800">أرسل له</div>
-        <div class="grid grid-cols-1 gap-2">
-          <a class="btn btn-wa" target="_blank" rel="noopener" href="${esc(waLink(`هلا ${c.name} 🌸 شكراً إنك اخترت منتجاتي، وجودك يفرق معي 🤍${S.profile.store ? '\n' + S.profile.store : ''}`, c.phone))}"><i class="fa-brands fa-whatsapp"></i> رسالة شكر</a>
-          <a class="btn btn-wa" target="_blank" rel="noopener" href="${esc(waLink(reviewRequestText(c.name), c.phone))}"><i class="fa-brands fa-whatsapp"></i> اطلب رأيه</a>
-          <button type="button" class="btn btn-soft" data-act="genCustMsg" data-id="${c.id}"><i class="fa-solid fa-wand-magic-sparkles"></i> اكتب لي رسالة ${occ ? 'لـ' + esc(occ.name) : 'عرض'}</button>
-        </div>
-        <div id="out-cust" class="hidden"></div>
-      </div>
-      <button type="button" class="btn w-full text-red-700 hover:bg-red-50" data-act="delCustomer" data-id="${c.id}"><i class="fa-solid fa-trash"></i> احذف الزبون</button>` : ''}`,
-    });
-  },
-};
-ACT.saveCustomer = (b) => {
-  const name = val('ce-name'); if (!name) { toast('اكتب الاسم.'); return; }
-  let c = S.customers.find(x => x.id === b.dataset.id);
-  if (!c) { c = { id: uid(), createdAt: Date.now() }; S.customers.push(c); }
-  Object.assign(c, { name, phone: val('ce-phone'), notes: val('ce-notes') }); save(); toast('انحفظ ✅', true); go('customerEdit', { id: c.id });
-};
-ACT.delCustomer = (b) => { S.customers = S.customers.filter(c => c.id !== b.dataset.id); save(); go('customers'); };
-ACT.genCustMsg = (btn) => {
-  const c = S.customers.find(x => x.id === btn.dataset.id); const st = customerStats(c); const occ = nextOccasions()[0];
-  aiRun({
-    prompt: rules() + `\n\nالمطلوب: رسالة واتساب قصيرة (أقل من 50 كلمة) لزبون سابق اسمه ${c.name}${st.count ? `، اشترى ${st.count} مرة` : ''}${c.notes ? `، ملاحظات عنه: ${c.notes}` : ''}.\n${occ ? `المناسبة الجاية: ${occ.name} بعد ${occ.days} يوم.` : ''}\nالرسالة: ودودة وشخصية، تذكّره بمنتجات الحرفي (${S.profile.craft || 'منتجات يدوية'}) وتعرض عليه شي مناسب للمناسبة، بدون إلحاح. اكتب الرسالة فقط.`,
-    outId: 'out-cust', btn, kind: 'customer_msg', title: 'رسالة لـ ' + c.name,
-  });
-};
-ROUTES.reviews = {
-  nav: 'more',
-  render() {
-    return screen({
-      title: 'آراء زبائني', sub: 'رأي زبون حقيقي يقنع أكثر من أي إعلان. اطلب الرأي، وانسخه هنا إذا وافق صاحبه.', back: 'customers',
-      body: `<div class="card space-y-3">
-        <div class="font-extrabold text-craft-800">رسالة تطلب فيها الرأي</div>
-        <div class="bg-gray-50 border rounded-xl p-3 text-sm whitespace-pre-wrap" id="rv-req">${esc(reviewRequestText(''))}</div>
-        <div class="grid grid-cols-2 gap-2"><button type="button" class="btn btn-soft" data-act="copyEl" data-el="rv-req"><i class="fa-regular fa-copy"></i> نسخ</button><a class="btn btn-wa" target="_blank" rel="noopener" href="${esc(waLink(reviewRequestText('')))}"><i class="fa-brands fa-whatsapp"></i> واتساب</a></div>
-      </div>
-      <div class="card space-y-3">
-        <div class="font-extrabold text-craft-800">أضف رأي وصلك</div>
-        ${fInput({ id: 'rv-name', label: 'اسم الزبون (أو أول حرف)', ph: 'مثال: نورة' })}
-        ${fText({ id: 'rv-text', label: 'وش قال بالضبط؟', rows: 3 })}
-        <label class="flex items-center gap-2"><input type="checkbox" id="rv-ok" class="w-5 h-5 accent-craft-600"> <span>الزبون وافق أنشر رأيه</span></label>
-        <button type="button" class="btn btn-main w-full" data-act="addReview">أضف</button>
-      </div>
-      <div class="space-y-2">${S.reviews.map(r => `<div class="card"><p class="leading-relaxed">“${esc(r.text)}”</p><div class="flex justify-between items-center mt-2 text-sm"><span class="text-gray-500">${esc(r.customer || 'زبون')} · ${fmtDay(r.at)} · ${r.ok ? '<span class="text-green-700 font-bold">موافق على النشر</span>' : '<span class="text-amber-700">للاطلاع فقط</span>'}</span><button type="button" class="text-gray-400 hover:text-red-600" data-act="delReview" data-id="${r.id}" aria-label="احذف"><i class="fa-solid fa-trash"></i></button></div></div>`).join('')}</div>
-      ${S.reviews.some(r => r.ok) ? '<p class="hint">الآراء الموافق على نشرها يستخدمها المساعد في "وصف المنتج".</p>' : ''}`,
-    });
-  },
-};
-ACT.addReview = () => { const t = val('rv-text'); if (!t) { toast('اكتب الرأي.'); return; } S.reviews.unshift({ id: uid(), customer: val('rv-name'), text: t, ok: $('rv-ok').checked, at: Date.now() }); save(); rerender(); };
-ACT.delReview = (b) => { S.reviews = S.reviews.filter(r => r.id !== b.dataset.id); save(); rerender(); };
-
-/* ============================================================
-   البطاقات والملصقات (صور جاهزة للطباعة أو الإرسال)
-   ============================================================ */
-const IMG_CACHE = {};
-function getImg(src, onload) {
-  if (!src) return null;
-  if (IMG_CACHE[src]) return IMG_CACHE[src].complete ? IMG_CACHE[src] : null;
-  const im = new Image(); im.onload = onload; im.src = src; IMG_CACHE[src] = im; return null;
-}
-function wrapLines(ctx, text, maxW) {
-  const out = [];
-  String(text || '').split('\n').forEach(par => {
-    const words = par.split(/\s+/).filter(Boolean); let line = '';
-    words.forEach(w => { const t = line ? line + ' ' + w : w; if (ctx.measureText(t).width > maxW && line) { out.push(line); line = w; } else line = t; });
-    out.push(line);
-  });
-  return out;
-}
-function txt(ctx, text, x, y, { size = 40, weight = 500, color = '#32221a', align = 'center', maxW = 900, lh = 1.5, font = 'Tajawal' } = {}) {
-  ctx.font = `${weight} ${size}px ${font}, Tajawal, Tahoma, sans-serif`; ctx.fillStyle = color; ctx.textAlign = align; ctx.textBaseline = 'top';
-  ctx.direction = dirOf(String(text)) ;
-  const lines = wrapLines(ctx, text, maxW);
-  lines.forEach((l, i) => ctx.fillText(l, x, y + i * size * lh));
-  return y + lines.length * size * lh;
-}
+/* ---------- شريط السدو (يستخدمه الشعار) ---------- */
 function saduBand(ctx, x, y, w, h) {
   ctx.fillStyle = '#7a2520'; ctx.fillRect(x, y, w, h);
   const s = h * 0.8, mg = h * 0.1;
   for (let i = 0, xx = x; xx < x + w; xx += s, i++) { ctx.fillStyle = i % 2 ? '#1f1a17' : '#f3e6d0'; ctx.beginPath(); ctx.moveTo(xx, y + mg + s); ctx.lineTo(xx + s / 2, y + mg); ctx.lineTo(xx + s, y + mg + s); ctx.closePath(); ctx.fill(); }
 }
-function cardBase(ctx, W, H, bg = '#fdf8f6') {
-  ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
-  saduBand(ctx, 0, 0, W, 36); saduBand(ctx, 0, H - 36, W, 36);
-  ctx.strokeStyle = '#d9a441'; ctx.lineWidth = 4; ctx.strokeRect(40, 70, W - 80, H - 140);
-}
-function cardProduct(params) { const o = S.orders.find(x => x.id === params.orderId); return prodById(params.productId) || (o && prodById(o.productId)) || prodById(S.settings.lastProduct) || S.products[0] || null; }
-const contactLine = () => [S.profile.handle, S.profile.whatsapp].filter(Boolean).join('  ·  ');
-
-const CARD_TYPES = {
-  quote: {
-    label: 'عرض سعر', icon: 'fa-file-invoice', size: [1080, 1350],
-    fields: (d) => `${S.orders.length ? `<div><label for="cf-order" class="lbl">من طلب مسجّل</label><select id="cf-order" class="inp" data-cf="orderId"><option value="">بدون</option>${S.orders.map(o => `<option value="${o.id}" ${o.id === d.orderId ? 'selected' : ''}>${esc((o.customer || 'زبون') + ' · ' + (o.productName || ''))}</option>`).join('')}</select></div>` : ''}
-      ${fInput({ id: 'cf-cust', label: 'اسم الزبون', value: d.customer, attrs: 'data-cf="customer"' })}
-      <div class="grid grid-cols-3 gap-2">${fInput({ id: 'cf-item', label: 'المنتج', value: d.item, attrs: 'data-cf="item"' })}${fInput({ id: 'cf-qty', label: 'الكمية', value: d.qty, type: 'number', attrs: 'data-cf="qty"' })}${fInput({ id: 'cf-unit', label: 'سعر القطعة', value: d.unit, type: 'number', attrs: 'data-cf="unit"' })}</div>
-      <div class="grid grid-cols-2 gap-2">${fInput({ id: 'cf-dep', label: 'العربون', value: d.deposit, type: 'number', attrs: 'data-cf="deposit"' })}${fInput({ id: 'cf-due', label: 'موعد التسليم', value: d.due, type: 'date', attrs: 'data-cf="due"' })}</div>
-      ${fInput({ id: 'cf-note', label: 'ملاحظة', value: d.note, ph: 'مثال: السعر يشمل التغليف', attrs: 'data-cf="note"' })}`,
-    defaults(params) {
-      const o = S.orders.find(x => x.id === params.orderId);
-      if (o) return { orderId: o.id, customer: o.customer, item: o.productName, qty: o.qty, unit: o.unitPrice, deposit: o.deposit || '', due: o.due || '', note: [o.rush ? 'طلب مستعجل' : '', o.custom ? 'تصميم خاص' : ''].filter(Boolean).join(' · ') };
-      const p = cardProduct(params);
-      return { customer: '', item: p ? p.name : '', qty: 1, unit: p ? computeRow(p).rounded : '', deposit: '', due: '', note: '' };
-    },
-    draw(ctx, W, H, d) {
-      cardBase(ctx, W, H);
-      let y = txt(ctx, S.profile.store || S.profile.name || 'عرض سعر', W / 2, 110, { size: 60, weight: 800, font: 'Reem Kufi' });
-      y = txt(ctx, 'عرض سعر', W / 2, y + 10, { size: 44, weight: 700, color: '#8b6450' });
-      txt(ctx, fmtDay(todayStr()), W / 2, y + 6, { size: 30, color: '#6b7280' });
-      y += 80;
-      if (d.customer) y = txt(ctx, 'إلى: ' + d.customer, W - 110, y, { size: 38, weight: 700, align: 'right' }) + 20;
-      const qty = nz(d.qty) || 1, unit = nz(d.unit), tot = qty * unit, dep = nz(d.deposit);
-      ctx.fillStyle = '#f2e8e5'; ctx.fillRect(100, y, W - 200, 70);
-      txt(ctx, 'المنتج', W - 130, y + 16, { size: 32, weight: 700, align: 'right' }); txt(ctx, 'الكمية', W / 2, y + 16, { size: 32, weight: 700 }); txt(ctx, 'المجموع', 130, y + 16, { size: 32, weight: 700, align: 'left' });
-      y += 90;
-      txt(ctx, d.item || '—', W - 130, y, { size: 36, align: 'right', maxW: 420 }); txt(ctx, `${qty} × ${money(unit)}`, W / 2, y, { size: 32 }); txt(ctx, money(tot), 130, y, { size: 36, weight: 700, align: 'left' });
-      y += 90; ctx.fillStyle = '#eaddd7'; ctx.fillRect(100, y, W - 200, 3); y += 30;
-      const line = (l, v, bold) => { txt(ctx, l, W - 130, y, { size: 36, weight: bold ? 800 : 500, align: 'right' }); txt(ctx, v, 130, y, { size: 38, weight: bold ? 800 : 600, align: 'left', color: bold ? '#4c3528' : '#32221a' }); y += 64; };
-      line('المجموع', money(tot), true);
-      if (dep) { line('العربون', money(dep)); line('الباقي عند الاستلام', money(tot - dep), true); }
-      if (d.due) line('موعد التسليم', fmtDay(d.due));
-      if (d.note) y = txt(ctx, d.note, W / 2, y + 10, { size: 32, color: '#8b6450' }) + 10;
-      txt(ctx, contactLine(), W / 2, H - 170, { size: 32, color: '#6b4c3a' });
-    },
-    shareText: (d) => `عرض سعر${S.profile.store ? ' من ' + S.profile.store : ''}\n${d.customer ? 'إلى: ' + d.customer + '\n' : ''}• ${d.item} × ${nz(d.qty) || 1} = ${money((nz(d.qty) || 1) * nz(d.unit))}${nz(d.deposit) ? `\n• العربون: ${money(d.deposit)}\n• الباقي: ${money((nz(d.qty) || 1) * nz(d.unit) - nz(d.deposit))}` : ''}${d.due ? '\n• التسليم: ' + fmtDay(d.due) : ''}${d.note ? '\n' + d.note : ''}`,
-  },
-  certificate: {
-    label: 'شهادة صُنع يدوي', icon: 'fa-award', size: [1080, 1350],
-    fields: (d) => `${productPicker('cf-prod', d.productId, 'المنتج')}
-      ${fInput({ id: 'cf-pname', label: 'اسم القطعة', value: d.pname, attrs: 'data-cf="pname"' })}
-      <div class="grid grid-cols-2 gap-2">${fInput({ id: 'cf-no', label: 'رقم القطعة', value: d.no, attrs: 'data-cf="no"' })}${fInput({ id: 'cf-hours', label: 'كم ساعة أخذت', value: d.hours, type: 'number', attrs: 'data-cf="hours"' })}</div>
-      ${fInput({ id: 'cf-maker', label: 'اسم الحرفي', value: d.maker, attrs: 'data-cf="maker"' })}
-      ${fText({ id: 'cf-line', label: 'جملة عن القطعة أو حرفتك', value: d.line, attrs: 'data-cf="line"' }).replace('<textarea', '<textarea data-cf="line"')}`,
-    defaults(params) { const p = cardProduct(params); const n = (S.settings.certNo || 0) + 1; return { productId: p ? p.id : '', pname: p ? p.name : '', no: String(n).padStart(4, '0'), hours: p ? p.hours : '', maker: S.profile.name, line: `صُنعت هذه القطعة يدوياً بحب، على طريقة ${S.profile.craft || 'الحرفة'} الأصيلة.` }; },
-    draw(ctx, W, H, d) {
-      cardBase(ctx, W, H, '#fffaf3');
-      ctx.strokeStyle = '#8b6450'; ctx.lineWidth = 2; ctx.strokeRect(60, 90, W - 120, H - 180);
-      let y = txt(ctx, 'شهادة صُنع يدوي', W / 2, 150, { size: 76, weight: 700, color: '#7a2520', font: 'Reem Kufi' });
-      y = txt(ctx, S.profile.craft ? `حرفة ${S.profile.craft}` : 'حرفة سعودية أصيلة', W / 2, y + 10, { size: 38, color: '#8b6450' });
-      ctx.fillStyle = '#d9a441'; ctx.fillRect(W / 2 - 120, y + 30, 240, 4);
-      y = txt(ctx, d.pname || 'اسم القطعة', W / 2, y + 80, { size: 64, weight: 800 });
-      y = txt(ctx, d.line, W / 2, y + 30, { size: 36, color: '#4b5563', maxW: 820 });
-      y += 60;
-      const row = (l, v) => { if (!v) return; txt(ctx, l, W - 160, y, { size: 34, color: '#6b7280', align: 'right' }); txt(ctx, v, 160, y, { size: 36, weight: 700, align: 'left' }); y += 66; };
-      row('رقم القطعة', d.no ? '#' + d.no : ''); row('صنعها', d.maker); row('المنطقة', S.profile.region); row('مدة الصنع', nz(d.hours) ? `${d.hours} ساعة` : ''); row('التاريخ', fmtDay(todayStr()));
-      txt(ctx, 'توقيع الحرفي', W - 160, H - 300, { size: 30, color: '#6b7280', align: 'right' }); ctx.fillStyle = '#9ca3af'; ctx.fillRect(W - 460, H - 240, 300, 2);
-      txt(ctx, S.profile.store || '', 160, H - 290, { size: 34, weight: 700, align: 'left', color: '#6b4c3a' });
-    },
-  },
-  thanks: {
-    label: 'بطاقة شكر وعناية', icon: 'fa-heart', size: [1080, 1350],
-    fields: (d) => `${fInput({ id: 'cf-cust', label: 'اسم الزبون (اختياري)', value: d.customer, attrs: 'data-cf="customer"' })}
-      ${fText({ id: 'cf-care', label: 'طريقة العناية بالمنتج', value: d.care, rows: 3 }).replace('<textarea', '<textarea data-cf="care"')}`,
-    defaults(params) {
-      const o = S.orders.find(x => x.id === params.orderId);
-      const care = { food: 'يُحفظ في مكان بارد وجاف، ويفضّل أكله خلال أيام.', scent: 'يُحفظ بعيد عن الشمس والحرارة، ويُغلق بإحكام بعد الاستخدام.', sewing: 'يُغسل باليد بماء بارد، ولا يُعصر بقوة.' }[S.profile.category] || 'نظّفه بقطعة قماش ناعمة، وأبعده عن الرطوبة وأشعة الشمس المباشرة.';
-      return { customer: o ? o.customer : '', care };
-    },
-    draw(ctx, W, H, d) {
-      cardBase(ctx, W, H);
-      let y = txt(ctx, 'شكراً لك', W / 2, 180, { size: 110, weight: 700, color: '#7a2520', font: 'Reem Kufi' });
-      if (d.customer) y = txt(ctx, d.customer, W / 2, y + 10, { size: 48, weight: 700 });
-      y = txt(ctx, 'اخترت منتج يدوي، صُنع بحب ووقت وتعب.\nوجودك يخلّي هالحرفة تعيش 🤍', W / 2, y + 40, { size: 40, color: '#4b5563', maxW: 860 });
-      ctx.fillStyle = '#f2e8e5'; const by = y + 60; ctx.fillRect(110, by, W - 220, 360);
-      txt(ctx, 'طريقة العناية', W / 2, by + 30, { size: 40, weight: 800, color: '#6b4c3a' });
-      txt(ctx, d.care, W / 2, by + 100, { size: 34, maxW: W - 300 });
-      txt(ctx, S.profile.store || S.profile.name || '', W / 2, H - 260, { size: 50, weight: 700, font: 'Reem Kufi', color: '#4c3528' });
-      txt(ctx, contactLine(), W / 2, H - 180, { size: 32, color: '#6b4c3a' });
-    },
-  },
-  qr: {
-    label: 'بطاقة معرض QR', icon: 'fa-qrcode', size: [1080, 1350],
-    fields: (d) => `${productPicker('cf-prod', d.productId, 'المنتج')}
-      ${fInput({ id: 'cf-pname', label: 'اسم المنتج', value: d.pname, attrs: 'data-cf="pname"' })}
-      ${fInput({ id: 'cf-price', label: 'السعر', value: d.price, attrs: 'data-cf="price"' })}
-      ${fInput({ id: 'cf-wa', label: 'رقم الواتساب اللي يطلبون عليه', value: d.wa, type: 'tel', attrs: 'data-cf="wa"' })}
-      ${!S.profile.whatsapp ? '<p class="hint">نصيحة: اكتب رقمك في "ملفي" عشان يتعبّى هنا كل مرة.</p>' : ''}`,
-    defaults(params) { const p = cardProduct(params); return { productId: p ? p.id : '', pname: p ? p.name : '', price: p ? computeRow(p).rounded + ' ر.س' : '', wa: S.profile.whatsapp, photo: p ? p.photo : '' }; },
-    draw(ctx, W, H, d, redraw) {
-      cardBase(ctx, W, H);
-      let y = txt(ctx, S.profile.store || 'منتج يدوي', W / 2, 100, { size: 52, weight: 700, font: 'Reem Kufi', color: '#7a2520' });
-      const ph = d.photo ? getImg(d.photo, redraw) : null;
-      if (ph) { const s = 420, k = Math.max(s / ph.naturalWidth, s / ph.naturalHeight); ctx.save(); ctx.beginPath(); ctx.rect((W - s) / 2, y + 20, s, s); ctx.clip(); ctx.drawImage(ph, (W - ph.naturalWidth * k) / 2, y + 20 + (s - ph.naturalHeight * k) / 2, ph.naturalWidth * k, ph.naturalHeight * k); ctx.restore(); y += 460; } else y += 30;
-      y = txt(ctx, d.pname || 'اسم المنتج', W / 2, y, { size: 56, weight: 800 });
-      if (d.price) y = txt(ctx, d.price, W / 2, y + 4, { size: 48, weight: 700, color: '#8b6450' });
-      const link = normPhone(d.wa) ? waLink(`السلام عليكم، أبي أطلب: ${d.pname || 'منتجكم'}`, d.wa) : '';
-      const qs = 300, qy = Math.max(y + 30, H - 140 - qs - 80);
-      if (link && typeof QRious !== 'undefined') { const q = new QRious({ value: link, size: qs, level: 'M', background: '#ffffff', foreground: '#32221a' }); ctx.fillStyle = '#fff'; ctx.fillRect((W - qs) / 2 - 16, qy - 16, qs + 32, qs + 32); ctx.drawImage(q.canvas, (W - qs) / 2, qy, qs, qs); txt(ctx, 'امسح الرمز واطلب على واتساب', W / 2, qy + qs + 26, { size: 34, weight: 700, color: '#4c3528' }); }
-      else txt(ctx, link ? 'الرمز ما اشتغل، افتح الصفحة من جديد' : 'اكتب رقم الواتساب عشان يطلع الرمز', W / 2, qy + 100, { size: 34, color: '#9ca3af' });
-    },
-  },
-  label: {
-    label: 'ملصق المنتج', icon: 'fa-tag', size: [1200, 800],
-    fields: (d) => `${productPicker('cf-prod', d.productId, 'المنتج')}
-      ${fInput({ id: 'cf-pname', label: 'اسم المنتج', value: d.pname, attrs: 'data-cf="pname"' })}
-      ${fText({ id: 'cf-ing', label: 'المكونات أو الخامات', value: d.ing }).replace('<textarea', '<textarea data-cf="ing"')}
-      <div class="grid grid-cols-2 gap-2">${fInput({ id: 'cf-w', label: 'الوزن أو الحجم', value: d.weight, ph: 'مثال: 250 جرام', attrs: 'data-cf="weight"' })}${fInput({ id: 'cf-made', label: 'تاريخ الإنتاج', value: d.made, type: 'date', attrs: 'data-cf="made"' })}</div>
-      ${fInput({ id: 'cf-exp', label: 'صالح لين (للأكل والعطور)', value: d.exp, type: 'date', attrs: 'data-cf="exp"' })}
-      ${S.profile.category === 'food' ? '<p class="hint text-amber-800">المنتجات الغذائية لها اشتراطات في الملصق والتصنيع. تأكد من اشتراطات البلدية والهيئة العامة للغذاء والدواء.</p>' : ''}`,
-    defaults(params) { const p = cardProduct(params); return { productId: p ? p.id : '', pname: p ? p.name : '', ing: p ? p.details : '', weight: '', made: todayStr(), exp: '' }; },
-    draw(ctx, W, H, d) {
-      ctx.fillStyle = '#fffaf3'; ctx.fillRect(0, 0, W, H); saduBand(ctx, 0, 0, W, 30); saduBand(ctx, 0, H - 30, W, 30);
-      ctx.fillStyle = '#7a2520'; ctx.fillRect(0, 0, 24, H); ctx.fillRect(W - 24, 0, 24, H); ctx.fillStyle = '#d9a441'; ctx.fillRect(24, 0, 6, H); ctx.fillRect(W - 30, 0, 6, H);
-      let y = txt(ctx, S.profile.store || S.profile.name || '', W / 2, 50, { size: 44, weight: 700, color: '#7a2520', font: 'Reem Kufi' });
-      y = txt(ctx, d.pname || 'اسم المنتج', W / 2, y + 10, { size: 70, weight: 800, maxW: W - 180 });
-      ctx.fillStyle = '#d9a441'; ctx.fillRect(W / 2 - 100, y + 10, 200, 4); y += 40;
-      if (d.ing) y = txt(ctx, 'المكونات: ' + d.ing, W / 2, y, { size: 32, maxW: W - 200, color: '#374151' }) + 10;
-      const info = [d.weight ? 'الحجم: ' + d.weight : '', d.made ? 'الإنتاج: ' + d.made : '', d.exp ? 'صالح لين: ' + d.exp : ''].filter(Boolean).join('    ');
-      if (info) y = txt(ctx, info, W / 2, y + 10, { size: 32, weight: 700, color: '#4c3528', maxW: W - 160 });
-      txt(ctx, 'صُنع يدوياً' + (S.profile.region ? ' في ' + S.profile.region : ''), W / 2, H - 150, { size: 32, color: '#8b6450' });
-      txt(ctx, contactLine(), W / 2, H - 95, { size: 30, color: '#6b4c3a' });
-    },
-  },
-};
-
-ROUTES.cards = {
-  nav: 'more',
-  render(params) {
-    const type = params.type || 'quote';
-    const def = CARD_TYPES[type];
-    ROUTES.cards._d = def.defaults(params);
-    if (type === 'qr' && ROUTES.cards._d.productId) ROUTES.cards._d.photo = (prodById(ROUTES.cards._d.productId) || {}).photo || '';
-    return screen({
-      title: 'بطاقات وملصقات', sub: 'صور جاهزة ترسلها للزبون أو تطبعها وتحطها مع منتجك.', back: 'more',
-      body: `<div class="flex gap-2 overflow-x-auto custom-scrollbar pb-1">${Object.entries(CARD_TYPES).map(([k, c]) => `<button type="button" class="chip flex-shrink-0 ${k === type ? 'on' : ''}" ${goP('cards', { type: k, productId: params.productId, orderId: params.orderId })}><i class="fa-solid ${c.icon} ml-1"></i>${c.label}</button>`).join('')}</div>
-      <div class="card space-y-3" id="card-form">${def.fields(ROUTES.cards._d)}</div>
-      <div class="bg-gray-100 rounded-2xl p-3 flex justify-center"><canvas id="card-canvas" class="canvas-prev rounded-lg shadow-lg" aria-label="معاينة البطاقة"></canvas></div>
-      <div class="grid grid-cols-${def.shareText ? 2 : 1} gap-2">
-        <button type="button" class="btn btn-green" data-act="saveCard" data-type="${type}"><i class="fa-solid fa-download"></i> احفظ الصورة</button>
-        ${def.shareText ? `<a class="btn btn-wa" target="_blank" rel="noopener" id="card-wa" href="#"><i class="fa-brands fa-whatsapp"></i> أرسلها كنص</a>` : ''}
-      </div>
-      <p class="hint">احفظ الصورة ثم أرسلها على واتساب أو اطبعها. للطباعة: البطاقات مقاسها مناسب لورق A6.</p>`,
-    });
-  },
-  after(params) {
-    ROUTES.cards._type = params.type || 'quote';
-    drawCard();
-    if (document.fonts && document.fonts.load) Promise.all([document.fonts.load('700 40px Tajawal'), document.fonts.load('700 40px "Reem Kufi"')]).then(drawCard).catch(() => {});
-  },
-  onInput(e) { const k = e.target.dataset.cf; if (k) { ROUTES.cards._d[k] = e.target.value; drawCard(); } },
-  onChange(e) {
-    const d = ROUTES.cards._d, type = ROUTES.cards._type;
-    if (e.target.id === 'cf-order') { go('cards', { type, orderId: e.target.value }); return; }
-    if (e.target.id === 'cf-prod') { go('cards', { type, productId: e.target.value }); return; }
-    const k = e.target.dataset.cf; if (k) { d[k] = e.target.value; drawCard(); }
-  },
-};
-function drawCard() {
-  const type = ROUTES.cards._type, def = CARD_TYPES[type], cv = $('card-canvas'); if (!cv) return;
-  const [W, H] = def.size; cv.width = W; cv.height = H;
-  const ctx = cv.getContext('2d'); ctx.clearRect(0, 0, W, H);
-  def.draw(ctx, W, H, ROUTES.cards._d, () => drawCard());
-  const wa = $('card-wa'); if (wa && def.shareText) { const d = ROUTES.cards._d; const o = S.orders.find(x => x.id === d.orderId); wa.href = waLink(def.shareText(d), o ? o.phone : ''); }
-}
-ACT.saveCard = async (b) => {
-  const type = b.dataset.type, cv = $('card-canvas');
-  const blob = await new Promise(r => cv.toBlob(r, 'image/png'));
-  if (!blob) { toast('ما قدرنا نجهّز الصورة.'); return; }
-  if (type === 'certificate') { S.settings.certNo = Math.max(S.settings.certNo || 0, parseInt(ROUTES.cards._d.no, 10) || 0); save(); }
-  track('actions', 'card_' + type);
-  offerFile(`${CARD_TYPES[type].label.replace(/\s+/g, '_')}_${safeName(ROUTES.cards._d.pname || ROUTES.cards._d.customer || ROUTES.cards._d.item || '')}.png`, blob, 'انحفظت البطاقة ✅');
-};
-
 /* ---------- اسم وشعار المتجر ---------- */
 const LOGO_THEMES = [['sadu', 'سدو', '#7a2520', '#fdf8f6', '#d9a441'], ['palm', 'نخلة', '#3f5d3a', '#f6f1e4', '#c2a35a'], ['night', 'ليل', '#1f2a44', '#f3efe6', '#d9a441'], ['clay', 'طين', '#8b5a3c', '#fbf3ea', '#3d2a1e']];
 ROUTES.logo = {
-  nav: 'more',
+  nav: 'market',
   render() {
     ROUTES.logo._d = ROUTES.logo._d || { name: S.profile.store || '', sub: S.profile.craft ? 'حرفة ' + S.profile.craft : '', theme: 'sadu', shape: 'circle' };
     const d = ROUTES.logo._d;
     return screen({
-      title: 'اسم وشعار لمتجرك', sub: 'ما عندك اسم؟ المساعد يقترح عليك. وبعدها صمّم شعار نصي بسيط تحطه في حساباتك.', back: 'more',
+      title: 'اسم وشعار لمتجرك', sub: 'ما عندك اسم؟ المساعد يقترح عليك. وبعدها صمّم شعار نصي بسيط تحطه في حساباتك.', back: 'market',
       body: `<div class="card space-y-3">
         <div class="font-extrabold text-craft-800"><i class="fa-solid fa-wand-magic-sparkles ml-1"></i> اقترح علي أسماء</div>
         ${fInput({ id: 'lg-about', label: 'وش تبي يعبّر عنه الاسم؟', ph: 'مثال: التراث، الجدة، الصحراء، البساطة' })}
@@ -2391,306 +1758,10 @@ ACT.saveLogo = async () => { const blob = await new Promise(r => $('logo-canvas'
 ACT.useLogoName = () => { if (!ROUTES.logo._d.name) { toast('اكتب الاسم.'); return; } S.profile.store = ROUTES.logo._d.name; save(); toast('صار اسم متجرك ✅', true); };
 
 /* ============================================================
-   تعلّم: دروس الدقيقة، الشارات، التراخيص، قياس الفايدة
+   لوحة صاحب المنصة: الآراء والاستخدام
    ============================================================ */
-const LESSONS = [
-  { id: 'l1', title: 'ليه لازم تحسب تعبك؟', go: 'products', goLabel: 'سعّر منتج', body: 'كثير من الحرفيين يحسبون سعر المواد بس، وينسون الساعات اللي جلسوها على القطعة.\n\n**مثال:** مواد بـ 50 ريال وشغل 5 ساعات. لو بعتها بـ 70، يعني ساعتك بـ 4 ريال بس!\n\nحدد كم تستاهل ساعتك (مثلاً 25 ريال)، وخلّها جزء ثابت من التكلفة. تعبك مو ببلاش.' },
-  { id: 'l2', title: 'الفرق بين "ربح فوق التكلفة" و"ربحك من كل 100"', go: 'products', goLabel: 'شوف ربحك', body: 'لما تضيف **40%** فوق تكلفة 100 ريال، تبيع بـ 140.\n\nلكن من كل 100 ريال يدفعها الزبون، ربحك **29 ريال** بس (40 ÷ 140).\n\nليش يهم؟ لأن أي خصم تعطيه ينقص من الـ 29، مو من الـ 40. خصم 20% يعني تقريباً ما ربحت شي.' },
-  { id: 'l3', title: 'العربون يحميك', go: 'orderEdit', goLabel: 'سجّل طلب', body: 'في الطلبات الخاصة والكبيرة، خذ عربون قبل ما تبدأ: **ربع أو نص المبلغ**.\n\nالعربون يغطي المواد لو الزبون غيّر رأيه، ويخلّي الزبون جاد.\n\nاكتبها بوضوح: "العربون ما يُرد إذا بدأنا الشغل".' },
-  { id: 'l4', title: 'صوّر منتجك عند الشباك', go: 'studio', goLabel: 'عدّل صورة', body: '- صوّر الصبح أو العصر **جنب شباك**، مو تحت لمبة.\n- خلفية سادة: قماش أبيض أو خشب.\n- صوّر 3 صور: كاملة، من الجنب، وقريبة على التفاصيل.\n- نظّف عدسة الجوال قبل التصوير.\n\nالصورة الحلوة تبيع قبل الكلام.' },
-  { id: 'l5', title: 'لا تنزل سعرك أول ما أحد يفاصل', go: 'replies', goLabel: 'ردود جاهزة', body: 'الزبون اللي يفاصل مو بالضرورة ما يبي يشتري. يبي يحس إنه كسبان.\n\nبدل ما تنزل السعر، عطه شي صغير: **تغليف هدية، شحن مجاني، أو قطعة صغيرة معه.**\n\nوإذا لزم تنزل، لا تنزل تحت التكلفة أبداً.' },
-  { id: 'l6', title: 'القصة تبيع المنتج', go: 'story', goLabel: 'اكتب قصتي', body: 'الناس تشتري المنتج اليدوي عشان القصة اللي وراه: مين علّمك، ومن متى تشتغل، ووش يميز شغلك.\n\nحط قصتك في البايو، ومع كل منتج في المعارض. قصة صادقة في سطرين تفرق كثير.' },
-  { id: 'l7', title: 'سعر المحلات غير سعر الزبون', go: 'products', goLabel: 'شوف سعر المحلات', body: 'المحل يبي يضيف ربحه، فيطلب منك سعر أقل.\n\nلا تعطي المحل نفس سعر الزبون، ولا تنزل تحت **تكلفتك + 15 إلى 25%**.\n\nوخلّ سعرك للزبون المباشر ثابت، عشان ما تكسر سعر المحل.' },
-  { id: 'l8', title: 'التغليف جزء من المنتج', go: 'cards', goLabel: 'بطاقة شكر', body: 'تغليف مرتب وبطاقة شكر صغيرة يخلّي الزبون يصوّر المنتج وينشره، ويرجع لك.\n\nاحسب تكلفة التغليف ضمن المواد. وحط بطاقة فيها طريقة العناية وحسابك.' },
-  { id: 'l9', title: 'سجّل كل بيعة', go: 'saleEdit', goLabel: 'سجّل بيعة', body: 'إذا ما سجّلت، ما تدري وش يبيع ووش ما يبيع.\n\nسجّل كل بيعة ولو صغيرة. بعد شهرين بتعرف أكثر منتج مطلوب، وأحسن مكان تبيع فيه، وتركّز عليه.' },
-  { id: 'l10', title: 'جهّز للمواسم بدري', go: 'occasions', goLabel: 'المناسبات الجاية', body: 'رمضان والأعياد واليوم الوطني أكثر وقت يبيع فيه الحرفي.\n\nابدأ تجهز المنتجات **قبل الموسم بشهر**، وانشر عنها قبلها بأسبوعين. اللي يجهز بدري يبيع أكثر.' },
-];
-function lessonOfDay() {
-  const unread = LESSONS.filter(l => !S.lessonsRead.includes(l.id));
-  const pool = unread.length ? unread : LESSONS;
-  const day = Math.floor(Date.now() / 86400000);
-  return pool[day % pool.length];
-}
-ROUTES.lessons = {
-  nav: 'more',
-  render() {
-    return screen({
-      title: 'دروس الدقيقة', sub: 'دروس قصيرة تقرأها في دقيقة، وتطبقها على طول.', back: 'more',
-      body: `<div class="space-y-2">${LESSONS.map((l, i) => `<button type="button" class="card w-full text-start flex items-center gap-3 hover:bg-craft-50 py-3" ${goP('lesson', { id: l.id })}><span class="w-9 h-9 rounded-full flex items-center justify-center font-bold flex-shrink-0 ${S.lessonsRead.includes(l.id) ? 'bg-green-100 text-green-700' : 'bg-craft-100 text-craft-700'}">${S.lessonsRead.includes(l.id) ? '<i class="fa-solid fa-check"></i>' : i + 1}</span><b class="text-craft-900">${esc(l.title)}</b></button>`).join('')}</div>
-      <div class="card bg-craft-50 text-gray-700">تبي تتعلم أكثر؟ اسأل ${esc(CONFIG.orgName)} عن الدورات والورش القادمة.</div>`,
-    });
-  },
-};
-ROUTES.lesson = {
-  nav: 'more',
-  render({ id }) {
-    const l = LESSONS.find(x => x.id === id) || LESSONS[0];
-    if (!S.lessonsRead.includes(l.id)) { S.lessonsRead.push(l.id); save(); }
-    const i = LESSONS.indexOf(l), next = LESSONS[i + 1];
-    return screen({
-      title: esc(l.title), back: 'lessons',
-      body: `<div class="card text-lg leading-loose"><div class="md">${md(l.body)}</div><button type="button" class="btn btn-soft btn-sm tts-btn mt-3 ${TTS.ok ? '' : 'hidden'}" data-act="speakLesson" data-id="${l.id}"><i class="fa-solid fa-volume-high"></i> اسمع الدرس</button></div>
-      <button type="button" class="btn btn-main w-full text-lg" data-go="${l.go}">${esc(l.goLabel)} <i class="fa-solid fa-arrow-left"></i></button>
-      ${next ? `<button type="button" class="btn btn-soft w-full" ${goP('lesson', { id: next.id })}>الدرس اللي بعده: ${esc(next.title)}</button>` : ''}`,
-    });
-  },
-};
-ACT.speakLesson = (b) => { const l = LESSONS.find(x => x.id === b.dataset.id); speak(l.title + '. ' + l.body); };
-
-/* ---------- الشارات ---------- */
-function badgeList() {
-  const a = S.usage.actions || {};
-  const priced = S.products.filter(p => computeRow(p).sellingPrice > 0).length;
-  return [
-    { icon: 'fa-coins', name: 'أول منتج مسعّر', got: priced >= 1, how: 'سعّر منتج في "منتجاتي"' },
-    { icon: 'fa-boxes-stacked', name: '5 منتجات مسعّرة', got: priced >= 5, how: 'سعّر 5 منتجات' },
-    { icon: 'fa-pen-nib', name: 'أول إعلان', got: (a.description || 0) >= 1, how: 'اكتب وصف لمنتج' },
-    { icon: 'fa-bullhorn', name: 'عندي خطة', got: (a.marketing || 0) >= 1, how: 'اكتب خطة تسويق' },
-    { icon: 'fa-camera-retro', name: 'مصوّر محترف', got: (a.image_export || 0) >= 1, how: 'عدّل صورة واحفظها' },
-    { icon: 'fa-clipboard-list', name: 'أول طلب', got: S.orders.length >= 1, how: 'سجّل طلب زبون' },
-    { icon: 'fa-sack-dollar', name: 'أول بيعة', got: S.sales.length >= 1, how: 'سجّل بيعة' },
-    { icon: 'fa-chart-line', name: '10 بيعات', got: S.sales.reduce((x, s) => x + nz(s.qty), 0) >= 10, how: 'سجّل 10 قطع مبيعة' },
-    { icon: 'fa-graduation-cap', name: 'متعلّم', got: S.lessonsRead.length >= 5, how: 'اقرأ 5 دروس' },
-    { icon: 'fa-star', name: 'زبائني يحبوني', got: S.reviews.length >= 1, how: 'أضف رأي زبون' },
-    { icon: 'fa-store', name: 'في المعرض', got: (S.catalogItems || []).length >= 1, how: 'اعرض منتجاتك في المعرض' },
-    { icon: 'fa-comment-dots', name: 'شريك في التطوير', got: S.feedback.length >= 1, how: 'أرسل رأيك في المنصة' },
-  ];
-}
-ROUTES.badges = {
-  nav: 'more',
-  render() {
-    const b = badgeList(), got = b.filter(x => x.got).length;
-    return screen({
-      title: 'شاراتي', sub: `جمعت ${got} من ${b.length}. كل شارة خطوة تكبّر فيها مشروعك.`, back: 'more',
-      body: `<div class="grid grid-cols-2 sm:grid-cols-3 gap-3">${b.map(x => `<div class="card text-center ${x.got ? 'border-amber-300 bg-amber-50' : 'opacity-70'}"><div class="w-14 h-14 mx-auto rounded-full flex items-center justify-center text-2xl ${x.got ? 'bg-amber-400 text-white' : 'bg-gray-100 text-gray-400'}"><i class="fa-solid ${x.icon}"></i></div><div class="font-extrabold mt-2 ${x.got ? 'text-craft-900' : 'text-gray-500'}">${x.name}</div><div class="text-xs mt-1 ${x.got ? 'text-amber-700 font-bold' : 'text-gray-500'}">${x.got ? 'حصّلتها ✓' : x.how}</div></div>`).join('')}</div>`,
-    });
-  },
-};
-
-/* ---------- التراخيص والأنظمة (حُدّثت أكتوبر 2026) ---------- */
-ROUTES.guide = {
-  nav: 'more',
-  render() {
-    const sec = (icon, title, body, links) => `<details class="more card p-0"><summary><span><i class="fa-solid ${icon} ml-1 text-craft-500"></i> ${title}</span><i class="fa-solid fa-chevron-down chev"></i></summary><div class="px-4 pb-4 space-y-2 leading-relaxed">${body}${links ? `<div class="flex flex-wrap gap-2 pt-1">${links.map(([l, u]) => `<a class="btn btn-soft btn-sm" href="${u}" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> ${l}</a>`).join('')}</div>` : ''}</div></details>`;
-    return screen({
-      title: 'التراخيص والأنظمة', sub: 'وش تحتاج عشان تبيع بشكل نظامي؟ معلومات عامة مختصرة، وتأكد دائماً من الجهة الرسمية.', back: 'more',
-      body: `<div class="card bg-amber-50 border-amber-200"><b class="text-amber-900"><i class="fa-solid fa-triangle-exclamation ml-1"></i> مهم للحرفيين:</b> صدر <b>نظام الحرف والصناعات اليدوية</b>، وفيه مهلة سنة لتصحيح الأوضاع <b>من 23 مايو 2026 إلى 23 مايو 2027</b>.</div>
-      ${sec('fa-id-card', 'ترخيص ممارس حرفي (هيئة التراث)', `<p>حسب نظام الحرف والصناعات اليدوية: اللي يمارس الحرفة <b>لأغراض تجارية</b> أو يتاجر بالمنتجات الحرفية يحتاج <b>ترخيص ممارس حرفي</b>، وتصدره هيئة التراث، ويُسجَّل في <b>السجل الوطني للحرفيين</b>.</p><p>وفيه ترخيص منفصل لمحلات بيع المنتجات الحرفية التراثية.</p><p>رخص الحرفيين كانت تُصدر عبر منصة "أبدع" التابعة لوزارة الثقافة. تأكد من القناة الحالية لأن الإجراءات ممكن تتحدث مع النظام الجديد.</p>`, [['خبر النظام الجديد (عكاظ)', 'https://www.okaz.com.sa/local/na/2237608'], ['رخصة الحرفيين عبر أبدع (واس)', 'https://www.spa.gov.sa/w1874445']])}
-      ${sec('fa-briefcase', 'وثيقة العمل الحر', `<p>وثيقة رسمية من <b>وزارة الموارد البشرية</b> عبر منصة العمل الحر، تخليك تشتغل لحسابك بشكل نظامي.</p><ul class="list-disc pr-5"><li>إصدارها <b>مجاني</b>، ومدتها سنة وتتجدد.</li><li>للسعوديين من عمر 18 سنة، وتحتاج حساب في النفاذ الوطني.</li><li>فيها فئة <b>الأسر المنتجة</b>: الأكل والحلويات، الخياطة، الأعمال اليدوية والحرفية، العطور والبخور.</li><li>تفيدك في: فتح حساب بنكي للنشاط، توثيق متجرك الإلكتروني، بوابات الدفع، وبرامج دعم وتمويل.</li></ul>`, [['منصة العمل الحر', 'https://freelance.sa']])}
-      ${sec('fa-receipt', 'هل علي ضريبة؟', `<p>التسجيل في <b>ضريبة القيمة المضافة</b> يصير <b>إلزامي</b> إذا مبيعاتك في السنة <b>375 ألف ريال أو أكثر</b>.</p><p>وإذا مبيعاتك بين 187,500 و375 ألف ريال، التسجيل <b>اختياري</b>. وأقل من كذا ما تحتاج تسجل.</p><p class="hint">سجّل مبيعاتك في "دفتر المبيعات" عشان تعرف وين أنت من هالأرقام.</p>`, [['هيئة الزكاة والضريبة والجمارك', 'https://zatca.gov.sa']])}
-      ${sec('fa-utensils', 'إذا تبيع أكل أو عطور', `<p>المنتجات الغذائية ومنتجات العناية لها اشتراطات خاصة في التصنيع والتغليف والملصق.</p><p>قبل ما تبيع بشكل واسع، اسأل <b>البلدية</b> و<b>الهيئة العامة للغذاء والدواء</b> عن الاشتراطات اللي تخص منتجك.</p>`, [['الهيئة العامة للغذاء والدواء', 'https://www.sfda.gov.sa']])}
-      <p class="hint">هذي معلومات عامة للتوعية، مو استشارة قانونية. آخر تحديث: أكتوبر 2026.</p>`,
-    });
-  },
-};
-
-/* ---------- قياس الفايدة (للحرفي) ---------- */
-function impactDue() {
-  const b = S.impact.baseline; if (!b || !b.at) return false;
-  const last = S.impact.followups.length ? S.impact.followups[S.impact.followups.length - 1].at : b.at;
-  return Date.now() - last > 30 * 86400000;
-}
-ROUTES.impact = {
-  nav: 'more',
-  render() {
-    const first = !S.impact.baseline;
-    return screen({
-      title: first ? 'قبل ما نبدأ' : 'كيف صار وضعك؟', sub: first ? '3 أسئلة تساعدنا نعرف إذا المنصة فادتك بعد فترة.' : 'نفس الأسئلة اللي سألناك أول. جاوب على وضعك الحين.', back: 'home',
-      body: `<div class="card space-y-4">
-        ${fInput({ id: 'im-price', label: 'بكم تبيع قطعتك الأشهر الحين؟ (ر.س)', type: 'number' })}
-        ${fInput({ id: 'im-sales', label: 'كم قطعة تبيع في الشهر تقريباً؟', type: 'number' })}
-        <div><span class="lbl">كم أنت واثق إن سعرك صح؟</span>${segGroup('im-conf', [['1', '1'], ['2', '2'], ['3', '3'], ['4', '4'], ['5', '5']], '', 5)}<p class="hint">1 = مو واثق أبداً، 5 = واثق جداً</p></div>
-        ${first ? '' : fText({ id: 'im-change', label: 'وش أكثر شي تغيّر عندك؟', ph: 'مثال: رفعت أسعاري، صرت آخذ عربون' })}
-        <button type="button" class="btn btn-main w-full text-lg" data-act="saveImpact">أرسل</button>
-      </div>`,
-    });
-  },
-};
-ACT.saveImpact = () => {
-  const rec = { price: nz(val('im-price')), sales: nz(val('im-sales')), conf: Number(segVal('im-conf')) || 0, at: Date.now() };
-  if (!rec.price && !rec.sales && !rec.conf) { toast('جاوب على سؤال واحد على الأقل.'); return; }
-  if (!S.impact.baseline) S.impact.baseline = rec; else S.impact.followups.push({ ...rec, change: val('im-change').slice(0, 600) });
-  save(); queueFeedback(); toast('شكراً لك ✅', true); go('home');
-};
-
-/* ============================================================
-   مجتمع الحرفيين: المعرض، الموردين، اسأل الحرفيات، الطلبات الكبيرة
-   كل حرفي يكتب في مستنده فقط (catalog/<id> ، suppliers/<id> ، qa/<id> ، progress/<id>)
-   ============================================================ */
-function initCommunity() {}
-const communityOk = () => !!(CAP.db && CAP.uid);
-const canPost = () => communityOk() && CAP.canWrite !== false;
-function communityGate(read = true) {
-  if (!CAP.ready) return `<div class="card">${loaderHtml('لحظة…')}</div>`;
-  if (!CAP.db) return '<div class="card bg-amber-50 border-amber-200 text-amber-900">المجتمع ما اشتغل. حدّث الصفحة وجرّب مرة ثانية.</div>';
-  if (!read && !canPost()) return '<div class="card bg-amber-50 border-amber-200 text-amber-900">تقدر تتصفح، بس المشاركة تحتاج صلاحية "مساهم" في الرابط. اطلبها من صاحب المنصة.</div>';
-  return '';
-}
 async function readAll(col) { const snap = await CAP.db.collection(col).get(); return snap.docs.filter(d => d.exists).map(d => ({ id: d.id, ...(d.data() || {}) })); }
-async function myDoc(col) { const s = await CAP.db.doc(col + '/' + CAP.uid).get(); return s.exists ? (s.data() || {}) : {}; }
-const myName = () => S.profile.name || S.profile.store || 'حرفي';
 function loadInto(id, fn) { fn().catch(() => { const el = $(id); if (el) el.innerHTML = '<div class="card text-center text-gray-500">ما قدرنا نجيب البيانات. جرّب بعدين.</div>'; }); }
-
-/* ---------- معرض المنتجات ---------- */
-ROUTES.catalog = {
-  nav: 'more',
-  render() {
-    return screen({
-      title: `معرض ${esc(CONFIG.orgName)}`, sub: 'منتجات الحرفيين والحرفيات في مكان واحد. اطلب مباشرة من صاحب المنتج على واتساب.', back: 'more',
-      body: `${communityGate() || `<button type="button" class="btn btn-main w-full" data-go="catalogMine"><i class="fa-solid fa-store"></i> اعرض منتجاتي هنا</button>
-      <input type="search" id="cat-q" class="inp" placeholder="دوّر: سدو، فخار، بخور…" aria-label="بحث">
-      <div id="cat-list" class="grid grid-cols-2 sm:grid-cols-3 gap-3"><div class="col-span-full">${loaderHtml('نجيب المنتجات…')}</div></div>`}`,
-    });
-  },
-  after() {
-    if (!CAP.db) return;
-    loadInto('cat-list', async () => {
-      const docs = await readAll('catalog');
-      const items = []; docs.forEach(d => (d.items || []).forEach(it => items.push({ ...it, seller: d })));
-      ROUTES.catalog._items = items; drawCatalog('');
-    });
-    $('cat-q') && $('cat-q').addEventListener('input', e => drawCatalog(e.target.value.trim()));
-  },
-};
-function drawCatalog(q) {
-  const el = $('cat-list'); if (!el) return;
-  const items = (ROUTES.catalog._items || []).filter(it => !q || [it.name, it.seller.craft, it.seller.name, it.seller.region].join(' ').includes(q));
-  el.innerHTML = items.length ? items.map(it => `<div class="card p-0 overflow-hidden flex flex-col">
-    <div class="aspect-square bg-craft-100 flex items-center justify-center">${it.photo && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(it.photo) ? `<img src="${esc(it.photo)}" alt="" class="w-full h-full object-cover">` : '<i class="fa-solid fa-box-open text-3xl text-craft-300"></i>'}</div>
-    <div class="p-3 flex-1 flex flex-col gap-1"><b class="text-craft-900 leading-snug">${esc(it.name)}</b><span class="text-craft-700 font-bold num">${it.price ? money(it.price) : ''}</span><span class="text-xs text-gray-500">${esc(it.seller.name || '')}${it.seller.region ? ' · ' + esc(it.seller.region) : ''}</span>
-    ${it.seller.whatsapp ? `<a class="btn btn-wa btn-sm mt-auto" target="_blank" rel="noopener" href="${esc(waLink(`السلام عليكم، شفت "${it.name}" في معرض ${CONFIG.orgName} وأبي أطلبه`, it.seller.whatsapp))}"><i class="fa-brands fa-whatsapp"></i> اطلب</a>` : ''}</div></div>`).join('')
-    : `<div class="col-span-full card text-center text-gray-500 py-8">${q ? 'ما لقينا شي بهالاسم.' : 'المعرض فاضي للحين. كن أول من يعرض منتجاته!'}</div>`;
-}
-ROUTES.catalogMine = {
-  nav: 'more',
-  render() {
-    const shown = new Set((S.catalogItems || []));
-    return screen({
-      title: 'اعرض منتجاتي في المعرض', sub: 'اختر المنتجات اللي تبي الناس يشوفونها. اللي في المعرض يشوفه كل من يفتح المنصة.', back: 'catalog',
-      body: communityGate(false) || (S.products.length ? `<div class="card space-y-4">
-        ${fInput({ id: 'cm-name', label: 'الاسم اللي يظهر', value: S.profile.store || S.profile.name })}
-        ${fInput({ id: 'cm-wa', label: 'رقم الواتساب للطلبات', value: S.profile.whatsapp, type: 'tel', ph: '05xxxxxxxx' })}
-        <label class="flex items-start gap-2"><input type="checkbox" id="cm-ok" class="w-5 h-5 mt-0.5 accent-craft-600"> <span>أوافق إن اسمي ورقمي وصور منتجاتي وأسعارها تظهر لكل اللي يفتحون المعرض.</span></label>
-        <div><span class="lbl">وش تبي تعرض؟ (12 منتج بالكثير)</span><div class="space-y-2">${S.products.map(p => `<label class="flex items-center gap-3 border border-craft-100 rounded-xl p-2"><input type="checkbox" class="w-5 h-5 accent-craft-600" data-cm="${p.id}" ${shown.has(p.id) ? 'checked' : ''}><span class="w-10 h-10 rounded-lg bg-craft-100 overflow-hidden flex-shrink-0">${p.photo ? `<img src="${p.photo}" alt="" class="w-full h-full object-cover">` : ''}</span><span class="flex-1 font-bold">${esc(p.name || 'منتج')}</span><span class="num text-craft-700 font-bold">${computeRow(p).rounded} ر.س</span></label>`).join('')}</div><p class="hint">المنتج بدون صورة يظهر بدون صورة. أضف صورة من بطاقة المنتج.</p></div>
-        <button type="button" class="btn btn-main w-full text-lg" data-act="publishCatalog"><i class="fa-solid fa-store"></i> انشر في المعرض</button>
-      </div>
-      ${shown.size ? '<button type="button" class="btn w-full text-red-700 hover:bg-red-50" data-act="unpublishCatalog"><i class="fa-solid fa-eye-slash"></i> أخفي كل منتجاتي من المعرض</button>' : ''}` : '<div class="card text-center text-gray-500 py-6">أضف منتجاتك أول من "منتجاتي".</div>'),
-    });
-  },
-};
-function smallThumb(dataUrl, max = 240) {
-  return new Promise(res => { if (!dataUrl) return res(''); const im = new Image(); im.onload = () => { const k = Math.min(1, max / Math.max(im.naturalWidth, im.naturalHeight)); const c = document.createElement('canvas'); c.width = Math.round(im.naturalWidth * k); c.height = Math.round(im.naturalHeight * k); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); res(c.toDataURL('image/jpeg', 0.72)); }; im.onerror = () => res(''); im.src = dataUrl; });
-}
-ACT.publishCatalog = async (btn) => {
-  if (!$('cm-ok').checked) { toast('لازم توافق على ظهور بياناتك أول.'); return; }
-  const ids = [...document.querySelectorAll('[data-cm]')].filter(x => x.checked).map(x => x.dataset.cm).slice(0, 12);
-  if (!ids.length) { toast('اختر منتج واحد على الأقل.'); return; }
-  btn.disabled = true; btn.textContent = 'لحظة…';
-  try {
-    const items = [];
-    for (const id of ids) { const p = prodById(id); items.push({ id, name: p.name || 'منتج', price: computeRow(p).rounded, photo: await smallThumb(p.photo) }); }
-    await CAP.db.doc('catalog/' + CAP.uid).set({ name: val('cm-name') || myName(), craft: S.profile.craft || '', region: S.profile.region || '', whatsapp: val('cm-wa'), items, updatedAt: new Date().toISOString() });
-    S.catalogItems = ids; save(); track('actions', 'catalog'); toast('انعرضت منتجاتك في المعرض ✅', true); go('catalog');
-  } catch { toast('ما قدرنا ننشر. تأكد إن عندك صلاحية "مساهم" في الرابط.'); btn.disabled = false; btn.textContent = 'انشر في المعرض'; }
-};
-ACT.unpublishCatalog = async () => { try { await CAP.db.doc('catalog/' + CAP.uid).delete(); S.catalogItems = []; save(); toast('انخفت منتجاتك من المعرض', true); go('catalog'); } catch { toast('ما قدرنا نخفيها. جرّب بعدين.'); } };
-
-/* ---------- الموردين والشراء الجماعي ---------- */
-ROUTES.suppliers = {
-  nav: 'more',
-  render() {
-    return screen({
-      title: 'الموردين والشراء الجماعي', sub: 'شاركوا بعض وين تلقون الخامات بسعر زين، واشتروا مع بعض بالجملة عشان ينزل السعر.', back: 'more',
-      body: communityGate() || `<div class="grid grid-cols-2 gap-2"><button type="button" class="btn btn-main" data-act="toggle" data-target="sp-tip-form"><i class="fa-solid fa-plus"></i> أضف مورد</button><button type="button" class="btn btn-dark" data-act="toggle" data-target="sp-buy-form"><i class="fa-solid fa-people-carry-box"></i> اطلب شراء جماعي</button></div>
-      <div id="sp-tip-form" class="hidden card space-y-3">${fInput({ id: 'sp-mat', label: 'وش الخامة؟', ph: 'مثال: صوف ملوّن' })}${fInput({ id: 'sp-sup', label: 'المورد (المحل أو الحساب)', ph: 'مثال: محل … في سوق …' })}<div class="grid grid-cols-2 gap-2">${fInput({ id: 'sp-city', label: 'المدينة', ph: 'جازان' })}${fInput({ id: 'sp-price', label: 'السعر تقريباً', ph: '120 ريال للفة' })}</div>${fInput({ id: 'sp-note', label: 'ملاحظة', ph: 'جودة ممتازة، يوصّل' })}<button type="button" class="btn btn-main w-full" data-act="addTip">أضف</button></div>
-      <div id="sp-buy-form" class="hidden card space-y-3">${fInput({ id: 'gb-mat', label: 'وش تبي تشتري؟', ph: 'مثال: خوص بالجملة' })}${fInput({ id: 'gb-qty', label: 'كم تحتاج أنت؟', ph: 'مثال: 10 حزم' })}${fInput({ id: 'gb-note', label: 'تفاصيل', ph: 'المورد، السعر لو اشترينا 50 حزمة…' })}<button type="button" class="btn btn-main w-full" data-act="addBuy">انشر الطلب</button></div>
-      <div id="sp-list" class="space-y-3">${loaderHtml('نجيب البيانات…')}</div>`,
-    });
-  },
-  after() { if (communityOk()) loadInto('sp-list', drawSuppliers); },
-};
-async function drawSuppliers() {
-  const docs = await readAll('suppliers'); ROUTES.suppliers._docs = docs;
-  const buys = [], tips = [];
-  docs.forEach(d => { (d.buys || []).forEach(b => buys.push({ ...b, owner: d.id, ownerName: d.name })); (d.tips || []).forEach(t => tips.push({ ...t, ownerName: d.name })); });
-  const joinsFor = (bid) => docs.flatMap(d => (d.joins && d.joins[bid]) ? [{ name: d.name, qty: d.joins[bid] }] : []);
-  const el = $('sp-list'); if (!el) return;
-  el.innerHTML = `${buys.length ? `<h2 class="font-extrabold text-craft-800">طلبات شراء جماعي</h2>${buys.sort((a, b) => String(b.at).localeCompare(String(a.at))).map(b => { const js = joinsFor(b.id); const mine = b.owner === CAP.uid; return `<div class="card space-y-2 border-amber-200"><div class="flex justify-between gap-2"><b class="text-craft-900">${esc(b.material)}</b><span class="text-xs text-gray-500">${esc(b.ownerName || '')} · ${fmtDay(b.at)}</span></div>${b.note ? `<p class="text-gray-700 text-sm">${esc(b.note)}</p>` : ''}<p class="text-sm">يحتاج: <b>${esc(b.qty || '—')}</b></p>${js.length ? `<p class="text-sm text-green-800">انضم معه: ${js.map(j => `${esc(j.name)} (${esc(j.qty)})`).join('، ')}</p>` : ''}${!mine && canPost() ? `<div class="flex gap-2"><input class="inp" id="join-${b.id}" placeholder="كم تحتاج؟" aria-label="كم تحتاج"><button type="button" class="btn btn-main btn-sm flex-shrink-0" data-act="joinBuy" data-id="${b.id}">انضم</button></div>` : ''}${mine ? `<button type="button" class="btn btn-soft btn-sm" data-act="delBuy" data-id="${b.id}">أغلق الطلب</button>` : ''}</div>`; }).join('')}` : ''}
-  <h2 class="font-extrabold text-craft-800">نصايح الموردين</h2>
-  ${tips.length ? tips.sort((a, b) => String(b.at).localeCompare(String(a.at))).map(t => `<div class="card"><div class="flex justify-between gap-2"><b class="text-craft-900">${esc(t.material)}</b><span class="text-xs text-gray-500">${esc(t.city || '')}</span></div><p class="text-gray-700">${esc(t.supplier)}${t.price ? ` · <b>${esc(t.price)}</b>` : ''}</p>${t.note ? `<p class="text-sm text-gray-500">${esc(t.note)}</p>` : ''}<p class="text-xs text-gray-400 mt-1">من ${esc(t.ownerName || 'حرفي')}</p></div>`).join('') : '<div class="card text-center text-gray-500">ما فيه نصايح للحين. شارك أول مورد تعرفه.</div>'}`;
-}
-async function updateMine(col, fn) { const d = await myDoc(col); d.name = myName(); fn(d); d.updatedAt = new Date().toISOString(); await CAP.db.doc(col + '/' + CAP.uid).set(d); }
-ACT.addTip = async () => {
-  if (!val('sp-mat') || !val('sp-sup')) { toast('اكتب الخامة والمورد.'); return; }
-  try { await updateMine('suppliers', d => { d.tips = (d.tips || []).concat({ id: uid(), material: val('sp-mat'), supplier: val('sp-sup'), city: val('sp-city'), price: val('sp-price'), note: val('sp-note'), at: new Date().toISOString() }).slice(-40); }); toast('شكراً على المشاركة ✅', true); rerender(); } catch { toast('ما قدرنا نحفظ. تأكد من صلاحية "مساهم".'); }
-};
-ACT.addBuy = async () => {
-  if (!val('gb-mat')) { toast('اكتب وش تبي تشتري.'); return; }
-  try { await updateMine('suppliers', d => { d.buys = (d.buys || []).concat({ id: uid(), material: val('gb-mat'), qty: val('gb-qty'), note: val('gb-note'), at: new Date().toISOString() }).slice(-10); }); toast('انشر طلبك ✅', true); rerender(); } catch { toast('ما قدرنا نحفظ. تأكد من صلاحية "مساهم".'); }
-};
-ACT.joinBuy = async (b) => { const q = val('join-' + b.dataset.id); if (!q) { toast('اكتب كم تحتاج.'); return; } try { await updateMine('suppliers', d => { d.joins = d.joins || {}; d.joins[b.dataset.id] = q; }); toast('انضميت ✅ تواصل مع صاحب الطلب', true); rerender(); } catch { toast('ما قدرنا نحفظ.'); } };
-ACT.delBuy = async (b) => { try { await updateMine('suppliers', d => { d.buys = (d.buys || []).filter(x => x.id !== b.dataset.id); }); rerender(); } catch { toast('ما قدرنا نحذف.'); } };
-
-/* ---------- اسأل الحرفيات ---------- */
-ROUTES.qa = {
-  nav: 'more',
-  render() {
-    return screen({
-      title: 'اسأل الحرفيات', sub: 'عندك سؤال عن الشغل؟ اسأل، والحرفيات اللي عندهن خبرة يجاوبون.', back: 'more',
-      body: communityGate() || `${canPost() ? `<div class="card space-y-3">${fText({ id: 'qa-q', label: 'سؤالك', ph: 'مثال: كيف أثبّت ألوان الصوف عشان ما تبهت؟' })}<button type="button" class="btn btn-main w-full" data-act="askQ"><i class="fa-solid fa-paper-plane"></i> اسأل</button></div>` : ''}
-      <div id="qa-list" class="space-y-3">${loaderHtml('نجيب الأسئلة…')}</div>`,
-    });
-  },
-  after() { if (communityOk()) loadInto('qa-list', drawQA); },
-};
-async function drawQA() {
-  const docs = await readAll('qa'); const posts = [];
-  docs.forEach(d => (d.posts || []).forEach(p => posts.push({ ...p, ownerName: d.name, owner: d.id })));
-  const qs = posts.filter(p => p.kind === 'q').sort((a, b) => String(b.at).localeCompare(String(a.at)));
-  const el = $('qa-list'); if (!el) return;
-  el.innerHTML = qs.length ? qs.map(q => { const ans = posts.filter(p => p.kind === 'a' && p.qid === q.id).sort((a, b) => String(a.at).localeCompare(String(b.at))); return `<div class="card space-y-2">
-    <div class="text-xs text-gray-500">${esc(q.ownerName || 'حرفي')} · ${fmtDay(q.at)}</div><p class="font-bold text-craft-900 leading-relaxed">${esc(q.text)}</p>
-    ${ans.map(a => `<div class="bg-craft-50 rounded-xl p-3"><div class="text-xs text-craft-600 font-bold">${esc(a.ownerName || 'حرفي')}</div><p class="text-gray-800 leading-relaxed">${esc(a.text)}</p></div>`).join('')}
-    ${canPost() ? `<div class="flex gap-2"><input class="inp" id="ans-${q.id}" placeholder="جاوب…" aria-label="جوابك"><button type="button" class="btn btn-soft btn-sm flex-shrink-0" data-act="answerQ" data-id="${q.id}">أرسل</button></div>` : ''}</div>`; }).join('')
-    : '<div class="card text-center text-gray-500 py-6">ما فيه أسئلة للحين. اسأل أول سؤال!</div>';
-}
-ACT.askQ = async () => { const t = val('qa-q'); if (!t) { toast('اكتب سؤالك.'); return; } try { await updateMine('qa', d => { d.posts = (d.posts || []).concat({ id: uid(), kind: 'q', text: t.slice(0, 800), at: new Date().toISOString() }).slice(-60); }); track('actions', 'qa'); rerender(); } catch { toast('ما قدرنا نرسل. تأكد من صلاحية "مساهم".'); } };
-ACT.answerQ = async (b) => { const t = val('ans-' + b.dataset.id); if (!t) return; try { await updateMine('qa', d => { d.posts = (d.posts || []).concat({ id: uid(), kind: 'a', qid: b.dataset.id, text: t.slice(0, 800), at: new Date().toISOString() }).slice(-60); }); rerender(); } catch { toast('ما قدرنا نرسل.'); } };
-
-/* ---------- الطلبات الكبيرة (للحرفي) ---------- */
-ROUTES.bigOrders = {
-  nav: 'more',
-  render() {
-    return screen({
-      title: 'الطلبات الكبيرة', sub: `طلبات جهات وشركات يوزعها ${esc(CONFIG.orgName)} على الحرفيين. هنا نصيبك منها.`, back: 'more',
-      body: communityGate() || `${CAP.isOwner ? '<button type="button" class="btn btn-dark w-full" data-go="owner" data-p=\'{"tab":"big"}\'><i class="fa-solid fa-gear"></i> إدارة الطلبات الكبيرة</button>' : ''}<div id="bo-list" class="space-y-3">${loaderHtml('نجيب الطلبات…')}</div>`,
-    });
-  },
-  after() {
-    if (!communityOk()) return;
-    loadInto('bo-list', async () => {
-      const [orders, mine] = await Promise.all([readAll('bigorders'), myDoc('progress').catch(() => ({}))]);
-      const prog = mine.orders || {};
-      const my = orders.filter(o => (o.assignments || []).some(a => a.uid === CAP.uid));
-      const el = $('bo-list'); if (!el) return;
-      el.innerHTML = my.length ? my.map(o => { const a = o.assignments.find(x => x.uid === CAP.uid); const done = nz((prog[o.id] || {}).done); return `<div class="card space-y-2">
-        <div class="flex justify-between gap-2"><b class="text-craft-900 text-lg">${esc(o.title)}</b>${o.due ? `<span class="text-sm font-bold ${daysUntil(o.due) <= 3 ? 'text-red-700' : 'text-gray-500'}">التسليم ${fmtDay(o.due)}</span>` : ''}</div>
-        ${o.product ? `<p class="text-gray-700">${esc(o.product)}</p>` : ''}${o.notes ? `<p class="text-sm text-gray-500">${esc(o.notes)}</p>` : ''}
-        <div class="bg-craft-50 rounded-xl p-3 flex justify-between"><span>نصيبك</span><b class="num">${nz(a.qty)} قطعة${o.unitPrice ? ` × ${money(o.unitPrice)}` : ''}</b></div>
-        <div class="h-3 rounded-full bg-craft-100 overflow-hidden"><div class="h-full bg-green-600" style="width:${Math.min(100, done / Math.max(1, nz(a.qty)) * 100)}%"></div></div>
-        ${canPost() ? `<div class="flex gap-2 items-end"><div class="flex-1">${fInput({ id: 'bo-done-' + o.id, label: 'خلّصت كم قطعة؟', value: done || '', type: 'number' })}</div><button type="button" class="btn btn-main" data-act="saveProgress" data-id="${o.id}">حدّث</button></div>` : ''}
-      </div>`; }).join('') : '<div class="card text-center text-gray-500 py-6">ما عندك نصيب في طلبات كبيرة الحين. إذا تبي تشارك، اعرض منتجاتك في المعرض عشان تعرفك الإدارة.</div>';
-    });
-  },
-};
-ACT.saveProgress = async (b) => {
-  const id = b.dataset.id, n = nz(val('bo-done-' + id));
-  try { await updateMine('progress', d => { d.orders = d.orders || {}; d.orders[id] = { done: n, at: new Date().toISOString() }; }); toast('انحدّث ✅', true); rerender(); } catch { toast('ما قدرنا نحفظ.'); }
-};
-
-/* ============================================================
-   لوحة صاحب المنصة: الآراء والاستخدام، الأثر، توزيع الطلبات الكبيرة
-   ============================================================ */
 const TAB_LABELS = { home: 'الرئيسية', products: 'منتجاتي', product: 'تسعير منتج', orders: 'الطلبات', chat: 'المساعد', more: 'المزيد', description: 'وصف المنتج', marketing: 'خطة التسويق', replies: 'ردود الزبائن', story: 'قصتي', ideas: 'أفكار منتجات', occasions: 'المناسبات', studio: 'تعديل الصور', imagePrompt: 'صورة بالذكاء الاصطناعي', cards: 'البطاقات', logo: 'اسم وشعار', sales: 'المبيعات', bazaar: 'البازار', customers: 'زبائني', lessons: 'الدروس', guide: 'التراخيص', catalog: 'المعرض', suppliers: 'الموردين', qa: 'اسأل الحرفيات', catalogMine: 'عرض منتجاتي', feedback: 'رأيك يهمنا', onboard: 'ملفي', orderEdit: 'تفاصيل طلب', saleEdit: 'تسجيل بيعة', customerEdit: 'تفاصيل زبون', reviews: 'آراء الزبائن', savedTexts: 'النصوص المحفوظة', savedText: 'نص محفوظ', dataPage: 'بياناتي', lesson: 'درس', badges: 'الشارات', impact: 'قياس الفايدة', bigOrders: 'الطلبات الكبيرة', privacy: 'الخصوصية', about: 'من نحن' };
 const ACTION_LABELS = { price_review: 'رأي المساعد في السعر', description: 'كتابة وصف', marketing: 'خطة تسويق', replies: 'ردود زبائن', story: 'قصتي', ideas: 'أفكار منتجات', occasion: 'منشور مناسبة', image_prompt: 'وصف صورة', chat: 'رسائل للمساعد', competitors: 'مقارنة أسعار', photo_upload: 'رفع صورة', card_quote: 'عرض سعر', card_certificate: 'شهادة صنع يدوي', card_thanks: 'بطاقة شكر', card_qr: 'بطاقة QR', card_label: 'ملصق', names: 'اقتراح أسماء', customer_msg: 'رسالة زبون', image_export: 'حفظ صورة معدّلة', excel: 'Excel', csv: 'ملف المتجر', order: 'طلب جديد', sale: 'بيعة', bazaar: 'بازار', catalog: 'نشر في المعرض', logo: 'شعار', qa: 'سؤال للمجتمع' };
 ROUTES.owner = {
@@ -2699,16 +1770,13 @@ ROUTES.owner = {
     if (!CAP.isOwner) return screen({ title: 'لوحة صاحب المنصة', back: 'more', body: '<div class="card text-gray-600">هذي الصفحة لصاحب المنصة فقط.</div>' });
     return screen({
       title: 'لوحة صاحب المنصة', sub: 'تظهر لك فقط. البيانات تتحدث كل ما فتحت الصفحة.', back: 'more',
-      body: `<div class="grid grid-cols-3 gap-2">${[['fb', 'الآراء والاستخدام'], ['impact', 'الأثر'], ['big', 'الطلبات الكبيرة']].map(([k, l]) => `<button type="button" class="seg ${tab === k ? 'on' : ''}" ${goP('owner', { tab: k })}>${l}</button>`).join('')}</div>
-      <div id="ow-body">${loaderHtml('نجيب البيانات…')}</div>`,
+      body: `<div id="ow-body">${loaderHtml('نجيب البيانات…')}</div>`,
     });
   },
   after({ tab = 'fb' }) {
     if (!CAP.isOwner || !CAP.db) return;
     loadInto('ow-body', async () => {
-      if (tab === 'big') return drawBigAdmin();
       const docs = (await readAll('feedback')).filter(d => d.id !== CAP.uid);
-      if (tab === 'impact') return drawImpact(docs);
       drawFeedbackAdmin(docs);
     });
   },
@@ -2740,81 +1808,6 @@ function drawFeedbackAdmin(docs) {
     ${entries.slice(0, 60).map(e => `<div class="card text-sm space-y-1"><div class="flex justify-between gap-2 flex-wrap"><b class="text-craft-800">${esc(e.who)}${e.craft ? ' · ' + esc(e.craft) : ''}</b><span class="text-gray-500">${e.rating ? '★'.repeat(e.rating) + ' · ' : ''}${fmtDay(e.at)}</span></div>${(e.tools || []).length ? `<p><b>فادته:</b> ${esc(e.tools.join('، '))}</p>` : ''}${e.hard ? `<p><b>صعب عليه:</b> ${esc(e.hard)}</p>` : ''}${e.idea ? `<p><b>يتمنى:</b> ${esc(e.idea)}</p>` : ''}</div>`).join('') || '<p class="hint">ما أرسل أحد رأي مكتوب للحين.</p>'}
   </div>` : '<div class="card text-center text-gray-500 py-8">ما فيه بيانات من المجرّبين للحين. شارك الرابط معهم بصلاحية "مساهم".</div>';
 }
-function drawImpact(docs) {
-  const withB = docs.filter(d => d.impact && d.impact.baseline);
-  const pairs = withB.filter(d => (d.impact.followups || []).length).map(d => ({ b: d.impact.baseline, f: d.impact.followups[d.impact.followups.length - 1], name: d.name, change: d.impact.followups[d.impact.followups.length - 1].change }));
-  const avg = (arr, k) => { const xs = arr.map(x => nz(x[k])).filter(Boolean); return xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0; };
-  const row = (label, k, unit) => { const b = avg(pairs.map(p => p.b), k), f = avg(pairs.map(p => p.f), k); const ch = b ? (f - b) / b * 100 : 0; return `<div class="card flex justify-between items-center gap-2"><span class="font-bold text-gray-700">${label}</span><span class="num">${b ? r2(b) : '—'} ← <b>${f ? r2(f) : '—'}</b> ${unit} ${b && f ? `<span class="font-bold ${ch >= 0 ? 'text-green-700' : 'text-red-700'}">(${ch >= 0 ? '+' : ''}${Math.round(ch)}%)</span>` : ''}</span></div>`; };
-  $('ow-body').innerHTML = `<div class="space-y-3">
-    <div class="grid grid-cols-2 gap-2"><div class="card text-center"><div class="text-xs text-gray-500 font-bold">جاوبوا أول مرة</div><div class="text-2xl font-extrabold num">${withB.length}</div></div><div class="card text-center"><div class="text-xs text-gray-500 font-bold">جاوبوا بعد شهر</div><div class="text-2xl font-extrabold num">${pairs.length}</div></div></div>
-    ${pairs.length ? `<p class="hint">المقارنة بين أول إجابة وآخر إجابة لنفس المجرّبين (${pairs.length}).</p>${row('سعر القطعة الأشهر', 'price', 'ر.س')}${row('القطع المبيعة شهرياً', 'sales', 'قطعة')}${row('الثقة في التسعير (من 5)', 'conf', '')}
-    <h3 class="font-extrabold text-craft-800">وش تغيّر عندهم؟</h3>${pairs.filter(p => p.change).map(p => `<div class="card text-sm"><b>${esc(p.name || 'مجرّب')}:</b> ${esc(p.change)}</div>`).join('') || '<p class="hint">ما كتبوا شي.</p>'}
-    <button type="button" class="btn btn-green w-full" data-act="exportImpact"><i class="fa-solid fa-file-excel"></i> احفظ أرقام الأثر Excel (للتقارير والداعمين)</button>`
-    : '<div class="card text-gray-600 leading-relaxed">بعد 30 يوم من أول إجابة، يظهر للمجرّب سؤال المتابعة في الرئيسية. لما يجاوب، تظهر المقارنة هنا.</div>'}
-  </div>`;
-  ROUTES.owner._impact = withB;
-}
-ACT.exportImpact = () => {
-  const data = [['المجرّب', 'الحرفة', 'المنطقة', 'السعر قبل', 'السعر بعد', 'القطع شهرياً قبل', 'القطع شهرياً بعد', 'الثقة قبل', 'الثقة بعد', 'وش تغيّر']];
-  (ROUTES.owner._impact || []).forEach(d => { const b = d.impact.baseline, f = (d.impact.followups || []).slice(-1)[0] || {}; data.push([d.name || '', d.craft || '', d.region || '', b.price || '', f.price || '', b.sales || '', f.sales || '', b.conf || '', f.conf || '', f.change || '']); });
-  const ws = XLSX.utils.aoa_to_sheet(data); ws['!cols'] = data[0].map(() => ({ wch: 16 }));
-  saveWorkbook([['الأثر', ws]], 'أثر_المنصة.xlsx');
-};
-
-/* ---------- توزيع الطلبات الكبيرة ---------- */
-async function artisansList() {
-  const [cat, fb] = await Promise.all([readAll('catalog').catch(() => []), readAll('feedback').catch(() => [])]);
-  const map = {};
-  fb.forEach(d => { if (d.id !== CAP.uid) map[d.id] = d.name || (d.craft ? 'حرفي ' + d.craft : 'مجرّب'); });
-  cat.forEach(d => { map[d.id] = d.name || map[d.id] || 'حرفي'; });
-  return Object.entries(map).map(([uid, name]) => ({ uid, name }));
-}
-async function drawBigAdmin() {
-  const [orders, progress, artisans] = await Promise.all([readAll('bigorders'), readAll('progress'), artisansList()]);
-  ROUTES.owner._artisans = artisans;
-  const doneOf = (oid, uid) => { const p = progress.find(x => x.id === uid); return p && p.orders && p.orders[oid] ? nz(p.orders[oid].done) : 0; };
-  $('ow-body').innerHTML = `<div class="space-y-3">
-    <button type="button" class="btn btn-main w-full" data-act="bigNew"><i class="fa-solid fa-plus"></i> طلب كبير جديد</button>
-    <div id="big-form"></div>
-    ${orders.length ? orders.sort((a, b) => String(a.due || '9').localeCompare(String(b.due || '9'))).map(o => { const tot = (o.assignments || []).reduce((s, a) => s + nz(a.qty), 0), done = (o.assignments || []).reduce((s, a) => s + Math.min(nz(a.qty), doneOf(o.id, a.uid)), 0); return `<div class="card space-y-2">
-      <div class="flex justify-between gap-2"><b class="text-lg text-craft-900">${esc(o.title)}</b><span class="text-sm text-gray-500">${o.client ? esc(o.client) + ' · ' : ''}${o.due ? fmtDay(o.due) : ''}</span></div>
-      <div class="flex justify-between text-sm"><span>المطلوب ${nz(o.total)} · الموزّع ${tot}</span><b class="num">${done} / ${tot} جاهز</b></div>
-      <div class="h-3 rounded-full bg-craft-100 overflow-hidden"><div class="h-full bg-green-600" style="width:${tot ? done / tot * 100 : 0}%"></div></div>
-      ${(o.assignments || []).map(a => `<div class="flex justify-between text-sm border-b border-craft-50 py-1"><span>${esc(a.name)}</span><span class="num">${doneOf(o.id, a.uid)} / ${nz(a.qty)}</span></div>`).join('')}
-      <div class="grid grid-cols-2 gap-2"><button type="button" class="btn btn-soft btn-sm" data-act="bigEdit" data-id="${o.id}">عدّل</button><button type="button" class="btn btn-soft btn-sm text-red-700" data-act="bigDel" data-id="${o.id}">احذف</button></div>
-    </div>`; }).join('') : '<div class="card text-center text-gray-500">ما فيه طلبات كبيرة.</div>'}
-    <p class="hint">قائمة الحرفيين تتكون من اللي أرسلوا بيانات استخدام أو عرضوا منتجاتهم في المعرض.</p>
-  </div>`;
-  ROUTES.owner._orders = orders;
-}
-function bigForm(o) {
-  const arts = ROUTES.owner._artisans || [];
-  o = o || { id: '', title: '', client: '', product: '', total: '', unitPrice: '', due: '', notes: '', assignments: [] };
-  ROUTES.owner._editing = JSON.parse(JSON.stringify(o));
-  $('big-form').innerHTML = `<div class="card space-y-3 border-craft-400">
-    ${fInput({ id: 'bf-title', label: 'اسم الطلب', value: o.title, ph: 'مثال: 200 هدية لليوم الوطني' })}
-    <div class="grid grid-cols-2 gap-2">${fInput({ id: 'bf-client', label: 'الجهة', value: o.client })}${fInput({ id: 'bf-due', label: 'التسليم', value: o.due, type: 'date' })}</div>
-    ${fInput({ id: 'bf-product', label: 'المنتج والمواصفات', value: o.product })}
-    <div class="grid grid-cols-2 gap-2">${fInput({ id: 'bf-total', label: 'الكمية الكلية', value: o.total, type: 'number' })}${fInput({ id: 'bf-unit', label: 'سعر القطعة للحرفي', value: o.unitPrice, type: 'number' })}</div>
-    ${fInput({ id: 'bf-notes', label: 'ملاحظات للحرفيين', value: o.notes })}
-    <div><span class="lbl">التوزيع</span>${arts.length ? arts.map(a => { const as = (o.assignments || []).find(x => x.uid === a.uid); return `<div class="flex items-center gap-2 mb-2"><span class="flex-1">${esc(a.name)}</span><input type="number" min="0" inputmode="numeric" class="inp num w-24" data-assign="${esc(a.uid)}" data-name="${esc(a.name)}" value="${as ? nz(as.qty) : ''}" placeholder="0" aria-label="كمية ${esc(a.name)}"></div>`; }).join('') : '<p class="hint">ما فيه حرفيين معروفين للحين.</p>'}</div>
-    <div class="grid grid-cols-2 gap-2"><button type="button" class="btn btn-main" data-act="bigSave">احفظ</button><button type="button" class="btn btn-soft" data-act="bigCancel">إلغاء</button></div>
-  </div>`;
-  $('big-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-ACT.bigNew = () => bigForm(null);
-ACT.bigEdit = (b) => bigForm((ROUTES.owner._orders || []).find(o => o.id === b.dataset.id));
-ACT.bigCancel = () => { $('big-form').innerHTML = ''; };
-ACT.bigSave = async () => {
-  const o = ROUTES.owner._editing; if (!val('bf-title')) { toast('اكتب اسم الطلب.'); return; }
-  Object.assign(o, { title: val('bf-title'), client: val('bf-client'), due: val('bf-due'), product: val('bf-product'), total: nz(val('bf-total')), unitPrice: nz(val('bf-unit')), notes: val('bf-notes'), updatedAt: new Date().toISOString() });
-  o.assignments = [...document.querySelectorAll('[data-assign]')].filter(x => nz(x.value)).map(x => ({ uid: x.dataset.assign, name: x.dataset.name, qty: nz(x.value) }));
-  if (!o.id) o.id = uid();
-  try { await CAP.db.doc('bigorders/' + o.id).set(o); toast('انحفظ الطلب ✅', true); go('owner', { tab: 'big' }); } catch { toast('ما قدرنا نحفظ.'); }
-};
-ACT.bigDel = (b) => openModal(`<p class="font-bold text-red-800 mb-3">متأكد تحذف الطلب الكبير؟</p><div class="grid grid-cols-2 gap-2"><button type="button" class="btn bg-red-600 text-white" data-act="bigDelYes" data-id="${esc(b.dataset.id)}">احذف</button><button type="button" class="btn btn-soft" data-act="closeModal">لا</button></div>`);
-ACT.bigDelYes = async (b) => { closeModal(); try { await CAP.db.doc('bigorders/' + b.dataset.id).delete(); go('owner', { tab: 'big' }); } catch { toast('ما قدرنا نحذف.'); } };
-
 /* ============================================================
    بدء التشغيل
    ============================================================ */
@@ -2843,7 +1836,6 @@ initTTS();
     try { const snap = await FB.ref.get(); if (snap.exists) { const b = snap.data() || {}; if (Array.isArray(b.entries) && !S.feedback.length) S.feedback = b.entries; } FB.writable = true; queueFeedback(); } catch {}
   }
   await initAccount();
-  if (typeof initCommunity === 'function') initCommunity();
   document.querySelectorAll('.img-only').forEach(el => { el.classList.toggle('hidden', !CAP.canImages); if (el.tagName === 'LABEL') el.classList.toggle('flex', CAP.canImages); });
   if (CUR.name === 'more' && CAP.isOwner) rerender();
 })();

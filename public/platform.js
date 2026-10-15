@@ -271,7 +271,7 @@
         <div class="text-center mb-5">
           <div class="mx-auto mb-3 w-16 h-16 rounded-2xl bg-craft-700 text-craft-100 flex items-center justify-center text-3xl"><i class="fa-solid fa-hands-holding-circle"></i></div>
           <h1 class="text-2xl font-extrabold text-craft-800">منصة الحرفي السعودي</h1>
-          <p class="text-gray-600 mt-1">سعّر منتجاتك، سوّق لها، وتابع طلباتك. ادخل وكمّل من أي جهاز.</p>
+          <p class="text-gray-600 mt-1">مستشارك الذكي في الحرفة: سعّر منتجاتك، سوّق لها، وصوّرها صور احترافية.</p>
         </div>
         ${msg ? `<div class="mb-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 p-3 text-sm">${escH(msg)}</div>` : ''}
         <div class="space-y-3" id="plat-login-oauth">
