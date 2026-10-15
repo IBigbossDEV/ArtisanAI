@@ -261,7 +261,7 @@ document.addEventListener('click', (e) => {
 (async () => {
   try {
     const cfg = await (await fetch('/api/config')).json();
-    await new Promise((res, rej) => { const s = document.createElement('script'); s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js'; s.onload = res; s.onerror = rej; document.head.appendChild(s); });
+    await new Promise((res, rej) => { const s = document.createElement('script'); s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js'; s.onload = res; s.onerror = rej; document.head.appendChild(s); });
     SB = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, { auth: { persistSession: true, autoRefreshToken: true, flowType: 'pkce' } });
     const { data } = await SB.auth.getSession();
     if (!data || !data.session) { $('view').innerHTML = '<div class="card">ادخل حسابك من <a class="underline" href="/">المنصة</a> أول، ثم ارجع هنا.</div>'; return; }

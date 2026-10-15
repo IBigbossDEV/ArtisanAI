@@ -470,6 +470,8 @@
     }
   }
 
+  PLAT.handlePayReturn = handlePayReturn;
+
   /* ---------- شريط التذكير بالتجديد ---------- */
   function renderBanner() {
     const m = PLAT.me; let b = document.getElementById('plat-banner');
@@ -522,7 +524,7 @@
       showLogin('الموقع ما اكتمل إعداده للحين (إعدادات السيرفر ناقصة).');
       return;
     }
-    try { await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js'); }
+    try { await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js'); }
     catch { showLogin('ما قدرنا نتصل. تأكد من النت وحدّث الصفحة.'); return; }
 
     PLAT.sb = window.supabase.createClient(PLAT.config.supabaseUrl, PLAT.config.supabaseAnonKey, {
