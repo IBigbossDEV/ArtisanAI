@@ -159,9 +159,9 @@
   sample.limits = async () => ({ images: { mediaTypes: ['image/jpeg', 'image/png', 'image/webp'] } });
 
   /* ---------- المصوّر الذكي (Gemini عبر السيرفر) ---------- */
-  PLAT.generateImage = async ({ file, scene, custom, name, details, ratio, signal }) => {
+  PLAT.generateImage = async ({ file, instruction, scene, custom, name, details, ratio, signal }) => {
     const image = await toImagePayload(file, 1536);
-    const res = await api('/api/ai/image', { method: 'POST', body: { image, scene, custom, name, details, ratio }, signal, raw: true });
+    const res = await api('/api/ai/image', { method: 'POST', body: { image, instruction, scene, custom, name, details, ratio }, signal, raw: true });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
       if (data.error === 'quota_exceeded') { PLAT.showQuota('image'); throw codeErr('quota_exceeded'); }
