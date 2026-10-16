@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#6b4c3a">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
-<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
 <script>
   tailwind.config = {
     theme: { extend: {
@@ -318,7 +318,12 @@ async function flushAccount() {
     for (const pid of Object.keys(ACC.sentPhotos)) if (!prodById(pid)) { await ACC.col.doc('photo-' + pid).delete().catch(() => {}); delete ACC.sentPhotos[pid]; }
   })();
   try { await ACC.busy; ACC.status = 'synced'; }
-  catch (e) { if (e && (e.code === 'invalid_argument' || e.code === 'not_granted' || e.code === 'revoked')) { ACC.writable = false; ACC.status = 'local'; } else ACC.dirty = true; }
+  catch (e) {
+    if (e && (e.code === 'invalid_argument' || e.code === 'not_granted' || e.code === 'revoked')) {
+      ACC.writable = false; ACC.status = 'local';
+      if (e.reason === 'storage_full' || e.reason === 'too_many_docs') toast('امتلأت مساحة حسابك، فلن تُحفظ التعديلات الجديدة إلا في هذا الجهاز. احذف صور منتجات قديمة.');
+    } else ACC.dirty = true;
+  }
   finally { ACC.busy = null; }
 }
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') { flushAccount().catch(() => {}); flushFeedback().catch(() => {}); } });
@@ -1779,7 +1784,7 @@ ACT.useLogoName = () => { if (!ROUTES.logo._d.name) { toast('اكتب الاسم
 async function readAll(col) { const snap = await CAP.db.collection(col).get(); return snap.docs.filter(d => d.exists).map(d => ({ id: d.id, ...(d.data() || {}) })); }
 function loadInto(id, fn) { fn().catch(() => { const el = $(id); if (el) el.innerHTML = '<div class="card text-center text-gray-500">تعذّر جلب البيانات. حاول لاحقاً.</div>'; }); }
 const TAB_LABELS = { home: 'الرئيسية', products: 'منتجاتي', product: 'تسعير منتج', orders: 'الطلبات', chat: 'المساعد', more: 'المزيد', description: 'وصف المنتج', marketing: 'خطة التسويق', replies: 'ردود الزبائن', story: 'قصتي', ideas: 'أفكار منتجات', occasions: 'المناسبات', studio: 'تعديل الصور', imagePrompt: 'صورة بالذكاء الاصطناعي', cards: 'البطاقات', logo: 'اسم وشعار', sales: 'المبيعات', bazaar: 'البازار', customers: 'زبائني', lessons: 'الدروس', guide: 'التراخيص', catalog: 'المعرض', suppliers: 'الموردين', qa: 'اسأل الحرفيات', catalogMine: 'عرض منتجاتي', feedback: 'رأيك يهمنا', onboard: 'ملفي', orderEdit: 'تفاصيل طلب', saleEdit: 'تسجيل بيعة', customerEdit: 'تفاصيل زبون', reviews: 'آراء الزبائن', savedTexts: 'النصوص المحفوظة', savedText: 'نص محفوظ', dataPage: 'بياناتي', lesson: 'درس', badges: 'الشارات', impact: 'قياس الفايدة', bigOrders: 'الطلبات الكبيرة', privacy: 'الخصوصية', about: 'من نحن' };
-const ACTION_LABELS = { price_review: 'رأي المساعد في السعر', description: 'كتابة وصف', marketing: 'خطة تسويق', replies: 'ردود زبائن', story: 'قصتي', ideas: 'أفكار منتجات', occasion: 'منشور مناسبة', image_prompt: 'وصف صورة', chat: 'رسائل للمساعد', competitors: 'مقارنة أسعار', photo_upload: 'رفع صورة', card_quote: 'عرض سعر', card_certificate: 'شهادة صنع يدوي', card_thanks: 'بطاقة شكر', card_qr: 'بطاقة QR', card_label: 'ملصق', names: 'اقتراح أسماء', customer_msg: 'رسالة زبون', image_export: 'حفظ صورة معدّلة', excel: 'Excel', csv: 'ملف المتجر', order: 'طلب جديد', sale: 'بيعة', bazaar: 'بازار', catalog: 'نشر في المعرض', logo: 'شعار', qa: 'سؤال للمجتمع' };
+const ACTION_LABELS = { price_review: 'رأي المساعد في السعر', description: 'كتابة وصف', marketing: 'خطة تسويق', replies: 'ردود زبائن', story: 'قصتي', ideas: 'أفكار منتجات', occasion: 'منشور مناسبة', image_prompt: 'وصف صورة', chat: 'رسائل للمساعد', competitors: 'مقارنة أسعار', photo_upload: 'رفع صورة', card_quote: 'عرض سعر', card_certificate: 'شهادة صنع يدوي', card_thanks: 'بطاقة شكر', card_qr: 'بطاقة QR', card_label: 'ملصق', names: 'اقتراح أسماء', customer_msg: 'رسالة زبون', image_export: 'حفظ صورة معدّلة', excel: 'Excel', csv: 'ملف المتجر', order: 'طلب جديد', sale: 'بيعة', bazaar: 'بازار', catalog: 'نشر في المعرض', logo: 'شعار', qa: 'سؤال للمجتمع', ai_photo: 'المصوّر الذكي' };
 ROUTES.owner = {
   nav: 'more',
   render({ tab = 'fb' }) {
@@ -1809,7 +1814,13 @@ function drawFeedbackAdmin(docs) {
     const u = d.usage || {};
     Object.entries(u.tabs || {}).forEach(([k, n]) => tabs[k] = (tabs[k] || 0) + (Number(n) || 0));
     Object.entries(u.actions || {}).forEach(([k, n]) => actions[k] = (actions[k] || 0) + (Number(n) || 0));
-    (Array.isArray(d.entries) ? d.entries : []).forEach(e => entries.push({ ...e, who: e.name || d.name || ('مجرّب ' + (i + 1)), craft: d.craft, region: d.region }));
+    // بيانات كتبها المستخدمون، فننظفها قبل العرض حتى لا يعطّل مستند واحد غريب اللوحة كلها
+    (Array.isArray(d.entries) ? d.entries : []).filter(e => e && typeof e === 'object').forEach(e => entries.push({
+      who: String(e.name || d.name || ('مجرّب ' + (i + 1))).slice(0, 80), craft: String(d.craft || '').slice(0, 80),
+      rating: Math.max(0, Math.min(5, Math.round(Number(e.rating) || 0))), at: String(e.at || ''),
+      tools: Array.isArray(e.tools) ? e.tools.map(String).slice(0, 20) : [],
+      hard: String(e.hard || '').slice(0, 2000), idea: String(e.idea || '').slice(0, 2000),
+    }));
   });
   entries.sort((a, b) => String(b.at).localeCompare(String(a.at)));
   const rated = entries.filter(e => e.rating > 0);

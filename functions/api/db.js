@@ -4,7 +4,8 @@ import { json, fail, db, getUser, isAdmin, readJson, missingEnv } from './_lib.j
 
 const MAX_BODY = 600 * 1024;          // أكبر مستند (المنتجات والطلبات بدون الصور)
 const MAX_USER_DOCS = 500;            // حد مستندات الحرفي الخاصة (صور المنتجات تحسب)
-const SHARED = ['catalog', 'progress', 'qa', 'suppliers', 'feedback', 'bigorders'];
+const MAX_USER_BYTES = 15 * 1024 * 1024; // مساحة كل حرفي (حوالي 300 صورة منتج)، حتى لا يملأ حساب واحد المخزن
+const MAX_FEEDBACK = 64 * 1024;       // مستند الآراء صغير دائماً
 const ID_RE = /^(?!\.+$)[A-Za-z0-9_.:-]{1,128}$/;  // بدون '..'
 
 // يحدد المجموعة ورقم المستند، ويرجع null إذا المسار غير مسموح
@@ -24,11 +25,10 @@ function rules(collection, user, admin) {
     const mine = own[1].toLowerCase() === user.id.toLowerCase();
     return { readDoc: mine, list: mine, write: () => mine, private: true };
   }
-  if (!SHARED.includes(collection)) return null;
-  if (collection === 'feedback') return { readDoc: true, readDocCheck: (id) => admin || id === user.id, list: admin, write: (id) => id === user.id };
-  if (collection === 'bigorders') return { readDoc: true, list: true, write: () => admin };
-  // باقي المجتمع: الكل يقرأ، وكل حرفي يكتب مستنده فقط
-  return { readDoc: true, list: true, write: (id) => id === user.id || admin };
+  // آراء المجرّبين: كل حرفي يكتب مستنده فقط، والمالك وحده يقرأ الجميع
+  if (collection === 'feedback') return { readDoc: true, readDocCheck: (id) => admin || id === user.id, list: admin, write: (id) => id === user.id, maxBytes: MAX_FEEDBACK };
+  // أي مجموعة أخرى مرفوضة (أدوات المجتمع القديمة حُذفت من التطبيق)
+  return null;
 }
 
 export async function onRequestPost({ request, env }) {
@@ -63,12 +63,13 @@ export async function onRequestPost({ request, env }) {
   if (op === 'set') {
     if (!rule.write(loc.id)) return fail('not_granted', 403);
     if (!body.data || typeof body.data !== 'object' || Array.isArray(body.data)) return fail('invalid_argument', 400);
+    const size = new TextEncoder().encode(JSON.stringify(body.data)).length;
+    if (rule.maxBytes && size > rule.maxBytes) return fail('invalid_argument', 400, { reason: 'too_large' });
     if (rule.private) {
-      const n = await d.count('docs', `owner=eq.${user.id}&collection=eq.${c}`);
-      if (n >= MAX_USER_DOCS) {
-        const exists = await d.select('docs', `collection=eq.${c}&doc_id=eq.${encodeURIComponent(loc.id)}&select=doc_id`);
-        if (!exists.length) return fail('invalid_argument', 400, { reason: 'too_many_docs' });
-      }
+      // نحسب المستندات الأخرى فقط، لأن هذا المستند سيُستبدل إن كان موجوداً
+      const u = (await d.rpc('docs_usage', { p_user: user.id, p_collection: loc.collection, p_except: loc.id })) || {};
+      if ((u.count || 0) >= MAX_USER_DOCS) return fail('invalid_argument', 400, { reason: 'too_many_docs' });
+      if ((u.bytes || 0) + size > MAX_USER_BYTES) return fail('invalid_argument', 400, { reason: 'storage_full' });
     }
     await d.upsert('docs', [{ collection: loc.collection, doc_id: loc.id, owner: user.id, data: body.data, updated_at: new Date().toISOString() }], 'collection,doc_id');
     return json({ ok: true });

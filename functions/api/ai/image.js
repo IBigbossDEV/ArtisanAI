@@ -75,8 +75,7 @@ export async function onRequestPost({ request, env, waitUntil }) {
 
   // نبحث عن الصورة بدون تحليل الرد كامل (الرد كبير، وهذا أخف على السيرفر)
   // نأخذ آخر صورة في الرد (بعض النماذج ترجع صور تفكير مبدئية قبل النتيجة)
-  let at = -1;
-  for (const m of text.matchAll(/"inline_?[dD]ata"\s*:/g)) at = m.index;
+  const at = Math.max(text.lastIndexOf('"inlineData"'), text.lastIndexOf('"inline_data"'));
   if (at < 0) {
     await refund();
     logAi(env, waitUntil, { user_id: user.id, kind: 'image', model, ok: false });

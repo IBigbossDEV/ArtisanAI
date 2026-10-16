@@ -32,7 +32,7 @@ ACT.platSignOut = () => {
 ACT.platSignOutYes = async () => {
   closeModal();
   try { await flushAccount(); } catch {}
-  PLAT.signOut();
+  PLAT.signOut({ wipe: true });
 };
 PLAT.onChange(() => { if (CUR.name === 'plan' && !document.getElementById('plat-layer')) rerender(); });
 
@@ -58,7 +58,7 @@ ROUTES.photographer = {
     const left = PLAT.left('image');
     const results = PH.results.map((r, i) => `
       <div class="card space-y-3">
-        <img src="${r.src}" alt="صورة من المصوّر الذكي" class="w-full rounded-xl border border-craft-100">
+        <img src="${esc(r.src)}" alt="صورة من المصوّر الذكي" class="w-full rounded-xl border border-craft-100">
         <div class="grid grid-cols-2 gap-2">
           <button type="button" class="btn btn-green btn-sm" data-act="phSave" data-i="${i}"><i class="fa-solid fa-download"></i> احفظ الصورة</button>
           <button type="button" class="btn btn-soft btn-sm" data-act="phToStudio" data-i="${i}"><i class="fa-solid fa-sliders"></i> أضف اسمك وإطاراً</button>
@@ -147,6 +147,7 @@ ACT.phGenerate = async () => {
     toast('الصورة جاهزة ✅', true);
   } catch (e) {
     const c = e && (e.name === 'AbortError' ? 'cancelled' : e.code);
+    if (c === 'cancelled') PLAT.refreshMe(); // الإيقاف بعد بدء العمل قد يُحسب من الرصيد، فنحدّث العدّاد
     if (c !== 'cancelled' && c !== 'quota_exceeded') {
       toast({
         refused: 'لم يتمكن المصوّر من العمل على هذه الصورة. جرّب صورة أخرى.',

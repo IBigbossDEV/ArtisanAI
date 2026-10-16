@@ -9,6 +9,7 @@
 
   const APP_KEYS = ['artisan_state_v2', 'artisan_pricelist_v1', 'artisan_usage_v1'];
   const OWNER_KEY = 'artisan_owner_v1';
+  const PENDING_KEY = 'artisan_pending_pay';
 
   const PLAT = (window.PLAT = {
     config: null, sb: null, session: null, me: null,
@@ -48,7 +49,7 @@
     const res = await fetch(path, { method, headers, body: body !== undefined ? JSON.stringify(body) : undefined, signal });
     if (raw) return res;
     const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw codeErr(data.error || 'upstream_error', '');
+    if (!res.ok) { const e = codeErr(data.error || 'upstream_error', ''); if (data.reason) e.reason = data.reason; throw e; }
     return data;
   }
   PLAT.api = api;
@@ -174,7 +175,7 @@
   /* ---------- مخزن البيانات (بنفس شكل قدرة db في Claude) ---------- */
   function dbErr(e) {
     const c = e && e.code;
-    if (c === 'not_granted' || c === 'invalid_argument') return codeErr(c);
+    if (c === 'not_granted' || c === 'invalid_argument') { const x = codeErr(c); x.reason = e.reason; return x; }
     return codeErr('unavailable');
   }
   const dbCall = (body) => api('/api/db', { method: 'POST', body }).catch((e) => { throw dbErr(e); });
@@ -327,10 +328,14 @@
     wrap.querySelector('#plat-code-back').addEventListener('click', () => { codeForm.classList.add('hidden'); emailForm.classList.remove('hidden'); });
   }
 
-  async function signOut() {
+  // wipe=true عند ضغط الحرفي على "خروج" (بعد حفظ بياناته في حسابه): نمسح بياناته من الجهاز.
+  // عند انتهاء الجلسة تلقائياً لا نمسح شيئاً، حتى لا تضيع تعديلات لم تُحفظ بعد؛
+  // وإذا دخل حساب آخر على الجهاز نفسه تُمسح البيانات القديمة عند دخوله (انظر start).
+  async function signOut({ wipe = false } = {}) {
     try { await PLAT.sb.auth.signOut(); } catch {}
-    APP_KEYS.forEach((k) => { try { localStorage.removeItem(k); } catch {} });
-    try { localStorage.removeItem(OWNER_KEY); } catch {}
+    if (wipe) {
+      [...APP_KEYS, OWNER_KEY, PENDING_KEY].forEach((k) => { try { localStorage.removeItem(k); } catch {} });
+    }
     location.replace('/');
   }
   PLAT.signOut = signOut;
@@ -436,7 +441,7 @@
       language: 'ar',
       fixed_width: false,
       apple_pay: { country: 'SA', label: 'منصة شوري', validate_merchant_url: 'https://api.moyasar.com/v1/applepay/initiate' },
-      on_completed: async (payment) => { try { localStorage.setItem('artisan_pending_pay', payment.id); } catch {} },
+      on_completed: async (payment) => { try { localStorage.setItem(PENDING_KEY, payment.id); } catch {} },
     });
   };
 
@@ -445,10 +450,18 @@
     let r = null;
     for (let i = 0; i < 4 && !(r && r.applied); i++) {
       try { r = await api('/api/pay/verify', { method: 'POST', body: { id } }); } catch (e) { r = { status: 'error', reason: e.code }; }
-      if (r.status !== 'paid' && r.status !== 'initiated') break;
+      if (r.status !== 'paid' && r.status !== 'initiated' && r.status !== 'error') break;
+      if (r.status === 'error' && (r.reason === 'not_your_payment' || r.reason === 'payment_not_found')) break;
       if (!r.applied) await new Promise((res) => setTimeout(res, 1500));
     }
-    try { localStorage.removeItem('artisan_pending_pay'); } catch {}
+    // تعذّر التحقق الآن (انقطاع أو تعطل مؤقت): لا نقول للحرفي إن الدفع فشل، فقد يكون خُصم فعلاً.
+    // نُبقي رقم العملية ونعيد المحاولة عند فتح الموقع، وإشعار ميسّر يفعّل الاشتراك تلقائياً.
+    if (r && r.status === 'error' && r.reason !== 'not_your_payment' && r.reason !== 'payment_not_found') {
+      openLayer(`<div class="text-center space-y-3"><h2 class="text-lg font-extrabold text-craft-800">لم نتمكن من التأكد من الدفع الآن</h2><p class="text-gray-600">إذا خُصم المبلغ فسيُفعَّل اشتراكك تلقائياً خلال دقائق. سنعيد التحقق عند فتح الموقع مرة أخرى. إذا تأخر فتواصل معنا من <a class="underline" href="/contact.html">صفحة التواصل</a> واذكر رقم العملية:</p><p dir="ltr" class="text-xs bg-gray-50 border rounded-lg p-2 break-all">${escH(id)}</p><button type="button" class="btn btn-soft w-full" data-plat-close>حسناً</button></div>`);
+      try { localStorage.setItem(PENDING_KEY, id); } catch {}
+      return;
+    }
+    try { localStorage.removeItem(PENDING_KEY); } catch {}
     await refreshMe();
     if (r && r.applied) {
       const prod = products()[r.product] || {};
@@ -539,7 +552,7 @@
       // إذا دخل حساب ثاني على نفس الجهاز، نمسح بيانات الحساب السابق من الجهاز
       let prev = null; try { prev = localStorage.getItem(OWNER_KEY); } catch {}
       if (prev && prev !== session.user.id) {
-        APP_KEYS.forEach((k) => { try { localStorage.removeItem(k); } catch {} });
+        [...APP_KEYS, PENDING_KEY].forEach((k) => { try { localStorage.removeItem(k); } catch {} });
         try { localStorage.setItem(OWNER_KEY, session.user.id); } catch {}
         location.reload();
         return;
@@ -549,7 +562,7 @@
       await refreshMe();
       if (!PLAT.me) { started = false; showLogin('حدث خطأ في الاتصال. حدّث الصفحة.'); return; }
       resolveReady();
-      const pending = payId || (() => { try { return localStorage.getItem('artisan_pending_pay'); } catch { return null; } })();
+      const pending = payId || (() => { try { return localStorage.getItem(PENDING_KEY); } catch { return null; } })();
       if (pending) handlePayReturn(pending);
     };
 
