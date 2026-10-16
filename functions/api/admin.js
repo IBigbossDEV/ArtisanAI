@@ -1,9 +1,9 @@
-// لوحة صاحب المنصة: الأرقام، الحرفيين، المدفوعات، والتعديل على الأسعار والحدود.
+// لوحة صاحب المنصة (نسخة الجمعية): الأرقام، الحرفيين، والحدود الشهرية. لا توجد مدفوعات.
 // مسموحة فقط للإيميلات المكتوبة في ADMIN_EMAILS.
 import { json, fail, db, getUser, isAdmin, readJson, getPlans, missingEnv } from './_lib.js';
 
 const int = (v, min, max) => { const n = Math.round(Number(v)); return Number.isFinite(n) && n >= min && n <= max ? n : null; };
-const PAGE_KEYS = ['terms', 'privacy', 'refund', 'contact'];
+const PAGE_KEYS = ['terms', 'privacy', 'contact'];
 
 async function guard(request, env) {
   const miss = missingEnv(env, ['SUPABASE_URL', 'SUPABASE_ANON_KEY', 'SUPABASE_SERVICE_ROLE_KEY']);
@@ -25,18 +25,11 @@ export async function onRequestGet({ request, env }) {
       d.rpc('admin_stats'), getPlans(env),
       d.select('app_settings', 'key=eq.pages&select=value').then((r) => (r[0] ? r[0].value : {})),
     ]);
-    return json({ stats, plans, pages, testMode: String(env.MOYASAR_SECRET_KEY || '').startsWith('sk_test_') });
+    return json({ stats, plans, pages });
   }
   if (view === 'users') {
     const q = (url.searchParams.get('q') || '').slice(0, 80).replace(/[%_,()]/g, '');
     return json({ users: await d.rpc('admin_users', { p_search: q, p_limit: 300 }) });
-  }
-  if (view === 'payments') {
-    const rows = await d.select('payments', 'select=id,user_id,product,amount,currency,status,live,method,note,applied_at,created_at&order=created_at.desc&limit=150');
-    const ids = [...new Set(rows.map((r) => r.user_id).filter(Boolean))];
-    const emails = {};
-    if (ids.length) (await d.select('accounts', `user_id=in.(${ids.join(',')})&select=user_id,email`)).forEach((a) => { emails[a.user_id] = a.email; });
-    return json({ payments: rows.map((r) => ({ ...r, email: emails[r.user_id] || '' })) });
   }
   return fail('bad_request', 400);
 }
@@ -48,7 +41,7 @@ export async function onRequestPost({ request, env }) {
   if (error) return fail('bad_request', 400);
   const uid = /^[0-9a-f-]{36}$/i.test(body.user_id || '') ? body.user_id : null;
 
-  // منح اشتراك يدوي (للتجربة، أو للجمعية، أو تعويض)
+  // منح رصيد موسّع لحرفي (يستخدم حدود "pro" في الإعدادات)
   if (body.action === 'grant') {
     const months = int(body.months, 1, 36);
     if (!uid || !months) return fail('bad_request', 400);
@@ -77,7 +70,7 @@ export async function onRequestPost({ request, env }) {
     for (const tier of ['free', 'pro']) for (const k of ['chat', 'images']) {
       if (p[tier] && p[tier][k] !== undefined) { const v = int(p[tier][k], 0, 100000); if (v === null) return fail('bad_value', 400, { field: `${tier}.${k}` }); next[tier][k] = v; }
     }
-    for (const key of Object.keys(next.products)) {
+    for (const key of Object.keys(next.products || {})) {
       const src = (p.products || {})[key]; if (!src) continue;
       const dst = next.products[key];
       if (src.amount !== undefined) { const v = int(src.amount, 100, 10000000); if (v === null) return fail('bad_value', 400, { field: key + '.amount' }); dst.amount = v; }

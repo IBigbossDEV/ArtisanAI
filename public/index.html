@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>منصة شوري</title>
+<title>منصة الحرفي السعودي</title>
 <meta name="description" content="دعم واستشارات للحرفيين والأسر المنتجة في الخليج بالذكاء الاصطناعي: تسعير، تسويق، ومصوّر ذكي لمنتجاتك.">
 <meta name="theme-color" content="#6b4c3a">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
@@ -100,13 +100,13 @@
     <div class="max-w-3xl mx-auto px-4 py-3 flex justify-between items-center gap-3">
       <button type="button" data-go="home" class="flex items-center gap-2 min-w-0 text-start">
         <i class="fa-solid fa-hands-holding-circle text-xl text-craft-200"></i>
-        <span id="app-title" class="text-base sm:text-xl font-bold truncate">منصة شوري</span>
+        <span id="app-title" class="text-base sm:text-xl font-bold truncate">منصة الحرفي السعودي</span>
       </button>
       <div class="flex items-center gap-2 flex-shrink-0">
         <span id="ai-pill" class="hidden sm:inline-flex items-center gap-1.5 text-xs font-medium bg-craft-800 text-craft-200 rounded-full px-2.5 py-1">
           <span id="ai-dot" class="w-2 h-2 rounded-full bg-craft-400"></span><span id="ai-pill-text">جاري تشغيل المساعد…</span>
         </span>
-        <button type="button" data-go="plan" class="bg-amber-500 hover:bg-amber-600 text-craft-900 rounded-lg px-2.5 py-1.5 font-bold text-sm flex items-center gap-1"><i class="fa-solid fa-crown"></i><span id="plan-btn-label">اشترك</span></button>
+        <button type="button" data-go="plan" class="bg-amber-500 hover:bg-amber-600 text-craft-900 rounded-lg px-2.5 py-1.5 font-bold text-sm flex items-center gap-1"><i class="fa-solid fa-gauge"></i><span id="plan-btn-label">رصيدي</span></button>
         <button type="button" data-go="more" class="bg-craft-800 hover:bg-craft-900 rounded-lg px-2.5 py-1.5 text-sm" aria-label="حسابي"><i class="fa-solid fa-user"></i></button>
         <button type="button" id="font-btn" class="bg-craft-800 hover:bg-craft-900 rounded-lg px-2.5 py-1.5 font-bold text-sm" aria-label="حجم الخط">أ<span class="text-xs">+</span></button>
       </div>
@@ -155,9 +155,9 @@
    إعدادات المنصة — عدّلها هنا
    ============================================================ */
 const CONFIG = {
-  platformName: 'منصة شوري',
+  platformName: 'منصة الحرفي السعودي',
   orgName: 'الحرفيين',                     // يظهر في عنوان المجتمع: "مجتمع الحرفيين"
-  supportedBy: '',                        // اسم جهة داعمة تظهر في "من نحن" (اتركه فارغاً إن لم توجد)
+  supportedBy: 'بيت الحرفيين',            // اسم الجهة الداعمة يظهر في "من نحن"
   orgAbout: 'مستشارك الذكي في الحرفة: يساعدك على تسعير منتجاتك بشكل صحيح، وتسويقها، وتصويرها صوراً احترافية.',
   contactWhatsapp: '',
   vatRate: 15,                            // ضريبة القيمة المضافة في السعودية (%)                      // رقم واتساب إدارة المنصة (اختياري)
@@ -1104,11 +1104,11 @@ ROUTES.more = {
     const tile = (r, icon, label, params) => has(r) ? `<button type="button" class="tile" ${params ? goP(r, params) : `data-go="${r}"`}><i class="fa-solid ${icon}"></i><span class="text-sm leading-tight">${label}</span></button>` : '';
     const group = (title, tiles) => { const t = tiles.join(''); return t ? `<section><h2 class="font-extrabold text-craft-800 mb-2">${title}</h2><div class="grid grid-cols-3 sm:grid-cols-4 gap-2">${t}</div></section>` : ''; };
     return screen({
-      title: 'حسابي', sub: 'اشتراكك وبياناتك وإعداداتك.',
+      title: 'حسابي', sub: 'رصيدك وبياناتك وإعداداتك.',
       body: `<div class="space-y-5">
-        ${group('حسابي', [tile('plan', 'fa-crown', 'اشتراكي'), tile('onboard', 'fa-user', 'ملفي', { first: false }), tile('savedTexts', 'fa-bookmark', 'نصوصي المحفوظة'), tile('dataPage', 'fa-database', 'بياناتي'), tile('feedback', 'fa-comment-dots', 'رأيك يهمنا'), tile('privacy', 'fa-shield-halved', 'الخصوصية'), tile('about', 'fa-circle-info', 'من نحن')])}
-        ${CAP.isOwner ? group('لصاحب المنصة', [tile('owner', 'fa-chart-pie', 'آراء واستخدام'), `<a class="tile" href="/admin.html"><i class="fa-solid fa-sack-dollar"></i><span class="text-sm leading-tight">المشتركين والإيرادات</span></a>`]) : ''}
-        <nav class="flex flex-wrap justify-center gap-x-4 gap-y-2 text-sm text-craft-600 pt-2"><a class="underline" href="/terms.html">الشروط والأحكام</a><a class="underline" href="/privacy.html">الخصوصية</a><a class="underline" href="/refund.html">الاسترجاع</a><a class="underline" href="/contact.html">تواصل معنا</a></nav>
+        ${group('حسابي', [tile('plan', 'fa-gauge', 'رصيدي'), tile('onboard', 'fa-user', 'ملفي', { first: false }), tile('savedTexts', 'fa-bookmark', 'نصوصي المحفوظة'), tile('dataPage', 'fa-database', 'بياناتي'), tile('feedback', 'fa-comment-dots', 'رأيك يهمنا'), tile('privacy', 'fa-shield-halved', 'الخصوصية'), tile('about', 'fa-circle-info', 'من نحن')])}
+        ${CAP.isOwner ? group('لصاحب المنصة', [tile('owner', 'fa-chart-pie', 'آراء واستخدام'), `<a class="tile" href="/admin.html"><i class="fa-solid fa-users"></i><span class="text-sm leading-tight">الحرفيين والاستهلاك</span></a>`]) : ''}
+        <nav class="flex flex-wrap justify-center gap-x-4 gap-y-2 text-sm text-craft-600 pt-2"><a class="underline" href="/terms.html">الشروط والأحكام</a><a class="underline" href="/privacy.html">الخصوصية</a><a class="underline" href="/contact.html">تواصل معنا</a></nav>
       </div>`,
     });
   },
@@ -1183,7 +1183,6 @@ ROUTES.privacy = {
         <p><b>منتجاتك وأسعارك ونصوصك المحفوظة:</b> تُحفظ في جهازك وفي حسابك على خوادم محمية، لتصل إليها من أي جهاز. لا يراها أي حرفي آخر، ولا تطّلع عليها إدارة المنصة إلا إذا طلبت منها المساعدة أو ألزمها نظام بذلك.</p>
         <p><b>ما يصل إلى إدارة المنصة:</b> رأيك إذا أرسلته، وعدد مرات استخدام كل أداة (دون محتوى ما تكتبه)، وحرفتك ومنطقتك واسمك الذي كتبته في ملفك.</p>
         <p><b>المساعد الذكي والمصوّر الذكي:</b> عند استخدامهما يصل سؤالك وبيانات المنتج أو الصورة التي ترفعها إلى مزود الذكاء الاصطناعي ليجيبك، ويُحسب كل طلب من رصيدك الشهري.</p>
-        <p><b>الدفع:</b> تذهب بيانات بطاقتك إلى بوابة ميسّر مباشرة، ولا نحفظها لدينا.</p>
         <p><b>تريد حذف بياناتك؟</b> راسلنا من <a class="underline" href="/contact.html">صفحة التواصل</a>.</p>
         <a class="btn btn-soft w-full" href="/privacy.html">سياسة الخصوصية كاملة</a>
       </div>`,
@@ -1447,7 +1446,7 @@ ACT.genOccasion = (btn) => {
 };
 
 /* ============================================================
-   تعديل الصور (يشتغل بدون المساعد)
+   تعديل الصور (يعمل دون المساعد)
    ============================================================ */
 const PRESETS = { auto: { b: 108, c: 110, s: 112, w: 5 }, warm: { b: 104, c: 106, s: 95, w: 30 }, clean: { b: 115, c: 104, s: 105, w: -10 }, reset: { b: 100, c: 100, s: 100, w: 0, zoom: 100 } };
 const st = { img: null, url: null, file: null, ratio: '1:1', fit: 'cover', bg: '#ffffff', frame: 'none', store: '', price: '', pos: 'bottom', band: 'dark', zoom: 100, b: 100, c: 100, s: 100, w: 0 };
@@ -1489,7 +1488,7 @@ ROUTES.studio = {
       <div class="card space-y-3 studio-ctrl">
         <div class="font-extrabold text-craft-800"><i class="fa-solid fa-sun ml-1"></i> الإضاءة والألوان</div>
         <div class="flex flex-wrap gap-2">
-          <button type="button" class="chip" data-preset="auto">حسّنها لي ✨</button><button type="button" class="chip" data-preset="warm">دافئ تراثي</button>
+          <button type="button" class="chip" data-preset="auto">حسّنها تلقائياً ✨</button><button type="button" class="chip" data-preset="warm">دافئ تراثي</button>
           <button type="button" class="chip" data-preset="clean">فاتح ونظيف</button><button type="button" class="chip" data-preset="reset">أعِدها كما كانت</button>
         </div>
         ${range('b', 'الإضاءة', 50, 160)}${range('c', 'الحِدّة', 50, 160)}${range('s', 'قوة الألوان', 0, 180)}${range('w', 'دفء الألوان', -50, 50)}

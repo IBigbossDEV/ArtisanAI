@@ -270,7 +270,8 @@
       <div class="plat-card">
         <div class="text-center mb-5">
           <div class="mx-auto mb-3 w-16 h-16 rounded-2xl bg-craft-700 text-craft-100 flex items-center justify-center text-3xl"><i class="fa-solid fa-hands-holding-circle"></i></div>
-          <h1 class="text-2xl font-extrabold text-craft-800">منصة شوري</h1>
+          <h1 class="text-2xl font-extrabold text-craft-800">منصة الحرفي السعودي</h1>
+          <p class="text-craft-600 font-bold mt-1">مجانية لحرفيي بيت الحرفيين</p>
           <p class="text-gray-600 mt-1">مستشارك الذكي في الحرفة: سعّر منتجاتك، وسوّقها، وصوّرها صوراً احترافية.</p>
         </div>
         ${msg ? `<div class="mb-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 p-3 text-sm">${escH(msg)}</div>` : ''}
@@ -349,8 +350,7 @@
         <div class="mx-auto w-14 h-14 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-2xl"><i class="fa-solid fa-hourglass-end"></i></div>
         <h2 class="text-xl font-extrabold text-craft-800">انتهى رصيد ${what} لهذا الشهر</h2>
         <p class="text-gray-600 leading-relaxed">${end ? `يتجدد رصيدك يوم <b>${escH(end)}</b>. ` : ''}بقية الأدوات تعمل كالمعتاد.</p>
-        ${kind === 'image' && products().images_20 ? `<button type="button" class="btn btn-main w-full" data-buy="images_20"><i class="fa-solid fa-images"></i> ${escH(products().images_20.images)} صورة إضافية بـ ${sar(products().images_20.amount)}</button>` : ''}
-        ${!isPro ? `<button type="button" class="btn ${kind === 'image' ? 'btn-soft' : 'btn-main'} w-full" data-plat-plans><i class="fa-solid fa-crown"></i> اشترك في المحترف</button>` : ''}
+        <p class="text-gray-600 leading-relaxed">إذا احتجت رصيداً أكثر، تواصل مع إدارة بيت الحرفيين.</p>
         <button type="button" class="btn btn-soft w-full" data-plat-close>حسناً</button>
       </div>`);
     wireBuy();
@@ -363,38 +363,14 @@
 
   PLAT.planHtml = () => {
     const m = PLAT.me || { plan: 'free', chat: { used: 0, limit: 0 }, images: { used: 0, limit: 0, extra: 0 } };
-    const pr = products(), free = limits('free'), pro = limits('pro');
-    const isPro = m.plan === 'pro';
-    const left = m.periodEnd ? daysLeft(m.periodEnd) : null;
-    const monthly = pr.pro_monthly, yearly = pr.pro_yearly, pack = pr.images_20;
-    const save = monthly && yearly ? Math.max(0, monthly.amount * 12 - yearly.amount) : 0;
-    const test = PLAT.config && PLAT.config.testMode;
     return `
-      ${test ? '<div class="card bg-amber-50 border-amber-200 text-amber-900 text-sm"><i class="fa-solid fa-flask ml-1"></i> وضع التجربة: الدفع هنا تجريبي، ولن يُخصم أي مبلغ.</div>' : ''}
       <div class="card space-y-3">
-        <div class="flex items-center justify-between gap-2">
-          <div><div class="text-sm text-gray-500">خطتك</div><div class="text-xl font-extrabold text-craft-800">${isPro ? '<i class="fa-solid fa-crown text-amber-500 ml-1"></i> المحترف' : 'المجانية'}</div></div>
-          ${isPro && m.periodEnd ? `<div class="text-start text-sm ${left <= 5 ? 'text-red-700 font-bold' : 'text-gray-600'}">ينتهي ${escH(dayFmt(m.periodEnd))}<br>${left <= 0 ? 'اليوم' : `بعد ${left} يوم`}</div>` : ''}
-        </div>
+        <div><div class="text-sm text-gray-500">خطتك</div><div class="text-xl font-extrabold text-craft-800"><i class="fa-solid fa-hand-holding-heart text-craft-500 ml-1"></i> مجانية لحرفيي بيت الحرفيين</div></div>
         ${usageRow('طلبات المساعد هذا الشهر', m.chat.used, m.chat.limit)}
         ${usageRow('صور المصوّر الذكي', m.images.used, m.images.limit, m.images.extra)}
         ${m.cycleEnd ? `<p class="hint">يتجدد الرصيد يوم ${escH(dayFmt(m.cycleEnd))}.</p>` : ''}
       </div>
-      <h2 class="font-extrabold text-craft-800 mt-2">${isPro ? 'جدّد اشتراكك أو مدّده' : 'اشترك واجعل المساعد معك كل يوم'}</h2>
-      <div class="space-y-3">
-        ${yearly ? `<button type="button" class="plat-plan best" data-buy="pro_yearly">
-          <div class="flex justify-between items-start gap-2"><div><div class="font-extrabold text-craft-800 text-lg">المحترف — سنة</div><div class="text-sm text-gray-600">${escH(pro.chat)} طلب للمساعد + ${escH(pro.images)} صورة كل شهر</div></div>
-          <div class="text-start flex-shrink-0"><div class="text-xl font-extrabold text-craft-800 num">${sar(yearly.amount)}</div>${save ? `<span class="plat-tag">وفّر ${sar(save)}</span>` : ''}</div></div></button>` : ''}
-        ${monthly ? `<button type="button" class="plat-plan" data-buy="pro_monthly">
-          <div class="flex justify-between items-start gap-2"><div><div class="font-extrabold text-craft-800 text-lg">المحترف — شهر</div><div class="text-sm text-gray-600">${escH(pro.chat)} طلب للمساعد + ${escH(pro.images)} صورة</div></div>
-          <div class="text-xl font-extrabold text-craft-800 num flex-shrink-0">${sar(monthly.amount)}</div></div></button>` : ''}
-        ${pack ? `<button type="button" class="plat-plan" data-buy="images_20">
-          <div class="flex justify-between items-start gap-2"><div><div class="font-extrabold text-craft-800 text-lg">${escH(pack.images)} صورة إضافية</div><div class="text-sm text-gray-600">لا تنتهي بنهاية الشهر، وتُستخدم بعد نفاد رصيدك الشهري.</div></div>
-          <div class="text-xl font-extrabold text-craft-800 num flex-shrink-0">${sar(pack.amount)}</div></div></button>` : ''}
-        <div class="card text-sm text-gray-600"><b class="text-craft-800">المجانية:</b> جميع الأدوات بلا حدود، و${escH(free.chat)} طلبات للمساعد و${escH(free.images)} صور شهرياً.</div>
-      </div>
-      ${(m.payments || []).length ? `<details class="card"><summary class="font-extrabold text-craft-800 cursor-pointer">مدفوعاتي</summary><div class="mt-2 space-y-2">${m.payments.map((p) => `<div class="border-t border-craft-100 pt-2 text-sm"><div class="flex justify-between gap-2"><b>${escH((pr[p.product] || {}).label || p.product)}</b><span class="num">${sar(p.amount)}</span></div><div class="flex justify-between gap-2 text-gray-500"><span>${escH(dayFmt(p.at))}</span><span>${p.ok ? 'تم ✅' : p.status === 'paid' ? 'قيد المراجعة' : 'لم يتم'}</span></div><div dir="ltr" class="text-xs text-gray-400 break-all text-right">${escH(p.id)}</div></div>`).join('')}</div></details>` : ''}
-      <p class="hint">الدفع آمن عبر ميسّر: مدى، فيزا وماستركارد${PLAT.config && PLAT.config.applePay ? '، Apple Pay' : ''}${PLAT.config && PLAT.config.stcPay ? '، STC Pay' : ''}. الاشتراك لا يتجدد تلقائياً، ونذكّرك قبل انتهائه. <a class="underline" href="/refund.html">سياسة الاسترجاع</a>.</p>`;
+      <p class="hint">المنصة مجانية بالكامل، ولا يوجد أي دفع. إذا احتجت رصيداً أكثر، تواصل مع إدارة بيت الحرفيين.</p>`;
   };
 
   function wireBuy(root = document) {
@@ -403,93 +379,10 @@
   }
   PLAT.wireBuy = wireBuy;
 
-  let moyasarLoaded = null;
-  const MPF = 'https://cdn.moyasar.com/mpf/1.15.0/';
-  PLAT.checkout = async (key) => {
-    const prod = products()[key];
-    if (!prod || !PLAT.me) return;
-    if (!PLAT.config.moyasarPublishableKey) { flash('الدفع غير مفعّل في الموقع حتى الآن.'); return; }
-    const layer = openLayer(`
-      <div class="flex justify-between items-center mb-3"><h2 class="text-lg font-extrabold text-craft-800">${escH(prod.label)}</h2><button type="button" class="text-gray-400 text-2xl leading-none" data-plat-close aria-label="إغلاق">&times;</button></div>
-      <div class="card bg-craft-50 flex justify-between items-center mb-3"><span class="text-gray-700">المبلغ</span><b class="text-xl text-craft-800 num">${sar(prod.amount)}</b></div>
-      ${PLAT.config.testMode ? '<p class="hint mb-2">بطاقة تجربة: 4111 1111 1111 1111، أي تاريخ مستقبلي، وأي CVC.</p>' : ''}
-      <div class="mysr-form" id="plat-mysr"><div class="text-center text-gray-500 py-6">جارٍ تجهيز صفحة الدفع…</div></div>
-      <p class="hint mt-3"><i class="fa-solid fa-lock ml-1"></i> تذهب بيانات بطاقتك إلى ميسّر مباشرة، ولا تمر علينا.</p>`);
-    try {
-      if (!moyasarLoaded) { loadCss(MPF + 'moyasar.css'); moyasarLoaded = loadScript(MPF + 'moyasar.js'); }
-      await moyasarLoaded;
-    } catch { flash('تعذّر فتح صفحة الدفع. تأكد من اتصالك بالإنترنت.'); closeLayer(); return; }
-    layer.querySelector('#plat-mysr').innerHTML = '';
-    const methods = ['creditcard'];
-    if (PLAT.config.applePay) methods.push('applepay');
-    if (PLAT.config.stcPay) methods.push('stcpay');
-    window.Moyasar.init({
-      element: '#plat-mysr',
-      amount: prod.amount,
-      currency: 'SAR',
-      description: `${prod.label} — ${PLAT.me.email}`,
-      publishable_api_key: PLAT.config.moyasarPublishableKey,
-      callback_url: location.origin + '/pay/return.html',
-      methods,
-      supported_networks: ['mada', 'visa', 'mastercard'],
-      metadata: { user_id: PLAT.me.id, product: key },
-      language: 'ar',
-      fixed_width: false,
-      apple_pay: { country: 'SA', label: 'منصة شوري', validate_merchant_url: 'https://api.moyasar.com/v1/applepay/initiate' },
-      on_completed: async (payment) => { try { localStorage.setItem('artisan_pending_pay', payment.id); } catch {} },
-    });
-  };
-
-  async function handlePayReturn(id) {
-    openLayer(`<div class="text-center py-6 space-y-3"><div class="dot-typing mx-auto"></div><p class="font-bold text-craft-700">جارٍ التحقق من الدفع…</p></div>`);
-    let r = null;
-    for (let i = 0; i < 4 && !(r && r.applied); i++) {
-      try { r = await api('/api/pay/verify', { method: 'POST', body: { id } }); } catch (e) { r = { status: 'error', reason: e.code }; }
-      if (r.status !== 'paid' && r.status !== 'initiated') break;
-      if (!r.applied) await new Promise((res) => setTimeout(res, 1500));
-    }
-    try { localStorage.removeItem('artisan_pending_pay'); } catch {}
-    await refreshMe();
-    if (r && r.applied) {
-      const prod = products()[r.product] || {};
-      openLayer(`<div class="text-center space-y-3">
-        <div class="mx-auto w-16 h-16 rounded-full bg-green-100 text-green-700 flex items-center justify-center text-3xl"><i class="fa-solid fa-check"></i></div>
-        <h2 class="text-xl font-extrabold text-craft-800">تم الدفع بنجاح 🎉</h2>
-        <p class="text-gray-600">تم تفعيل ${escH(prod.label || 'اشتراكك')}.</p>
-        <button type="button" class="btn btn-main w-full" data-plat-close>لنبدأ</button></div>`);
-    } else if (r && r.status === 'paid') {
-      openLayer(`<div class="text-center space-y-3"><h2 class="text-lg font-extrabold text-craft-800">وصلنا الدفع</h2><p class="text-gray-600">سنراجعه ونفعّله لك قريباً. إذا تأخر فتواصل معنا من <a class="underline" href="/contact.html">صفحة التواصل</a> واذكر رقم العملية:</p><p dir="ltr" class="text-xs bg-gray-50 border rounded-lg p-2 break-all">${escH(id)}</p><button type="button" class="btn btn-soft w-full" data-plat-close>حسناً</button></div>`);
-    } else {
-      openLayer(`<div class="text-center space-y-3">
-        <div class="mx-auto w-16 h-16 rounded-full bg-red-100 text-red-700 flex items-center justify-center text-3xl"><i class="fa-solid fa-xmark"></i></div>
-        <h2 class="text-xl font-extrabold text-craft-800">لم يتم الدفع</h2>
-        <p class="text-gray-600">لم يُخصم أي مبلغ. جرّب بطاقة أخرى أو طريقة دفع أخرى.</p>
-        <button type="button" class="btn btn-main w-full" data-plat-plans>العودة إلى الاشتراك</button>
-        <button type="button" class="btn btn-soft w-full" data-plat-close>إغلاق</button></div>`);
-      wireBuy();
-    }
-  }
-
-  PLAT.handlePayReturn = handlePayReturn;
+  PLAT.checkout = async () => {}; // لا يوجد دفع في نسخة الجمعية
 
   /* ---------- شريط التذكير بالتجديد ---------- */
-  function renderBanner() {
-    const m = PLAT.me; let b = document.getElementById('plat-banner');
-    let html = '';
-    if (m && m.plan === 'pro' && m.periodEnd) {
-      const left = daysLeft(m.periodEnd);
-      if (left <= 5) html = `<i class="fa-solid fa-bell ml-1"></i> ينتهي اشتراكك ${left <= 0 ? 'اليوم' : `بعد ${left} يوم`}. جدّده حتى لا يتوقف المساعد.`;
-    } else if (m && m.plan === 'free' && m.periodEnd && daysLeft(m.periodEnd) > -30 && daysLeft(m.periodEnd) <= 0) {
-      html = '<i class="fa-solid fa-circle-info ml-1"></i> انتهى اشتراك المحترف وعدت إلى الخطة المجانية. يمكنك التجديد في أي وقت.';
-    }
-    if (!html) { if (b) b.remove(); return; }
-    if (!b) {
-      b = el('<div id="plat-banner" class="plat-banner" dir="rtl"></div>');
-      const header = document.querySelector('.site-header');
-      if (header && header.parentNode) header.parentNode.insertBefore(b, header.nextSibling); else document.body.prepend(b);
-    }
-    b.innerHTML = `<div class="max-w-3xl mx-auto px-4 py-2 flex items-center justify-between gap-3"><span>${html}</span><button type="button" class="btn btn-main btn-sm flex-shrink-0" data-go="plan">جدّد</button></div>`;
-  }
+  function renderBanner() {} // لا توجد اشتراكات تتجدد في نسخة الجمعية
 
   /* ---------- مؤشر الرصيد في رأس الصفحة ---------- */
   function renderPill() {
@@ -501,7 +394,7 @@
     const cl = document.getElementById('chat-left');
     if (cl) cl.textContent = `متبقٍّ لك ${left} طلب`;
     const crown = document.getElementById('plan-btn-label');
-    if (crown) crown.textContent = m.plan === 'pro' ? 'المحترف' : 'اشترك';
+    if (crown) crown.textContent = 'رصيدي';
   }
   PLAT.onChange(() => { renderPill(); renderBanner(); });
 
@@ -510,11 +403,6 @@
      ============================================================ */
   async function boot() {
     injectCss();
-    // رجوع من صفحة الدفع: /#pay=<id>
-    const hash = location.hash || '';
-    let payId = null;
-    const pm = hash.match(/^#pay=([0-9a-fA-F-]{36})/);
-    if (pm) { payId = pm[1]; history.replaceState(null, '', location.pathname + location.search); }
 
     try {
       const r = await fetch('/api/config');
@@ -549,8 +437,6 @@
       await refreshMe();
       if (!PLAT.me) { started = false; showLogin('حدث خطأ في الاتصال. حدّث الصفحة.'); return; }
       resolveReady();
-      const pending = payId || (() => { try { return localStorage.getItem('artisan_pending_pay'); } catch { return null; } })();
-      if (pending) handlePayReturn(pending);
     };
 
     PLAT.sb.auth.onAuthStateChange((event, session) => {

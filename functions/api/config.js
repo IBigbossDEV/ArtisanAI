@@ -9,12 +9,9 @@ export async function onRequestGet({ env }) {
   return json({
     supabaseUrl: env.SUPABASE_URL,
     supabaseAnonKey: env.SUPABASE_ANON_KEY,
-    moyasarPublishableKey: env.MOYASAR_PUBLISHABLE_KEY || '',
-    testMode: String(env.MOYASAR_PUBLISHABLE_KEY || '').startsWith('pk_test_'),
+    edition: 'association',
     appleLogin: env.ENABLE_APPLE_LOGIN === '1',
     googleLogin: env.ENABLE_GOOGLE_LOGIN !== '0',
-    applePay: env.ENABLE_APPLE_PAY === '1',
-    stcPay: env.ENABLE_STC_PAY === '1',
     plans,
   }, 200, { 'cache-control': 'public, max-age=60' });
 }

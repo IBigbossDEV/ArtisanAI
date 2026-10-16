@@ -108,32 +108,3 @@ export function timingSafeEqual(a, b) {
   for (let i = 0; i < a.length; i++) x |= a.charCodeAt(i) ^ b.charCodeAt(i);
   return x === 0;
 }
-
-// ميسّر: جلب عملية دفع من السيرفر بالمفتاح السري
-export async function moyasarPayment(env, id) {
-  if (!/^[0-9a-fA-F-]{36}$/.test(String(id || ''))) return null;
-  const r = await fetch(`https://api.moyasar.com/v1/payments/${id}`, {
-    headers: { authorization: 'Basic ' + btoa(env.MOYASAR_SECRET_KEY + ':') },
-  });
-  if (!r.ok) return null;
-  return r.json();
-}
-
-// يطبق عملية دفع من ميسّر على حساب الحرفي (مرة وحدة فقط)
-export async function applyMoyasarPayment(env, p) {
-  const md = p.metadata || {};
-  const userId = /^[0-9a-f-]{36}$/i.test(md.user_id || '') ? md.user_id : null;
-  const src = p.source || {};
-  return db(env).rpc('apply_payment', {
-    p_id: p.id,
-    p_user: userId,
-    p_product: md.product || null,
-    p_amount: Number(p.amount) || 0,
-    p_currency: String(p.currency || ''),
-    p_status: String(p.status || ''),
-    p_live: !String(env.MOYASAR_SECRET_KEY || '').startsWith('sk_test_'),
-    p_method: src.type || null,
-    p_raw: { id: p.id, status: p.status, amount: p.amount, currency: p.currency, created_at: p.created_at,
-             source: { type: src.type, company: src.company, number: src.number }, metadata: md },
-  });
-}

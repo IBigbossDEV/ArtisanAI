@@ -7,10 +7,8 @@ export async function onRequestGet({ request, env }) {
   const user = await getUser(request, env);
   if (!user) return fail('session_expired', 401);
   const d = db(env);
-  const [rows, payments] = await Promise.all([
-    d.rpc('plan_state', { p_user: user.id }),
-    d.select('payments', `user_id=eq.${user.id}&select=id,product,amount,status,applied_at,created_at&order=created_at.desc&limit=10`).catch(() => []),
-  ]);
+  const rows = await d.rpc('plan_state', { p_user: user.id });
+  const payments = [];
   const s = (rows && rows[0]) || {};
   return json({
     id: user.id,

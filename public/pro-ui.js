@@ -1,6 +1,6 @@
 /* ============================================================
    شاشات النسخة المدفوعة داخل التطبيق:
-   - اشتراكي (الخطة والرصيد والدفع والحساب)
+   - رصيدي (الرصيد الشهري والحساب) — نسخة الجمعية بلا اشتراكات ولا دفع
    - المصوّر الذكي (صور إعلانية من صورة الحرفي عبر Gemini)
    تُحمَّل بعد التطبيق وتستخدم أدواته (screen, go, toast, ACT, ROUTES…).
    ============================================================ */
@@ -11,14 +11,14 @@ ROUTES.plan = {
   render() {
     const m = PLAT.me || {};
     return screen({
-      title: 'اشتراكي', sub: 'رصيدك هذا الشهر، وخطط الاشتراك.', back: 'more',
+      title: 'رصيدي', sub: 'رصيدك من المساعد والمصوّر هذا الشهر.', back: 'more',
       body: `<div class="space-y-4">${PLAT.planHtml()}
         <div class="card space-y-3">
           <div class="font-extrabold text-craft-800"><i class="fa-solid fa-user ml-1"></i> حسابي</div>
           <p class="text-gray-700 break-all" dir="ltr" style="text-align:right">${esc(m.email || '')}</p>
           <button type="button" class="btn btn-soft w-full" data-act="platSignOut"><i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج</button>
         </div>
-        <nav class="flex flex-wrap justify-center gap-x-4 gap-y-2 text-sm text-craft-600"><a class="underline" href="/terms.html">الشروط والأحكام</a><a class="underline" href="/privacy.html">الخصوصية</a><a class="underline" href="/refund.html">الاسترجاع</a><a class="underline" href="/contact.html">تواصل معنا</a></nav>
+        <nav class="flex flex-wrap justify-center gap-x-4 gap-y-2 text-sm text-craft-600"><a class="underline" href="/terms.html">الشروط والأحكام</a><a class="underline" href="/privacy.html">الخصوصية</a><a class="underline" href="/contact.html">تواصل معنا</a></nav>
       </div>`,
     });
   },
@@ -71,7 +71,7 @@ ROUTES.photographer = {
       body: `
       <div class="card flex items-center justify-between gap-3 ${left ? '' : 'bg-amber-50 border-amber-200'}">
         <span class="text-gray-700"><i class="fa-solid fa-images ml-1 text-craft-500"></i> رصيدك: <b class="num">${left}</b> صورة</span>
-        <button type="button" class="btn btn-soft btn-sm" data-go="plan">زِد رصيدك</button>
+        <button type="button" class="btn btn-soft btn-sm" data-go="plan">تفاصيل رصيدي</button>
       </div>
       <div class="card space-y-3">
         <div class="font-extrabold text-craft-800">1. صورة منتجك</div>

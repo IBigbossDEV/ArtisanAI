@@ -16,15 +16,11 @@ create table if not exists public.app_settings (
   updated_at timestamptz not null default now()
 );
 
--- المبالغ بالهللة: 2900 = 29 ريال
+-- نسخة الجمعية: لا توجد أسعار. "free" = الرصيد العادي لكل حرفي، "pro" = الرصيد الموسّع الذي تمنحه الإدارة.
 insert into public.app_settings (key, value) values ('plans', '{
-  "free": { "chat": 10,  "images": 2  },
-  "pro":  { "chat": 150, "images": 30 },
-  "products": {
-    "pro_monthly": { "amount": 2900,  "months": 1,  "label": "المحترف — شهر" },
-    "pro_yearly":  { "amount": 24900, "months": 12, "label": "المحترف — سنة" },
-    "images_20":   { "amount": 900,   "images": 20, "label": "باقة 20 صورة إضافية" }
-  }
+  "free": { "chat": 30,  "images": 5  },
+  "pro":  { "chat": 100, "images": 20 },
+  "products": {}
 }'::jsonb)
 on conflict (key) do nothing;
 
