@@ -265,7 +265,10 @@ function newProduct(init = {}) {
   }, init);
 }
 /* يكمّل الحقول الناقصة في المنتجات القديمة حتى لا تتعطل الشاشات */
-const fixProducts = (list) => (Array.isArray(list) ? list : []).filter(p => p && typeof p === 'object').map(p => newProduct(Object.assign({}, p, { tiers: Object.assign({ shop: 20, bulk: 30, bulkMin: 20 }, p.tiers), timer: p.timer && Array.isArray(p.timer.sessions) ? p.timer : { sessions: [], running: null, pieces: 0 }, matList: Array.isArray(p.matList) ? p.matList : [], competitors: Array.isArray(p.competitors) ? p.competitors : [] })));
+/* منتج فارغ: فُتح ولم يُكتب فيه شيء. يُحذف تلقائياً حتى لا تتراكم منتجات فارغة */
+const isBlankProduct = (p) => !p.name && !p.details && !p.photo && !nz(p.materials) && !nz(p.hours) && !nz(p.overhead) && !nz(p.shipping) && !nz(p.fee) && !(p.matList || []).some(m => m && (m.name || nz(m.price))) && !(p.competitors || []).some(nz) && !(p.timer && (p.timer.running || (p.timer.sessions || []).length));
+function pruneBlankProduct(id) { const p = prodById(id); if (p && isBlankProduct(p)) { S.products = S.products.filter(x => x !== p); save(); } }
+const fixProducts = (list) => (Array.isArray(list) ? list : []).filter(p => p && typeof p === 'object').map(p => newProduct(Object.assign({}, p, { tiers: Object.assign({ shop: 20, bulk: 30, bulkMin: 20 }, p.tiers), timer: p.timer && Array.isArray(p.timer.sessions) ? p.timer : { sessions: [], running: null, pieces: 0 }, matList: Array.isArray(p.matList) ? p.matList : [], competitors: Array.isArray(p.competitors) ? p.competitors : [] }))).filter(p => !isBlankProduct(p));
 function migrateV1() {
   const st = DEFAULT_STATE();
   try {
@@ -584,6 +587,7 @@ let HISTORY = [];
 const sameRoute = (a, b) => a.name === b.name && JSON.stringify(a.params || {}) === JSON.stringify(b.params || {});
 function go(name, params = {}, opts = {}) {
   if (!ROUTES[name]) name = 'home';
+  if (CUR.name === 'product' && CUR.params && CUR.params.id && !(name === 'product' && params.id === CUR.params.id)) pruneBlankProduct(CUR.params.id);
   if (opts.reset) HISTORY = [];
   else if (!opts.replace && !opts.back && CUR.name && !sameRoute(CUR, { name, params })) { HISTORY.push(CUR); if (HISTORY.length > 30) HISTORY.shift(); }
   if (name === 'home') HISTORY = [];
@@ -711,7 +715,7 @@ ROUTES.products = {
     });
   },
 };
-ACT.newProduct = () => { const p = newProduct({ name: '', craft: S.profile.craft || '', wage: 25 }); S.products.unshift(p); S.settings.lastProduct = p.id; save(); go('product', { id: p.id, isNew: true }); };
+ACT.newProduct = () => { const blank = S.products.find(isBlankProduct); if (blank) { S.settings.lastProduct = blank.id; go('product', { id: blank.id, isNew: true }); return; } const p = newProduct({ name: '', craft: S.profile.craft || '', wage: 25 }); S.products.unshift(p); S.settings.lastProduct = p.id; save(); go('product', { id: p.id, isNew: true }); };
 
 /* ---------- بطاقة المنتج والتسعير ---------- */
 ROUTES.product = {
