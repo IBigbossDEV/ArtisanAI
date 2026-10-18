@@ -96,7 +96,7 @@
   }
   PLAT.toImagePayload = toImagePayload;
 
-  /* ---------- المساعد (Claude عبر السيرفر) ---------- */
+  /* ---------- المساعد (Gemini عبر السيرفر) ---------- */
   const SERVER_TO_APP = { not_configured: 'capability_disabled', bad_request: 'upstream_error', image_too_large: 'image_rejected' };
 
   async function sample(input, opts = {}) {

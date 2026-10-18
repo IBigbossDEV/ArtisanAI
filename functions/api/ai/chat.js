@@ -1,4 +1,5 @@
-// المساعد: يمرر الطلب لـ Claude بمفتاح السيرفر بعد خصم طلب من رصيد الحرفي
+// المساعد: يمرر الطلب لـ Gemini بمفتاح السيرفر بعد خصم طلب من رصيد الحرفي.
+// يحوّل بث Gemini إلى نفس صيغة الأحداث التي تقرؤها الواجهة (content_block_delta / message_delta).
 import { fail, db, getUser, readJson, logAi, missingEnv } from '../_lib.js';
 
 const MAX_BODY = 4 * 1024 * 1024;   // يكفي صورة مصغّرة مع المحادثة
@@ -27,7 +28,7 @@ function normalize(messages) {
 }
 
 export async function onRequestPost({ request, env, waitUntil }) {
-  const miss = missingEnv(env, ['SUPABASE_URL', 'SUPABASE_ANON_KEY', 'SUPABASE_SERVICE_ROLE_KEY', 'ANTHROPIC_API_KEY']);
+  const miss = missingEnv(env, ['SUPABASE_URL', 'SUPABASE_ANON_KEY', 'SUPABASE_SERVICE_ROLE_KEY', 'GEMINI_API_KEY']);
   if (miss) return miss;
   const user = await getUser(request, env);
   if (!user) return fail('session_expired', 401);
@@ -43,7 +44,7 @@ export async function onRequestPost({ request, env, waitUntil }) {
   let image = null;
   if (body.image && typeof body.image.data === 'string') {
     if (!IMAGE_TYPES.includes(body.image.media_type) || body.image.data.length > 3_000_000) return fail('image_rejected', 400);
-    image = { type: 'image', source: { type: 'base64', media_type: body.image.media_type, data: body.image.data } };
+    image = { inlineData: { mimeType: body.image.media_type, data: body.image.data } };
   }
 
   // خصم طلب من الرصيد قبل الإرسال
@@ -51,20 +52,22 @@ export async function onRequestPost({ request, env, waitUntil }) {
   if (!q || !q.ok) return fail('quota_exceeded', 402, { kind: 'chat', plan: q && q.plan });
   const refund = () => db(env).rpc('refund_quota', { p_user: user.id, p_kind: 'chat', p_source: q.source, p_cycle: q.cycle }).catch(() => {});
 
-  const messages = turns.map((t) => ({ role: t.role, content: [{ type: 'text', text: t.text }] }));
-  if (image) messages[messages.length - 1].content.unshift(image);
+  const contents = turns.map((t) => ({ role: t.role === 'assistant' ? 'model' : 'user', parts: [{ text: t.text }] }));
+  if (image) contents[contents.length - 1].parts.unshift(image);
 
-  const model = env.CLAUDE_MODEL || 'claude-haiku-5-5';
+  const model = env.GEMINI_TEXT_MODEL || 'gemini-3.8-flash';
   const system = body.json
     ? GUARD + '\n- أجب بـ JSON صالح فقط، دون أي كلام قبله أو بعده ودون علامات ```.'
     : GUARD;
+  const generationConfig = { maxOutputTokens: 8192, temperature: body.json ? 0.4 : 0.7 };
+  if (body.json) generationConfig.responseMimeType = 'application/json';
 
   let upstream;
   try {
-    upstream = await fetch('https://api.anthropic.com/v1/messages', {
+    upstream = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:streamGenerateContent?alt=sse`, {
       method: 'POST',
-      headers: { 'x-api-key': env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
-      body: JSON.stringify({ model, max_tokens: body.json ? 1500 : 2000, system, messages, stream: true }),
+      headers: { 'x-goog-api-key': env.GEMINI_API_KEY, 'content-type': 'application/json' },
+      body: JSON.stringify({ systemInstruction: { parts: [{ text: system }] }, contents, generationConfig }),
     });
   } catch {
     await refund();
@@ -76,25 +79,43 @@ export async function onRequestPost({ request, env, waitUntil }) {
     const t = await upstream.text().catch(() => '');
     logAi(env, waitUntil, { user_id: user.id, kind: 'chat', model, ok: false });
     let code = 'upstream_error';
-    if (upstream.status === 429 || upstream.status === 529) code = 'rate_limited';
-    else if (/prompt is too long|too many tokens/i.test(t)) code = 'prompt_too_large';
-    else if (/image/i.test(t) && upstream.status === 400) code = 'image_rejected';
+    if (upstream.status === 429 || upstream.status === 503) code = 'rate_limited';
+    else if (/token|too long|exceeds/i.test(t) && upstream.status === 400) code = 'prompt_too_large';
+    else if (/image|inline_data|mime/i.test(t) && upstream.status === 400) code = 'image_rejected';
     return fail(code, upstream.status === 429 ? 429 : 502);
   }
 
-  // نمرر البث كما هو، ونلتقط عدد التوكنز من الطريق لسجل الاستهلاك
-  let input = 0, output = 0, tail = '';
-  const dec = new TextDecoder();
+  // نحوّل بث Gemini إلى أحداث بنفس الصيغة التي تفهمها الواجهة، ونلتقط عدد التوكنز لسجل الاستهلاك
+  const BLOCKED = ['SAFETY', 'PROHIBITED_CONTENT', 'BLOCKLIST', 'SPII', 'RECITATION', 'IMAGE_SAFETY'];
+  const enc = new TextEncoder(), dec = new TextDecoder();
+  let buf = '', input = 0, output = 0, stop = null, sent = false;
+  const out = (ctl, ev) => ctl.enqueue(enc.encode(`data: ${JSON.stringify(ev)}\n\n`));
+  const handle = (ctl, line) => {
+    if (!line.startsWith('data:')) return;
+    let ev; try { ev = JSON.parse(line.slice(5)); } catch { return; }
+    if (ev.usageMetadata) { input = ev.usageMetadata.promptTokenCount || input; output = ev.usageMetadata.candidatesTokenCount || output; }
+    if (ev.promptFeedback && ev.promptFeedback.blockReason) stop = 'refusal';
+    const c = (ev.candidates || [])[0];
+    if (c) {
+      for (const p of (c.content && c.content.parts) || []) {
+        if (p && typeof p.text === 'string' && p.text && !p.thought) { sent = true; out(ctl, { type: 'content_block_delta', delta: { type: 'text_delta', text: p.text } }); }
+      }
+      if (c.finishReason === 'MAX_TOKENS') stop = 'max_tokens';
+      else if (BLOCKED.includes(c.finishReason)) stop = 'refusal';
+      else if (c.finishReason && !stop) stop = 'end_turn';
+    }
+  };
   const tap = new TransformStream({
     transform(chunk, ctl) {
-      ctl.enqueue(chunk);
-      const s = tail + dec.decode(chunk, { stream: true });
-      const mi = s.match(/"input_tokens":\s*(\d+)/); if (mi) input = Math.max(input, Number(mi[1]));
-      const all = s.match(/"output_tokens":\s*(\d+)/g); if (all) output = Math.max(output, Number(all[all.length - 1].replace(/\D/g, '')));
-      tail = s.slice(-64);
+      buf += dec.decode(chunk, { stream: true });
+      let nl;
+      while ((nl = buf.indexOf('\n')) >= 0) { const line = buf.slice(0, nl).trim(); buf = buf.slice(nl + 1); handle(ctl, line); }
     },
-    flush() {
-      logAi(env, waitUntil, { user_id: user.id, kind: 'chat', model, input_tokens: input, output_tokens: output, ok: true });
+    flush(ctl) {
+      if (buf.trim()) handle(ctl, buf.trim());
+      out(ctl, { type: 'message_delta', delta: { stop_reason: stop || 'end_turn' } });
+      if (!sent) refund(); // لم يصل أي نص: لا يُخصم الطلب
+      logAi(env, waitUntil, { user_id: user.id, kind: 'chat', model, input_tokens: input, output_tokens: output, ok: sent });
     },
   });
 

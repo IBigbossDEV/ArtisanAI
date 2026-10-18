@@ -186,7 +186,7 @@ function renderPlans() {
     <div class="card space-y-3"><b class="text-craft-800">الرصيد الموسّع (لمن تمنحه من "الحرفيون")</b>
       <div class="grid grid-cols-2 gap-2">${f('pro-chat', 'طلبات المساعد', p.pro.chat)}${f('pro-images', 'صور المصوّر', p.pro.images)}</div>
     </div></div>
-    <p class="text-xs text-gray-500 mt-2">التكلفة على مفاتيحك في Claude وGemini، فابدأ بأرقام صغيرة وراقب "نظرة عامة".</p>
+    <p class="text-xs text-gray-500 mt-2">التكلفة على مفتاحك في Gemini، فابدأ بأرقام صغيرة وراقب "نظرة عامة".</p>
     <button class="btn btn-main mt-3" id="plans-save"><i class="fa-solid fa-floppy-disk"></i> احفظ الحدود</button>`;
   $('plans-save').onclick = async () => {
     const v = (id) => Number($(id).value);
