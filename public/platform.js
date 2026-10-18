@@ -311,7 +311,13 @@
       const btn = wrap.querySelector('#plat-email-btn'); btn.disabled = true; btn.textContent = 'جارٍ الإرسال…';
       const { error } = await PLAT.sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
       btn.disabled = false; btn.textContent = 'أرسل لي رمز الدخول';
-      if (error) { flash(/rate|seconds/i.test(error.message) ? 'انتظر دقيقة ثم حاول مرة أخرى.' : 'تعذّر إرسال الرمز. تأكد من البريد الإلكتروني.'); return; }
+      if (error) {
+        const why = `${error.code || ''} ${error.message || ''}`;
+        // عند قفل التسجيل في Supabase: البريد غير مضاف من الجمعية
+        if (/otp_disabled|signup_disabled|signups? not allowed/i.test(why)) flash('هذا البريد غير مسجّل في المنصة. تواصل مع الجمعية لإضافتك.');
+        else flash(/rate|seconds/i.test(why) ? 'انتظر دقيقة ثم حاول مرة أخرى.' : 'تعذّر إرسال الرمز. تأكد من البريد الإلكتروني.');
+        return;
+      }
       wrap.querySelector('#plat-code-to').textContent = email;
       emailForm.classList.add('hidden'); codeForm.classList.remove('hidden');
       wrap.querySelector('#plat-code').focus();
