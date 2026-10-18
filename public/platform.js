@@ -311,6 +311,8 @@
       if (!password) { flash('اكتب كلمة المرور.'); return; }
       const btn = wrap.querySelector('#plat-pass-btn'); btn.disabled = true; btn.textContent = 'لحظة…';
       const { error } = await PLAT.sb.auth.signInWithPassword({ email, password });
+      // جلسة واحدة لكل حساب: الدخول من هذا الجهاز يُخرج الأجهزة الأخرى
+      if (!error) { try { await PLAT.sb.auth.signOut({ scope: 'others' }); } catch {} }
       btn.disabled = false; btn.textContent = 'دخول';
       if (error) {
         const why = `${error.code || ''} ${error.message || ''}`;
@@ -325,8 +327,12 @@
   // wipe=true عند ضغط الحرفي على "خروج" (بعد حفظ بياناته في حسابه): نمسح بياناته من الجهاز.
   // عند انتهاء الجلسة تلقائياً لا نمسح شيئاً، حتى لا تضيع تعديلات لم تُحفظ بعد؛
   // وإذا دخل حساب آخر على الجهاز نفسه تُمسح البيانات القديمة عند دخوله (انظر start).
+  let leaving = false; // true عند ضغط الحرفي على "خروج" بنفسه
+  const markKicked = () => { try { sessionStorage.setItem('plat_kicked', '1'); } catch {} };
   async function signOut({ wipe = false } = {}) {
-    try { await PLAT.sb.auth.signOut(); } catch {}
+    // خروج غير مقصود (انتهت الجلسة أو فُتح الحساب من جهاز آخر): نعرض سبباً عند الرجوع لشاشة الدخول
+    if (wipe) leaving = true; else markKicked();
+    try { await PLAT.sb.auth.signOut(wipe ? undefined : { scope: 'local' }); } catch {}
     if (wipe) {
       [...APP_KEYS, OWNER_KEY, PENDING_KEY].forEach((k) => { try { localStorage.removeItem(k); } catch {} });
     }
@@ -439,11 +445,14 @@
 
     PLAT.sb.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') start(session);
-      if (event === 'SIGNED_OUT' && started) location.replace('/');
+      if (event === 'SIGNED_OUT' && started) { if (!leaving) markKicked(); location.replace('/'); }
     });
     const { data } = await PLAT.sb.auth.getSession();
     if (data && data.session) start(data.session);
-    else if (!/[?&]code=/.test(location.search)) showLogin();
+    else if (!/[?&]code=/.test(location.search)) {
+      let kicked = false; try { kicked = sessionStorage.getItem('plat_kicked') === '1'; sessionStorage.removeItem('plat_kicked'); } catch {}
+      showLogin(kicked ? 'خرجت من هذا الجهاز لأن الحساب فُتح من جهاز آخر، أو لأن الجلسة انتهت. الحساب شخصي ولا يُشارك مع أحد.' : '');
+    }
     else setTimeout(() => { if (!started) showLogin('لم يكتمل تسجيل الدخول. حاول مرة أخرى.'); }, 6000);
 
     // تحديث الرصيد كل ما رجع الحرفي للصفحة
