@@ -9,45 +9,45 @@
 <script src="https://cdn.tailwindcss.com/3.4.17"></script>
 <script>
   tailwind.config = { theme: { extend: {
-    fontFamily: { sans: ['Tajawal', 'Tahoma', 'Arial', 'sans-serif'] },
-    colors: { craft: { 50:'#fdf8f6',100:'#f2e8e5',200:'#eaddd7',300:'#e0cec7',400:'#d2bab0',500:'#a37c68',600:'#8b6450',700:'#6b4c3a',800:'#4c3528',900:'#32221a' } } } } };
+    fontFamily: { sans: ['"IBM Plex Sans Arabic"', 'Tahoma', 'Arial', 'sans-serif'] },
+    colors: { craft: { 50:'#FBF6EA',100:'#F3EAD7',200:'#E8DAB9',300:'#D9C49C',400:'#B9A27A',500:'#A8322A',600:'#6B5A48',700:'#4A3A2C',800:'#2B2118',900:'#1E1711' }, gray: { 50:'#FBF6EA',100:'#EFE4CC',200:'#E2D3B4',300:'#D9C49C',400:'#7A6650',500:'#655341',600:'#56463A',700:'#3F3226',800:'#2B2118',900:'#1E1711' } } } } };
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Reem+Kufi:wght@600;700&display=swap" rel="stylesheet">
 <style>
   :root { color-scheme: light; }
-  body { font-family: 'Tajawal', Tahoma, Arial, sans-serif; background: #fdf8f6; color: #1f2937; }
-  .card { border: 1px solid #eaddd7; border-radius: 1rem; padding: 1rem; }
-  .card:not([class*="bg-"]) { background: #fff; }
-  .btn { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; font-weight: 700; border-radius: .6rem; padding: .5rem .85rem; font-size: .9rem; }
+  body { font-family: 'IBM Plex Sans Arabic', Tahoma, Arial, sans-serif; background: #F3EAD7; color: #2B2118; }
+  .card { border: 1px solid #D9C49C; border-radius: 6px; padding: 1rem; }
+  .card:not([class*="bg-"]) { background: #FBF6EA; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; font-weight: 600; border-radius: 6px; padding: .5rem .85rem; font-size: .9rem; min-height: 40px; }
   .btn:disabled { opacity: .5; }
-  .btn-main { background: #8b6450; color: #fff; } .btn-main:hover { background: #6b4c3a; }
-  .btn-soft { background: #fdf8f6; color: #6b4c3a; border: 1px solid #eaddd7; } .btn-soft:hover { background: #f2e8e5; }
+  .btn-main { background: #2B2118; color: #F3EAD7; } .btn-main:hover { background: #000; }
+  .btn-soft { background: transparent; color: #2B2118; border: 1px solid #2B2118; } .btn-soft:hover { background: #FBF6EA; }
   .btn-red { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
-  .inp { width: 100%; padding: .55rem .7rem; border: 1px solid #d1d5db; border-radius: .6rem; background: #fff; min-width: 0; }
-  .inp:focus { outline: 2px solid #a37c68; outline-offset: 1px; }
-  .tab { padding: .55rem .9rem; border-radius: .7rem; font-weight: 800; color: #6b4c3a; white-space: nowrap; }
-  .tab.on { background: #8b6450; color: #fff; }
+  .inp { width: 100%; padding: .55rem .7rem; border: 1px solid #D9C49C; border-radius: 6px; background: #FFFDF8; min-width: 0; }
+  .inp:focus { outline: 2px solid #A8322A; outline-offset: 1px; }
+  .tab { padding: .55rem .9rem; border-radius: 6px; font-weight: 600; color: #2B2118; white-space: nowrap; }
+  .tab.on { background: #2B2118; color: #F3EAD7; }
   .num { font-variant-numeric: tabular-nums; }
-  .kpi .v { font-size: 1.6rem; font-weight: 800; color: #4c3528; line-height: 1.2; }
-  .kpi .l { color: #6b7280; font-size: .85rem; }
+  .kpi .v { font-family: 'Reem Kufi', sans-serif; font-size: 1.6rem; font-weight: 700; color: #2B2118; line-height: 1.2; }
+  .kpi .l { color: #6B5A48; font-size: .85rem; }
   .pill { font-size: .75rem; font-weight: 800; padding: .1rem .5rem; border-radius: 999px; }
-  .bars { display: flex; align-items: flex-end; gap: 2px; height: 120px; border-bottom: 1px solid #e5e7eb; }
+  .bars { display: flex; align-items: flex-end; gap: 2px; height: 120px; border-bottom: 1px solid #D9C49C; }
   .bars > div { flex: 1; position: relative; height: 100%; display: flex; align-items: flex-end; }
-  .bars > div > i { display: block; width: 100%; background: #8b6450; border-radius: 4px 4px 0 0; min-height: 0; }
-  .bars > div:hover > i { background: #6b4c3a; }
-  .tip { position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: #32221a; color: #fff; font-size: .75rem; padding: .2rem .5rem; border-radius: .4rem; white-space: nowrap; pointer-events: none; opacity: 0; }
+  .bars > div > i { display: block; width: 100%; background: #A8322A; border-radius: 3px 3px 0 0; min-height: 0; }
+  .bars > div:hover > i { background: #2B2118; }
+  .tip { position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: #2B2118; color: #F3EAD7; font-size: .75rem; padding: .2rem .5rem; border-radius: .4rem; white-space: nowrap; pointer-events: none; opacity: 0; }
   .bars > div:hover .tip, .bars > div:focus .tip { opacity: 1; }
   table { width: 100%; border-collapse: collapse; font-size: .9rem; }
-  th { text-align: start; color: #6b7280; font-weight: 700; font-size: .8rem; padding: .4rem; border-bottom: 1px solid #eaddd7; }
-  td { padding: .5rem .4rem; border-bottom: 1px solid #f2e8e5; vertical-align: top; }
+  th { text-align: start; color: #6B5A48; font-weight: 700; font-size: .8rem; padding: .4rem; border-bottom: 1px solid #D9C49C; }
+  td { padding: .5rem .4rem; border-bottom: 1px solid #E8DAB9; vertical-align: top; }
 </style>
 </head>
 <body>
-<header class="bg-craft-700 text-white">
+<header class="bg-craft-100 text-craft-800" style="border-bottom: 8px solid transparent; border-image: repeating-linear-gradient(135deg,#A8322A 0 6px,#D9C49C 6px 12px,#2B2118 12px 14px,#D9C49C 14px 20px) 0 0 8 0">
   <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center gap-3">
-    <div class="font-extrabold text-lg"><i class="fa-solid fa-chart-pie ml-1"></i> لوحة المالك</div>
-    <a href="/" class="btn bg-craft-800 text-white">العودة إلى المنصة</a>
+    <div class="text-xl" style="font-family:'Reem Kufi',sans-serif;font-weight:700">لوحة المالك</div>
+    <a href="/" class="btn btn-soft">العودة إلى المنصة</a>
   </div>
 </header>
 <main class="max-w-5xl mx-auto px-4 py-4 space-y-4">

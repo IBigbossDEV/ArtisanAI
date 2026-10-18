@@ -227,18 +227,18 @@
   const CSS = `
   .plat-layer{position:fixed;inset:0;z-index:80;display:flex;align-items:flex-end;justify-content:center;background:rgba(30,20,15,.45)}
   @media(min-width:640px){.plat-layer{align-items:center}}
-  .plat-sheet{background:#fff;width:100%;max-width:30rem;max-height:94vh;overflow-y:auto;border-radius:1.25rem 1.25rem 0 0;padding:1.25rem 1.25rem calc(1.25rem + env(safe-area-inset-bottom,0px));box-shadow:0 -10px 40px rgba(0,0,0,.2)}
-  @media(min-width:640px){.plat-sheet{border-radius:1.25rem}}
-  .plat-full{position:fixed;inset:0;z-index:90;background:#fdf8f6;overflow-y:auto;display:flex;align-items:center;justify-content:center;padding:1.25rem}
-  .plat-card{width:100%;max-width:26rem;background:#fff;border:1px solid #eaddd7;border-radius:1.25rem;padding:1.5rem;box-shadow:0 10px 30px rgba(76,53,40,.08)}
-  .plat-oauth{width:100%;display:flex;align-items:center;justify-content:center;gap:.6rem;font-weight:700;border-radius:.8rem;padding:.8rem 1rem;border:1px solid #d1d5db;background:#fff;color:#1f2937}
-  .plat-oauth:hover{background:#f9fafb}
+  .plat-sheet{background:#FBF6EA;width:100%;max-width:30rem;max-height:94vh;overflow-y:auto;border-radius:8px 8px 0 0;padding:1.25rem 1.25rem calc(1.25rem + env(safe-area-inset-bottom,0px));border-top:1px solid #D9C49C}
+  @media(min-width:640px){.plat-sheet{border-radius:8px;border:1px solid #D9C49C}}
+  .plat-full{position:fixed;inset:0;z-index:90;background:#F3EAD7;overflow-y:auto;display:flex;align-items:center;justify-content:center;padding:1.25rem}
+  .plat-card{width:100%;max-width:26rem;background:#FBF6EA;border:1px solid #D9C49C;border-radius:8px;padding:1.5rem;border-top:8px solid transparent;border-image:repeating-linear-gradient(135deg,#A8322A 0 6px,#D9C49C 6px 12px,#2B2118 12px 14px,#D9C49C 14px 20px) 8 0 0 0}
+  .plat-oauth{width:100%;display:flex;align-items:center;justify-content:center;gap:.6rem;font-weight:700;border-radius:6px;padding:.8rem 1rem;min-height:48px;border:1px solid #2B2118;background:#FFFDF8;color:#2B2118}
+  .plat-oauth:hover{background:#F3EAD7}
   .plat-oauth.apple{background:#000;color:#fff;border-color:#000}
-  .plat-or{display:flex;align-items:center;gap:.75rem;color:#9ca3af;font-size:.85rem;margin:1rem 0}
-  .plat-or:before,.plat-or:after{content:"";flex:1;height:1px;background:#e5e7eb}
+  .plat-or{display:flex;align-items:center;gap:.75rem;color:#6B5A48;font-size:.85rem;margin:1rem 0}
+  .plat-or:before,.plat-or:after{content:"";flex:1;height:1px;background:#D9C49C}
   .plat-code{letter-spacing:.5em;text-align:center;font-size:1.5rem;font-variant-numeric:tabular-nums;direction:ltr}
-  .plat-bar{height:.6rem;border-radius:999px;background:#f2e8e5;overflow:hidden}
-  .plat-bar>i{display:block;height:100%;background:#8b6450;border-radius:999px}
+  .plat-bar{height:.6rem;border-radius:999px;background:#E8DAB9;overflow:hidden}
+  .plat-bar>i{display:block;height:100%;background:#A8322A;border-radius:999px}
   .plat-plan{border:2px solid #eaddd7;border-radius:1rem;padding:1rem;text-align:start;width:100%;background:#fff}
   .plat-plan.best{border-color:#8b6450;background:#fdf8f6}
   .plat-tag{display:inline-block;font-size:.72rem;font-weight:800;border-radius:999px;padding:.15rem .55rem;background:#8b6450;color:#fff}
@@ -270,8 +270,7 @@
     const wrap = el(`<div id="plat-login" class="plat-full" dir="rtl" lang="ar">
       <div class="plat-card">
         <div class="text-center mb-5">
-          <div class="mx-auto mb-3 w-16 h-16 rounded-2xl bg-craft-700 text-craft-100 flex items-center justify-center text-3xl"><i class="fa-solid fa-hands-holding-circle"></i></div>
-          <h1 class="text-2xl font-extrabold text-craft-800">منصة الحرفي</h1>
+          <h1 class="font-display text-[2rem] leading-tight text-craft-800">منصة الحرفي</h1>
           <p class="text-craft-600 font-bold mt-1">مجانية للحرفيين والحرفيات والأسر المنتجة</p>
           <p class="text-gray-600 mt-1">مستشارك الذكي في الحرفة: سعّر منتجاتك، وسوّقها، وصوّرها صوراً احترافية.</p>
         </div>

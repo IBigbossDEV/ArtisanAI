@@ -5,112 +5,121 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>منصة الحرفي</title>
 <meta name="description" content="دعم واستشارات للحرفيين والأسر المنتجة في الخليج بالذكاء الاصطناعي: تسعير، تسويق، ومصوّر ذكي لمنتجاتك.">
-<meta name="theme-color" content="#6b4c3a">
+<meta name="theme-color" content="#F3EAD7">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <script src="https://cdn.tailwindcss.com/3.4.17"></script>
 <script>
   tailwind.config = {
     theme: { extend: {
-      fontFamily: { sans: ['Tajawal', 'Tahoma', 'Arial', 'sans-serif'] },
-      colors: { craft: { 50:'#fdf8f6',100:'#f2e8e5',200:'#eaddd7',300:'#e0cec7',400:'#d2bab0',500:'#a37c68',600:'#8b6450',700:'#6b4c3a',800:'#4c3528',900:'#32221a' } }
+      fontFamily: { sans: ['"IBM Plex Sans Arabic"', 'Tahoma', 'Arial', 'sans-serif'] },
+      /* هوية "خوص": لون الخوص الطبيعي، بني التمر، وأحمر الحناء */
+      colors: { craft: { 50:'#FBF6EA',100:'#F3EAD7',200:'#E8DAB9',300:'#D9C49C',400:'#B9A27A',500:'#A8322A',600:'#6B5A48',700:'#4A3A2C',800:'#2B2118',900:'#1E1711' }, gray: { 50:'#FBF6EA',100:'#EFE4CC',200:'#E2D3B4',300:'#D9C49C',400:'#7A6650',500:'#655341',600:'#56463A',700:'#3F3226',800:'#2B2118',900:'#1E1711' } }
     } }
   }
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=Reem+Kufi:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Reem+Kufi:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
-  /* Layout: app shell — sticky brown header, one centred column of screens, fixed bottom tab bar. Single light theme by design (craft palette). */
-  :root { color-scheme: light; --scale: 1; --page: #fdf8f6; --ink: #1f2937; --craft: #8b6450; }
+  /* هوية "خوص": أرضية بلون الخوص، حبر بني تمري، ولون مميز واحد (الحناء). بلا ظلال ولا زوايا كبيرة ولا ألوان متعددة. */
+  :root { color-scheme: light; --scale: 1; --page: #F3EAD7; --panel: #FBF6EA; --ink: #2B2118; --muted: #6B5A48; --line: #D9C49C; --henna: #A8322A; --gold: #E9B44C; }
   html { font-size: calc(100% * var(--scale)); }
-  body { font-family: 'Tajawal', Tahoma, Arial, sans-serif; background: var(--page); color: var(--ink); }
+  body { font-family: 'IBM Plex Sans Arabic', Tahoma, Arial, sans-serif; background: var(--page); color: var(--ink); }
+  h1, .font-display { font-family: 'Reem Kufi', 'IBM Plex Sans Arabic', sans-serif; font-weight: 700; }
   .site-header { top: env(safe-area-inset-top, 0px); }
+  .weave { height: 8px; background: repeating-linear-gradient(135deg, var(--henna) 0 6px, var(--line) 6px 12px, var(--ink) 12px 14px, var(--line) 14px 20px); }
   .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
-  .custom-scrollbar::-webkit-scrollbar-thumb { background: #a37c68; border-radius: 4px; }
-  .dot-typing { position: relative; left: -9999px; width: 7px; height: 7px; border-radius: 4px; background-color: #a37c68; color: #a37c68;
-    box-shadow: 9984px 0 0 0 #a37c68, 9999px 0 0 0 #a37c68, 10014px 0 0 0 #a37c68; animation: dot-typing 1.5s infinite linear; }
+  .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
+  .dot-typing { position: relative; left: -9999px; width: 7px; height: 7px; border-radius: 4px; background-color: var(--henna); color: var(--henna);
+    box-shadow: 9984px 0 0 0 var(--henna), 9999px 0 0 0 var(--henna), 10014px 0 0 0 var(--henna); animation: dot-typing 1.5s infinite linear; }
   @keyframes dot-typing {
-    0% { box-shadow: 9984px 0 0 0 #a37c68, 9999px 0 0 0 #a37c68, 10014px 0 0 0 #a37c68; }
-    16.667% { box-shadow: 9984px -6px 0 0 #a37c68, 9999px 0 0 0 #a37c68, 10014px 0 0 0 #a37c68; }
-    33.333% { box-shadow: 9984px 0 0 0 #a37c68, 9999px -6px 0 0 #a37c68, 10014px 0 0 0 #a37c68; }
-    50% { box-shadow: 9984px 0 0 0 #a37c68, 9999px 0 0 0 #a37c68, 10014px -6px 0 0 #a37c68; }
-    66.667%,100% { box-shadow: 9984px 0 0 0 #a37c68, 9999px 0 0 0 #a37c68, 10014px 0 0 0 #a37c68; }
+    0% { box-shadow: 9984px 0 0 0 var(--henna), 9999px 0 0 0 var(--henna), 10014px 0 0 0 var(--henna); }
+    16.667% { box-shadow: 9984px -6px 0 0 var(--henna), 9999px 0 0 0 var(--henna), 10014px 0 0 0 var(--henna); }
+    33.333% { box-shadow: 9984px 0 0 0 var(--henna), 9999px -6px 0 0 var(--henna), 10014px 0 0 0 var(--henna); }
+    50% { box-shadow: 9984px 0 0 0 var(--henna), 9999px 0 0 0 var(--henna), 10014px -6px 0 0 var(--henna); }
+    66.667%,100% { box-shadow: 9984px 0 0 0 var(--henna), 9999px 0 0 0 var(--henna), 10014px 0 0 0 var(--henna); }
   }
   @media (prefers-reduced-motion: reduce) { .dot-typing { animation: none; } * { scroll-behavior: auto !important; } }
   .md p { margin: 0 0 .5rem; } .md p:last-child { margin: 0; }
   .md ul, .md ol { margin: .25rem 0 .5rem; padding-inline-start: 1.25rem; }
   .md ul { list-style: disc; } .md ol { list-style: decimal; }
-  .md h4 { font-weight: 700; margin: .6rem 0 .25rem; color: #4c3528; }
+  .md h4 { font-weight: 700; margin: .6rem 0 .25rem; color: var(--ink); }
   input, textarea, select { font-size: 1rem; }
-  input:focus-visible, textarea:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible, summary:focus-visible { outline: 2px solid #a37c68; outline-offset: 2px; }
+  input:focus-visible, textarea:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible, summary:focus-visible { outline: 2px solid var(--henna); outline-offset: 2px; }
   .num { font-variant-numeric: tabular-nums; }
   .hidden { display: none !important; }
-  .inp { width: 100%; padding: .6rem .75rem; border: 1px solid #d1d5db; border-radius: .6rem; background: #fff; color: #1f2937; outline: none; min-width: 0; }
-  .inp:focus { border-color: #a37c68; }
-  .lbl { display: block; font-weight: 700; color: #374151; margin-bottom: .3rem; font-size: .95rem; }
-  .hint { font-size: .85rem; color: #6b7280; margin-top: .25rem; line-height: 1.6; }
-  .card { background: #fff; border: 1px solid #eaddd7; border-radius: 1rem; padding: 1rem; }
-  .btn { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; font-weight: 700; border-radius: .7rem; padding: .7rem 1rem; transition: background .15s, opacity .15s; }
+  /* زوايا صغيرة وبدون ظلال في كل مكان */
+  .rounded-2xl, .rounded-xl, .rounded-lg { border-radius: 6px !important; }
+  .shadow, .shadow-md, .shadow-lg, .shadow-2xl { box-shadow: none !important; }
+  .inp { width: 100%; padding: .65rem .75rem; border: 1px solid var(--line); border-radius: 6px; background: #FFFDF8; color: var(--ink); outline: none; min-width: 0; }
+  .inp:focus { border-color: var(--ink); }
+  .lbl { display: block; font-weight: 600; color: var(--ink); margin-bottom: .3rem; font-size: .95rem; }
+  .hint { font-size: .85rem; color: var(--muted); margin-top: .25rem; line-height: 1.6; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 1rem; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; font-weight: 600; border-radius: 6px; padding: .7rem 1rem; min-height: 44px; transition: background .15s, opacity .15s; }
   .btn:disabled { opacity: .5; cursor: not-allowed; }
-  .btn-main { background: #8b6450; color: #fff; } .btn-main:hover { background: #6b4c3a; }
-  .btn-dark { background: #4c3528; color: #fff; } .btn-dark:hover { background: #32221a; }
-  .btn-green { background: #15803d; color: #fff; } .btn-green:hover { background: #166534; }
-  .btn-wa { background: #1f9d55; color: #fff; } .btn-wa:hover { background: #17824a; }
-  .btn-soft { background: #fdf8f6; color: #6b4c3a; border: 1px solid #eaddd7; } .btn-soft:hover { background: #f2e8e5; }
-  .btn-sm { padding: .45rem .75rem; font-size: .9rem; border-radius: .6rem; }
-  .seg { border: 1px solid #d1d5db; background: #fff; color: #4c3528; border-radius: .6rem; padding: .55rem .5rem; font-weight: 700; }
-  .seg.on { background: #8b6450; color: #fff; border-color: #8b6450; }
-  .chip { border: 1px solid #eaddd7; background: #fdf8f6; color: #6b4c3a; border-radius: 999px; padding: .4rem .85rem; font-size: .9rem; font-weight: 700; text-align: start; }
-  .chip.on { background: #8b6450; border-color: #8b6450; color: #fff; }
-  .swatch { width: 2rem; height: 2rem; border-radius: 999px; border: 1px solid #d1d5db; }
-  .swatch.on { outline: 3px solid #8b6450; outline-offset: 2px; }
-  .star { font-size: 2rem; color: #d1d5db; line-height: 1; } .star.on { color: #e0a93a; }
-  .tile { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .4rem; text-align: center; background: #fff; border: 1px solid #eaddd7; border-radius: 1rem; padding: .9rem .4rem; font-weight: 700; color: #4c3528; min-height: 6.2rem; }
-  .tile:hover { background: #fdf8f6; border-color: #d2bab0; }
-  .tile i, .tile svg { font-size: 1.5rem; color: #8b6450; }
-  .big-action { display: flex; align-items: center; gap: .9rem; background: #fff; border: 1px solid #eaddd7; border-radius: 1rem; padding: 1rem; font-weight: 800; font-size: 1.1rem; color: #4c3528; text-align: start; }
-  .big-action:hover { background: #fdf8f6; }
-  .big-action .ic { width: 3rem; height: 3rem; border-radius: .9rem; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
-  details.more > summary { cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; gap: .5rem; font-weight: 800; color: #4c3528; padding: .9rem 1rem; }
+  .btn-main, .btn-dark { background: var(--ink); color: #F3EAD7; } .btn-main:hover, .btn-dark:hover { background: #000; }
+  .btn-green { background: var(--henna); color: #fff; } .btn-green:hover { background: #8E2A23; }
+  .btn-wa { background: #1f7a45; color: #fff; } .btn-wa:hover { background: #17633a; }
+  .btn-soft { background: transparent; color: var(--ink); border: 1px solid var(--ink); } .btn-soft:hover { background: var(--panel); }
+  .btn-sm { padding: .45rem .75rem; font-size: .9rem; min-height: 40px; }
+  .seg { border: 1px solid var(--line); background: #FFFDF8; color: var(--ink); border-radius: 6px; padding: .55rem .5rem; font-weight: 600; min-height: 44px; }
+  .seg.on { background: var(--ink); color: #F3EAD7; border-color: var(--ink); }
+  .chip { border: 1px solid var(--line); background: #FFFDF8; color: var(--ink); border-radius: 6px; padding: .45rem .85rem; font-size: .9rem; font-weight: 600; text-align: start; }
+  .chip.on { background: var(--ink); border-color: var(--ink); color: #F3EAD7; }
+  .swatch { width: 2rem; height: 2rem; border-radius: 999px; border: 1px solid var(--line); }
+  .swatch.on { outline: 3px solid var(--ink); outline-offset: 2px; }
+  .star { font-size: 2rem; color: #8C7558; line-height: 1; } .star.on { color: var(--henna); }
+  .tile { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .4rem; text-align: center; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: .9rem .4rem; font-weight: 600; color: var(--ink); min-height: 6.2rem; }
+  .tile:hover { border-color: var(--ink); }
+  .tile i, .tile svg { font-size: 1.4rem; color: var(--henna); }
+  /* الرئيسية والتسويق: زر رئيسي داكن، وقائمة أدوات بفواصل رفيعة */
+  .hero-action { width: 100%; display: flex; align-items: center; gap: .9rem; background: var(--ink); color: #F3EAD7; border-radius: 6px; padding: 1.1rem; text-align: start; }
+  .hero-action:hover { background: #000; }
+  .tool-list { border-top: 1px solid var(--line); }
+  .tool-row { width: 100%; display: flex; align-items: center; gap: .9rem; padding: .85rem 0; border-bottom: 1px solid var(--line); text-align: start; color: var(--ink); min-height: 56px; }
+  .tool-row:hover { background: var(--panel); }
+  .tool-ic { width: 1.6rem; text-align: center; font-size: 1.25rem; color: var(--henna); }
+  .day-box { width: 58px; height: 58px; flex-shrink: 0; border: 1.5px solid var(--ink); border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--ink); }
+  details.more > summary { cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; gap: .5rem; font-weight: 700; color: var(--ink); padding: .9rem 1rem; }
   details.more > summary::-webkit-details-marker { display: none; }
   details.more[open] > summary .chev { transform: rotate(180deg); }
-  .chev { transition: transform .2s; color: #a37c68; }
-  .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: .15rem; padding: .45rem 0 .35rem; font-size: .78rem; font-weight: 700; color: #a37c68; }
-  .nav-item svg { font-size: 1.25rem; }
-  .nav-item.on { color: #4c3528; }
-  .nav-item.on .nav-pill { background: #f2e8e5; }
-  .nav-pill { padding: .2rem 1rem; border-radius: 999px; }
-  .badge-dot { min-width: 1.1rem; height: 1.1rem; border-radius: 999px; background: #dc2626; color: #fff; font-size: .7rem; display: inline-flex; align-items: center; justify-content: center; padding: 0 .25rem; }
-  .status-new { background: #eff6ff; color: #1d4ed8; } .status-working { background: #fef3c7; color: #92400e; }
-  .status-ready { background: #ecfdf5; color: #047857; } .status-done { background: #f3f4f6; color: #4b5563; }
+  .chev { transition: transform .2s; color: var(--muted); }
+  .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: .2rem; padding: .55rem 0 .45rem; min-height: 52px; font-size: .78rem; font-weight: 500; color: #CBB894; }
+  .nav-item svg { font-size: 1.2rem; }
+  .nav-item.on { color: var(--gold); font-weight: 700; }
+  .nav-pill { padding: .1rem .8rem; }
+  .badge-dot { min-width: 1.1rem; height: 1.1rem; border-radius: 999px; background: var(--henna); color: #fff; font-size: .7rem; display: inline-flex; align-items: center; justify-content: center; padding: 0 .25rem; }
   #view { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
   #view.with-bar { padding-bottom: calc(170px + env(safe-area-inset-bottom, 0px)); }
-  .price-bar { bottom: calc(64px + env(safe-area-inset-bottom, 0px)); }
+  .price-bar { bottom: calc(68px + env(safe-area-inset-bottom, 0px)); }
   .canvas-prev { max-width: 100%; max-height: 62vh; width: auto; height: auto; }
-  #studio-drop.drag { border-color: #8b6450; background: #f2e8e5; }
+  #studio-drop.drag { border-color: var(--ink); background: var(--panel); }
   .fade-in { animation: fadein .2s ease-out; } @keyframes fadein { from { opacity: .4; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  .status-new { background: #eff6ff; color: #1d4ed8; } .status-working { background: #fef3c7; color: #92400e; }
+  .status-ready { background: #ecfdf5; color: #047857; } .status-done { background: #f3f4f6; color: #4b5563; }
 </style>
 
 </head>
 <body>
 <div dir="rtl" lang="ar" class="text-gray-800 antialiased min-h-screen flex flex-col">
-  <header class="site-header bg-craft-700 text-white shadow-lg sticky z-40">
+  <header class="site-header bg-craft-100 text-craft-800 sticky z-40">
     <div class="max-w-3xl mx-auto px-4 py-3 flex justify-between items-center gap-3">
-      <button type="button" data-go="home" class="flex items-center gap-2 min-w-0 text-start">
-        <i class="fa-solid fa-hands-holding-circle text-xl text-craft-200"></i>
-        <span id="app-title" class="text-base sm:text-xl font-bold truncate">منصة الحرفي</span>
+      <button type="button" data-go="home" class="min-w-0 text-start">
+        <span id="app-title" class="font-display text-[1.45rem] leading-tight truncate block">منصة الحرفي</span>
       </button>
       <div class="flex items-center gap-2 flex-shrink-0">
-        <span id="ai-pill" class="hidden sm:inline-flex items-center gap-1.5 text-xs font-medium bg-craft-800 text-craft-200 rounded-full px-2.5 py-1">
+        <span id="ai-pill" class="hidden sm:inline-flex items-center gap-1.5 text-xs font-medium text-craft-600 px-1">
           <span id="ai-dot" class="w-2 h-2 rounded-full bg-craft-400"></span><span id="ai-pill-text">جاري تشغيل المساعد…</span>
         </span>
-        <button type="button" data-go="plan" class="bg-amber-500 hover:bg-amber-600 text-craft-900 rounded-lg px-2.5 py-1.5 font-bold text-sm flex items-center gap-1"><i class="fa-solid fa-gauge"></i><span id="plan-btn-label">رصيدي</span></button>
-        <button type="button" data-go="more" class="bg-craft-800 hover:bg-craft-900 rounded-lg px-2.5 py-1.5 text-sm" aria-label="حسابي"><i class="fa-solid fa-user"></i></button>
-        <button type="button" id="font-btn" class="bg-craft-800 hover:bg-craft-900 rounded-lg px-2.5 py-1.5 font-bold text-sm" aria-label="حجم الخط">أ<span class="text-xs">+</span></button>
+        <button type="button" data-go="plan" class="h-11 px-3 rounded-full border border-craft-800 font-semibold text-sm flex items-center gap-1.5"><i class="fa-solid fa-gauge text-craft-500"></i><span id="plan-btn-label">رصيدي</span></button>
+        <button type="button" id="font-btn" class="w-11 h-11 rounded-full border border-craft-800 font-bold text-sm" aria-label="حجم الخط">أ<span class="text-xs">+</span></button>
+        <button type="button" data-go="more" class="w-11 h-11 rounded-full border border-craft-800 flex items-center justify-center" aria-label="حسابي"><i class="fa-regular fa-user"></i></button>
       </div>
     </div>
+    <div class="weave" aria-hidden="true"></div>
   </header>
 
   <div id="offline-banner" class="hidden bg-amber-50 border-b border-amber-200 text-amber-900 text-sm">
@@ -120,7 +129,7 @@
   <main id="view" class="flex-grow max-w-3xl mx-auto w-full px-4 pt-4" aria-live="polite"></main>
 
   <div id="price-bar" class="price-bar hidden fixed inset-x-0 z-30 px-3">
-    <div class="max-w-3xl mx-auto bg-craft-800 text-white rounded-2xl shadow-2xl px-4 py-3 flex items-center justify-between gap-3">
+    <div class="max-w-3xl mx-auto bg-craft-800 text-craft-100 rounded-md border border-craft-700 px-4 py-3 flex items-center justify-between gap-3">
       <div class="min-w-0">
         <div class="text-xs text-craft-200" id="pb-label">سعر بيع القطعة</div>
         <div id="pb-price" class="text-2xl font-extrabold num leading-tight">—</div>
@@ -132,18 +141,18 @@
     </div>
   </div>
 
-  <nav class="fixed bottom-0 inset-x-0 z-40 bg-white border-t border-craft-200 shadow-[0_-4px_16px_rgba(0,0,0,0.06)]" style="padding-bottom: env(safe-area-inset-bottom, 0px)" aria-label="الأقسام">
+  <nav class="fixed bottom-0 inset-x-0 z-40 bg-craft-800" style="padding-bottom: env(safe-area-inset-bottom, 0px)" aria-label="الأقسام">
     <div class="max-w-3xl mx-auto flex">
       <button type="button" class="nav-item" data-go="home" data-nav="home"><span class="nav-pill"><i class="fa-solid fa-house"></i></span>الرئيسية</button>
       <button type="button" class="nav-item" data-go="products" data-nav="products"><span class="nav-pill"><i class="fa-solid fa-tags"></i></span>التسعير</button>
       <button type="button" class="nav-item" data-go="chat" data-nav="chat"><span class="nav-pill"><i class="fa-solid fa-comments"></i></span>المساعد</button>
-      <button type="button" class="nav-item" data-go="photographer" data-nav="photographer"><span class="nav-pill"><i class="fa-solid fa-wand-magic-sparkles"></i></span>المصوّر</button>
+      <button type="button" class="nav-item" data-go="photographer" data-nav="photographer"><span class="nav-pill"><i class="fa-solid fa-camera"></i></span>المصوّر</button>
       <button type="button" class="nav-item" data-go="market" data-nav="market"><span class="nav-pill"><i class="fa-solid fa-bullhorn"></i></span>التسويق</button>
     </div>
   </nav>
 
   <div id="modal" class="hidden fixed inset-0 z-[60] bg-black/40 items-end sm:items-center justify-center" role="dialog" aria-modal="true">
-    <div id="modal-box" class="bg-white w-full sm:max-w-lg max-h-[92vh] overflow-y-auto custom-scrollbar rounded-t-2xl sm:rounded-2xl shadow-2xl p-5" style="padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px))"></div>
+    <div id="modal-box" class="bg-craft-50 w-full sm:max-w-lg max-h-[92vh] overflow-y-auto custom-scrollbar rounded-t-2xl sm:rounded-2xl shadow-2xl p-5" style="padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px))"></div>
   </div>
 
   <div id="toast" class="fixed left-1/2 -translate-x-1/2 bg-red-600 text-white px-5 py-3 rounded-xl shadow-lg opacity-0 pointer-events-none transition-opacity duration-300 z-[70] text-sm font-bold max-w-[90vw] text-center" style="bottom: calc(150px + env(safe-area-inset-bottom, 0px))" role="status"></div>
@@ -202,7 +211,7 @@ function toast(text, ok = false) {
 
 function copyText(text) {
   try {
-    navigator.clipboard.writeText(text).then(() => toast('تم النسخ ✅', true)).catch(() => showCopyBox(text));
+    navigator.clipboard.writeText(text).then(() => toast('تم النسخ', true)).catch(() => showCopyBox(text));
   } catch { showCopyBox(text); }
 }
 function showCopyBox(text) {
@@ -537,7 +546,7 @@ function outActions(text, { kind, title, productId, wa = true, saveable = true }
       S.texts.unshift({ id: uid(), kind, title: title || KIND_NAMES[kind] || 'نص', text, productId, at: Date.now() });
       S.texts = S.texts.slice(0, 80); save();
       b.innerHTML = '<i class="fa-solid fa-bookmark"></i> تم الحفظ'; b.disabled = true;
-      toast('تم الحفظ في "نصوصي المحفوظة" ✅', true);
+      toast('تم الحفظ في "نصوصي المحفوظة"', true);
     }
   });
   return row;
@@ -627,7 +636,7 @@ function updateBadges() {
 }
 
 /* ---------- حفظ ملف للجهاز ---------- */
-async function offerFile(filename, blob, okText = 'تم الحفظ ✅') {
+async function offerFile(filename, blob, okText = 'تم الحفظ') {
   if (!CAP.downloads) { toast('حفظ الملفات لا يعمل في هذا المتصفح.'); return; }
   try { await CAP.downloads.save({ filename, data: blob }); toast(okText, true); }
   catch (e) { const c = e && e.code; if (c === 'declined') return; toast(c === 'rate_limited' ? 'يوجد ملف ينتظر موافقتك، أكمله أولاً.' : 'تعذّر حفظ الملف هنا.'); }
@@ -732,7 +741,7 @@ ROUTES.product = {
           <div class="flex flex-col gap-2">
             <label for="p-photo" class="btn btn-soft btn-sm cursor-pointer"><i class="fa-solid fa-camera"></i> ${p.photo ? 'غيّر الصورة' : 'أضف صورة'}</label>
             <input type="file" id="p-photo" accept="image/*" class="hidden">
-            ${p.photo ? `<button type="button" class="btn btn-soft btn-sm" ${goP('studio', { productId: p.id })}><i class="fa-solid fa-wand-magic-sparkles"></i> عدّلها في محرر الصور</button>` : ''}
+            ${p.photo ? `<button type="button" class="btn btn-soft btn-sm" ${goP('studio', { productId: p.id })}><i class="fa-solid fa-sliders"></i> عدّلها في محرر الصور</button>` : ''}
           </div>
         </div>
       </div>
@@ -814,7 +823,7 @@ ROUTES.product = {
       </details>
 
       <div class="card space-y-3">
-        <div class="font-extrabold text-craft-800"><i class="fa-solid fa-wand-magic-sparkles ml-1"></i> هل سعري مناسب؟</div>
+        <div class="font-extrabold text-craft-800"><i class="fa-solid fa-comments ml-1"></i> هل سعري مناسب؟</div>
         <p class="hint mt-0">يراجع المساعد أرقامك ويعطيك رأيه، ويقترح 3 أسعار.</p>
         <button type="button" class="btn btn-soft w-full" id="btn-review" data-act="priceReview" data-id="${p.id}">اسأل المساعد</button>
         <div id="out-review" class="hidden"></div>
@@ -824,7 +833,7 @@ ROUTES.product = {
 
       <div class="grid grid-cols-2 gap-2">
         <button type="button" class="btn btn-soft" ${goP('description', { productId: p.id })}><i class="fa-solid fa-pen-nib"></i> اكتب وصفاً</button>
-        <button type="button" class="btn btn-soft" ${goP('photographer', { productId: p.id })}><i class="fa-solid fa-wand-magic-sparkles"></i> صوّره بالمصوّر الذكي</button>
+        <button type="button" class="btn btn-soft" ${goP('photographer', { productId: p.id })}><i class="fa-solid fa-camera"></i> صوّره بالمصوّر الذكي</button>
       </div>
       <div id="del-zone"><button type="button" class="btn w-full text-red-700 hover:bg-red-50" data-act="askDelete" data-id="${p.id}"><i class="fa-solid fa-trash"></i> احذف المنتج</button></div>
       `,
@@ -887,10 +896,10 @@ function updateProductResult(p) {
       ${r.vatRate ? row('سعرك قبل الضريبة', money(r.sellingPrice), 'bg-gray-50') : ''}
       ${r.vatRate ? row(`ضريبة القيمة المضافة ${r.vatRate}% <span class="text-gray-500 text-sm">(تدفعها للهيئة، وليست لك)</span>`, money(r.vatValue)) : ''}
     </div>
-    <div class="bg-craft-700 text-white rounded-2xl p-4">
+    <div class="bg-craft-800 text-craft-100 rounded-md p-4">
       <div class="flex justify-between items-center gap-2"><span class="font-bold">${r.vatRate ? 'سعر البيع شامل الضريبة' : 'سعر بيع القطعة'}</span><span class="text-2xl font-extrabold num">${r.sellingPrice ? money(r.finalPrice) : '—'}</span></div>
       ${r.rounded ? `<div class="flex justify-between text-sm text-craft-100 mt-1"><span>أو قرّبه إلى</span><b class="num">${r.rounded} ر.س</b></div>` : ''}
-      ${!r.shipIn && r.shipping ? `<p class="text-sm text-craft-100 mt-2 border-t border-craft-500 pt-2">+ الشحن ${money(r.shipping)} يدفعه الزبون. اذكر ذلك بوضوح في الإعلان.</p>` : ''}
+      ${!r.shipIn && r.shipping ? `<p class="text-sm text-craft-100 mt-2 border-t border-craft-700 pt-2">+ الشحن ${money(r.shipping)} يدفعه الزبون. اذكر ذلك بوضوح في الإعلان.</p>` : ''}
     </div>
     <div class="rounded-2xl border p-4 ${t.box}">
       <div class="flex justify-between items-center gap-2">
@@ -966,7 +975,7 @@ ACT.timerReset = () => { const p = prodById(CUR.params.id); p.timer = { sessions
 ACT.timerUse = () => {
   const p = prodById(CUR.params.id), tm = p.timer;
   const hrs = tm.sessions.reduce((a, s) => a + (s.e - s.s), 0) / 3600000 / nz(tm.pieces);
-  p.hours = r2(hrs); $('p-hours').value = p.hours; save(); updateProductResult(p); toast('أُضيف وقتك إلى السعر ✅', true);
+  p.hours = r2(hrs); $('p-hours').value = p.hours; save(); updateProductResult(p); toast('أُضيف وقتك إلى السعر', true);
 };
 
 /* مقارنة بأسعار السوق */
@@ -1053,33 +1062,41 @@ ACT.delText = (b) => { S.texts = S.texts.filter(t => t.id !== b.dataset.id); sav
    ============================================================ */
 const has = (r) => !!ROUTES[r];
 
+/* صف أداة: أيقونة بلون واحد، عنوان، وصف، سهم — بدل البطاقات الملونة */
+const toolRow = (attrs, icon, label, sub) => `<button type="button" class="tool-row" ${attrs}><i class="fa-solid ${icon} tool-ic" aria-hidden="true"></i><span class="flex-1 min-w-0"><span class="block text-[1.06rem] font-bold">${label}</span><span class="block text-sm text-craft-600">${sub}</span></span><i class="fa-solid fa-chevron-left text-craft-400" aria-hidden="true"></i></button>`;
+
 ROUTES.home = {
   render() {
     if (!S.settings.onboarded) return ROUTES.onboard.render({ first: true });
     const p = S.profile;
-    const hour = new Date().getHours();
-    const greet = hour < 12 ? 'صباح الخير' : 'مساء الخير';
-    const cards = [];
-    // المناسبة الجاية
-    const occ = nextOccasions().find(o => o.days <= 45);
-    if (occ) cards.push(`<button type="button" class="card w-full text-start bg-amber-50 border-amber-200 hover:bg-amber-100" data-go="occasions"><div class="text-sm font-bold text-amber-800"><i class="fa-solid fa-calendar-day ml-1"></i> ${occ.days === 0 ? 'اليوم' : `بعد ${occ.days} يوم`}: ${esc(occ.name)}</div><div class="text-gray-700 mt-1">${esc(occ.tip)}</div><div class="text-sm font-bold text-craft-700 mt-2">جهّز منشورك <i class="fa-solid fa-chevron-left mr-1"></i></div></button>`);
-    return `<div class="fade-in space-y-4">
-      <div class="rounded-2xl bg-craft-700 text-white p-5 relative overflow-hidden">
-        <div class="absolute inset-x-0 bottom-0 h-2" style="background:repeating-linear-gradient(90deg,#9e2b25 0 14px,#f3e6d0 14px 28px,#1f1a17 28px 42px)"></div>
-        <div class="text-craft-200 font-bold">${greet}</div>
-        <div class="text-2xl font-extrabold mt-1">أهلاً ${esc(p.name || 'بك')} 👋</div>
-        ${p.craft ? `<div class="text-craft-100 mt-1">${esc(p.craft)}${p.region ? ' · ' + esc(p.region) : ''}</div>` : ''}
+    const greet = new Date().getHours() < 12 ? 'صباح الخير' : 'مساء الخير';
+    const occ = nextOccasions().find(o => o.days <= 150);
+    return `<div class="fade-in space-y-6 pt-1">
+      <div>
+        <div class="text-craft-600">${greet}</div>
+        <div class="font-display text-[2.1rem] leading-tight text-craft-800">${esc(p.name || 'أهلاً بك')}</div>
+        ${p.craft ? `<div class="text-sm text-craft-600 mt-0.5">${esc(p.craft)}${p.region ? ' · ' + esc(p.region) : ''}</div>` : ''}
       </div>
-      <h2 class="text-xl font-extrabold text-craft-800">ماذا تريد أن تفعل اليوم؟</h2>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <button type="button" class="big-action" data-act="newProduct"><span class="ic bg-amber-100 text-amber-700"><i class="fa-solid fa-coins"></i></span><span>تسعير قطعة جديدة<span class="block text-sm font-medium text-gray-500">بكم أبيع؟ وكم ربحي؟</span></span></button>
-        ${S.products.length ? `<button type="button" class="big-action" data-go="products"><span class="ic bg-amber-100 text-amber-700"><i class="fa-solid fa-tags"></i></span><span>أسعار منتجاتي<span class="block text-sm font-medium text-gray-500">${(n => n === 1 ? 'منتج واحد، وسعره وربحك منه' : n === 2 ? 'منتجان، وأسعارهما وربحك منهما' : `${n} ${n <= 10 ? 'منتجات' : 'منتجاً'}، وأسعارها وربحك منها`)(S.products.length)}</span></span></button>` : ''}
-        <button type="button" class="big-action" data-go="description"><span class="ic bg-blue-100 text-blue-700"><i class="fa-solid fa-pen-nib"></i></span><span>كتابة إعلان<span class="block text-sm font-medium text-gray-500">وصف جاهز للنشر</span></span></button>
-        <button type="button" class="big-action" data-go="photographer"><span class="ic bg-purple-100 text-purple-700"><i class="fa-solid fa-wand-magic-sparkles"></i></span><span>تصوير منتجي<span class="block text-sm font-medium text-gray-500">صورة إعلانية من صورة جوالك</span></span></button>
-        <button type="button" class="big-action" data-go="chat"><span class="ic bg-green-100 text-green-700"><i class="fa-solid fa-comments"></i></span><span>استشارة المساعد<span class="block text-sm font-medium text-gray-500">أي سؤال عن عملك ومشروعك</span></span></button>
-      </div>
-      ${cards.join('')}
-      <button type="button" class="card w-full text-start flex items-center gap-3 hover:bg-craft-50" data-go="feedback"><i class="fa-solid fa-comment-dots text-2xl text-craft-500"></i><span><b class="text-craft-800">رأيك يهمنا</b><span class="block text-sm text-gray-500">أخبرنا بما أعجبك وما صعب عليك.</span></span></button>
+      <button type="button" class="hero-action" data-act="newProduct">
+        <i class="fa-solid fa-tag text-2xl text-[#E9B44C]" aria-hidden="true"></i>
+        <span class="flex-1 min-w-0"><span class="block text-xl font-bold">تسعير قطعة جديدة</span><span class="block text-sm text-craft-300">بكم تُباع؟ وكم يبقى من الربح؟</span></span>
+        <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+      </button>
+      <section>
+        <h2 class="text-sm font-semibold text-craft-600 mb-1">أدوات اليوم</h2>
+        <div class="tool-list">
+          ${S.products.length ? toolRow('data-go="products"', 'fa-tags', 'أسعار منتجاتي', (n => n === 1 ? 'منتج واحد، وسعره وربحك منه' : n === 2 ? 'منتجان، وأسعارهما وربحك منهما' : `${n} ${n <= 10 ? 'منتجات' : 'منتجاً'}، وأسعارها وربحك منها`)(S.products.length)) : ''}
+          ${toolRow('data-go="description"', 'fa-pen-nib', 'كتابة إعلان', 'وصف جاهز للنشر')}
+          ${toolRow('data-go="photographer"', 'fa-camera', 'تصوير منتج', 'صورة إعلانية من صورة الجوال')}
+          ${toolRow('data-go="chat"', 'fa-comments', 'سؤال للمساعد', 'عن السعر أو التسويق أو زبون')}
+        </div>
+      </section>
+      ${occ ? `<button type="button" class="w-full text-start flex items-center gap-4" data-go="occasions">
+        <span class="day-box"><span class="font-display text-2xl leading-none num">${occ.days}</span><span class="text-[11px] text-craft-600">${occ.days === 1 ? 'يوم' : 'يوماً'}</span></span>
+        <span class="flex-1 min-w-0"><span class="block font-bold">${esc(occ.name)}</span><span class="block text-sm text-craft-600">جهّز منشورك ومنتجاتك مبكراً</span></span>
+        <span class="font-semibold text-craft-500">ابدأ</span>
+      </button>` : ''}
+      <button type="button" class="w-full text-start flex items-center gap-3 border-t border-craft-300 pt-4" data-go="feedback"><i class="fa-regular fa-comment-dots text-xl text-craft-500" aria-hidden="true"></i><span><b class="text-craft-800">رأيك يهمنا</b><span class="block text-sm text-craft-600">أخبرنا بما أعجبك وما صعب عليك.</span></span></button>
     </div>`;
   },
   after() { if (!S.settings.onboarded) ROUTES.onboard.after({ first: true }); },
@@ -1092,7 +1109,7 @@ ROUTES.onboard = {
   render({ first }) {
     const p = S.profile;
     return `<div class="fade-in space-y-4">
-      ${first ? `<div class="rounded-2xl bg-craft-700 text-white p-5"><div class="text-2xl font-extrabold">أهلاً وسهلاً 👋</div><p class="text-craft-100 mt-2 leading-relaxed">${esc(CONFIG.orgAbout)}</p><p class="text-craft-100 mt-2">عرّفنا بنفسك في دقيقة، لنقدم لك نصائح تناسبك.</p></div>`
+      ${first ? `<div class="pt-1"><div class="font-display text-[2.1rem] leading-tight text-craft-800">أهلاً وسهلاً</div><p class="text-craft-700 mt-2 leading-relaxed">${esc(CONFIG.orgAbout)}</p><p class="text-craft-600 mt-1">عرّفنا بنفسك في دقيقة، لنقدم لك نصائح تناسبك.</p></div>`
       : screen({ title: 'ملفي', sub: 'معلوماتك تساعد المساعد على تقديم نصائح تناسبك.', back: 'more' })}
       <div class="card space-y-4">
         ${fInput({ id: 'o-name', label: 'بماذا نناديك؟', value: p.name, ph: 'مثال: أم محمد' })}
@@ -1115,7 +1132,7 @@ ROUTES.onboard = {
 ACT.saveProfile = (btn) => {
   Object.assign(S.profile, { name: val('o-name'), craft: val('o-craft'), category: val('o-cat'), region: val('o-region'), store: val('o-store'), whatsapp: val('o-wa'), handle: val('o-handle') });
   S.settings.onboarded = true; save(); queueFeedback();
-  toast('تم الحفظ ✅', true);
+  toast('تم الحفظ', true);
   if (btn.dataset.first) go('home'); else ACT.goBack({ dataset: { fallback: 'more' } });
 };
 ACT.skipOnboard = () => { S.settings.onboarded = true; save(); go('home'); };
@@ -1139,18 +1156,18 @@ ROUTES.more = {
 /* ---------- مستشار التسويق ---------- */
 ROUTES.market = {
   render() {
-    const item = (r, icon, tone, label, sub) => has(r) ? `<button type="button" class="big-action" data-go="${r}"><span class="ic ${tone}"><i class="fa-solid ${icon}"></i></span><span>${label}<span class="block text-sm font-medium text-gray-500">${sub}</span></span></button>` : '';
+    const item = (r, icon, label, sub) => has(r) ? toolRow(`data-go="${r}"`, icon, label, sub) : '';
     return screen({
       title: 'مستشار التسويق', sub: 'يكتب المساعد لك ويخطط معك، وأنت تنسخ وتنشر.',
-      body: `<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        ${item('photographer', 'fa-wand-magic-sparkles', 'bg-purple-100 text-purple-700', 'المصوّر الذكي', 'صورة إعلانية لمنتجك')}
-        ${item('description', 'fa-pen-nib', 'bg-blue-100 text-blue-700', 'وصف المنتج', 'وصف جذاب جاهز للنشر')}
-        ${item('marketing', 'fa-bullhorn', 'bg-amber-100 text-amber-700', 'خطة تسويق', 'ماذا تفعل هذا الشهر')}
-        ${item('replies', 'fa-reply', 'bg-green-100 text-green-700', 'الرد على الزبائن', 'ردود جاهزة على المساومة والأسئلة')}
-        ${item('occasions', 'fa-calendar-days', 'bg-rose-100 text-rose-700', 'المناسبات', 'منشورات قبل كل مناسبة')}
-        ${item('story', 'fa-book-open', 'bg-craft-100 text-craft-700', 'قصتي', 'نبذة وقصة قصيرة عنك')}
-        ${item('ideas', 'fa-lightbulb', 'bg-yellow-100 text-yellow-700', 'أفكار منتجات', 'منتجات جديدة بمهارتك نفسها')}
-        ${item('logo', 'fa-signature', 'bg-slate-100 text-slate-700', 'اسم وشعار', 'اسم لمتجرك وشعار نصي')}
+      body: `<div class="tool-list">
+        ${item('photographer', 'fa-camera', 'المصوّر الذكي', 'صورة إعلانية لمنتجك')}
+        ${item('description', 'fa-pen-nib', 'وصف المنتج', 'وصف جذاب جاهز للنشر')}
+        ${item('marketing', 'fa-bullhorn', 'خطة تسويق', 'ماذا تفعل هذا الشهر')}
+        ${item('replies', 'fa-reply', 'الرد على الزبائن', 'ردود جاهزة على المساومة والأسئلة')}
+        ${item('occasions', 'fa-calendar-days', 'المناسبات', 'منشورات قبل كل مناسبة')}
+        ${item('story', 'fa-book-open', 'قصتي', 'نبذة وقصة قصيرة عنك')}
+        ${item('ideas', 'fa-lightbulb', 'أفكار منتجات', 'منتجات جديدة بمهارتك نفسها')}
+        ${item('logo', 'fa-signature', 'اسم وشعار', 'اسم لمتجرك وشعار نصي')}
       </div>`,
     });
   },
@@ -1192,12 +1209,12 @@ ROUTES.dataPage = {
         st.profile = Object.assign(DEFAULT_STATE().profile, d.profile); st.settings = Object.assign(DEFAULT_STATE().settings, d.settings);
         ['products', 'texts', 'feedback'].forEach(k => { if (!Array.isArray(st[k])) st[k] = []; });
         st.products = fixProducts(st.products);
-        S = st; S.updatedAt = Date.now(); save(); applyScale(); toast('تم استرجاع بياناتك ✅', true); go('home', {}, { reset: true });
+        S = st; S.updatedAt = Date.now(); save(); applyScale(); toast('تم استرجاع بياناتك', true); go('home', {}, { reset: true });
       } catch { toast('هذا الملف ليس نسخة احتياطية من المنصة.'); }
     });
   },
 };
-ACT.backup = () => offerFile(`نسخة_المنصة_${todayStr()}.json`, new Blob([JSON.stringify(S)], { type: 'application/json' }), 'تم حفظ النسخة ✅');
+ACT.backup = () => offerFile(`نسخة_المنصة_${todayStr()}.json`, new Blob([JSON.stringify(S)], { type: 'application/json' }), 'تم حفظ النسخة');
 
 /* ---------- الخصوصية ومن نحن ---------- */
 ROUTES.privacy = {
@@ -1267,7 +1284,7 @@ ACT.sendFeedback = async (btn) => {
   $('fb-form').classList.add('hidden');
   const tl = Object.fromEntries(FB_TOOLS);
   $('fb-result').innerHTML = ok
-    ? `<div class="card text-center py-8 space-y-2"><div class="text-5xl">🌟</div><p class="font-extrabold text-craft-800 text-lg">وصلنا رأيك، شكراً لك</p><p class="text-gray-500">يمكنك إرسال رأي جديد في أي وقت بعد أن تجرب أكثر.</p><button type="button" class="btn btn-main mt-2" data-go="home">العودة إلى الرئيسية</button></div>`
+    ? `<div class="card text-center py-8 space-y-2"><p class="font-extrabold text-craft-800 text-lg">وصلنا رأيك، شكراً لك</p><p class="text-gray-500">يمكنك إرسال رأي جديد في أي وقت بعد أن تجرب أكثر.</p><button type="button" class="btn btn-main mt-2" data-go="home">العودة إلى الرئيسية</button></div>`
     : `<div class="card space-y-3"><p class="font-extrabold text-craft-800">تعذّر إرسال رأيك من هنا</p><p class="text-gray-600">انسخه وأرسله إلى صاحب المنصة عبر واتساب.</p><div id="fb-text" class="bg-gray-50 border rounded-xl p-3 whitespace-pre-wrap text-sm">${esc(`رأيي في ${CONFIG.platformName}\nالتقييم: ${entry.rating ? '★'.repeat(entry.rating) : '—'}\nالأدوات الأكثر فائدة: ${entry.tools.map(t => tl[t]).join('، ') || '—'}\nما صعب علي: ${entry.hard || '—'}\nما أتمنى إضافته: ${entry.idea || '—'}${entry.name ? '\nالاسم: ' + entry.name : ''}`)}</div><button type="button" class="btn btn-main w-full" data-act="copyFb"><i class="fa-regular fa-copy"></i> انسخ رأيي</button></div>`;
 };
 ACT.copyFb = () => copyText($('fb-text').textContent);
@@ -1456,7 +1473,7 @@ ROUTES.occasions = {
       <div class="space-y-3">${list.map((o, i) => `<div class="card space-y-2 ${o.days <= 30 ? 'border-amber-300 bg-amber-50' : ''}">
         <div class="flex justify-between items-center gap-2"><h2 class="font-extrabold text-craft-900 text-lg">${esc(o.name)}</h2><span class="text-sm font-bold ${o.days <= 30 ? 'text-amber-800' : 'text-gray-500'} num">${o.days === 0 ? 'اليوم' : `بعد ${o.days} يوم`} · ${fmtDay(o.date.getTime())}</span></div>
         <p class="text-gray-700">${esc(o.tip)}</p>
-        <button type="button" class="btn btn-soft btn-sm" data-act="genOccasion" data-i="${i}"><i class="fa-solid fa-wand-magic-sparkles"></i> اكتب لي منشوراً وفكرة عرض</button>
+        <button type="button" class="btn btn-soft btn-sm" data-act="genOccasion" data-i="${i}"><i class="fa-solid fa-pen-nib"></i> اكتب لي منشوراً وفكرة عرض</button>
         <div id="out-occ-${i}" class="hidden"></div>
       </div>`).join('')}</div>
       ${!hijriFmt ? '<p class="hint">جهازك لا يدعم التاريخ الهجري، لذلك لم يظهر رمضان والأعياد.</p>' : ''}`,
@@ -1514,7 +1531,7 @@ ROUTES.studio = {
       <div class="card space-y-3 studio-ctrl">
         <div class="font-extrabold text-craft-800"><i class="fa-solid fa-sun ml-1"></i> الإضاءة والألوان</div>
         <div class="flex flex-wrap gap-2">
-          <button type="button" class="chip" data-preset="auto">حسّنها تلقائياً ✨</button><button type="button" class="chip" data-preset="warm">دافئ تراثي</button>
+          <button type="button" class="chip" data-preset="auto">حسّنها تلقائياً</button><button type="button" class="chip" data-preset="warm">دافئ تراثي</button>
           <button type="button" class="chip" data-preset="clean">فاتح ونظيف</button><button type="button" class="chip" data-preset="reset">أعِدها كما كانت</button>
         </div>
         ${range('b', 'الإضاءة', 50, 160)}${range('c', 'الحِدّة', 50, 160)}${range('s', 'قوة الألوان', 0, 180)}${range('w', 'دفء الألوان', -50, 50)}
@@ -1534,7 +1551,7 @@ ROUTES.studio = {
         <div class="font-extrabold text-craft-800"><i class="fa-solid fa-box-open ml-1"></i> احفظها كصورة لمنتج</div>
         <div class="flex gap-2"><select id="st-prod" class="inp" data-picker="1">${productOptions(p ? p.id : S.settings.lastProduct, 'اختر منتجاً')}</select><button type="button" class="btn btn-main btn-sm flex-shrink-0" data-act="studioToProduct">احفظ</button></div>
       </div>` : ''}
-      <button type="button" class="card w-full text-start flex items-center gap-3 hover:bg-craft-50 border-craft-400" data-go="photographer"><i class="fa-solid fa-wand-magic-sparkles text-2xl text-amber-500"></i><span><b class="text-craft-800">دع المصوّر الذكي يصوّر منتجك</b><span class="block text-sm text-gray-500">يضع منتجك في مكان احترافي (مجلس، صحراء، خلفية بيضاء…) انطلاقاً من صورتك نفسها.</span></span></button>`,
+      <button type="button" class="card w-full text-start flex items-center gap-3 hover:bg-craft-50 border-craft-400" data-go="photographer"><i class="fa-solid fa-camera text-2xl text-amber-500"></i><span><b class="text-craft-800">دع المصوّر الذكي يصوّر منتجك</b><span class="block text-sm text-gray-500">يضع منتجك في مكان احترافي (مجلس، صحراء، خلفية بيضاء…) انطلاقاً من صورتك نفسها.</span></span></button>`,
     });
   },
   onInput(e) {
@@ -1636,12 +1653,12 @@ ACT.studioExport = async (b) => {
   if (!blob) { toast('تعذّر تجهيز الصورة. حاول مرة أخرى.'); return; }
   track('actions', 'image_export');
   const p = $('st-prod') ? prodById($('st-prod').value) : null;
-  offerFile(`${safeName(p ? p.name : (S.profile.store || 'منتجي'))}_${RATIO_NAMES[st.ratio]}.jpg`, blob, 'تم حفظ الصورة ✅');
+  offerFile(`${safeName(p ? p.name : (S.profile.store || 'منتجي'))}_${RATIO_NAMES[st.ratio]}.jpg`, blob, 'تم حفظ الصورة');
 };
 ACT.studioToProduct = () => {
   if (!st.img) { toast('ضع صورة منتجك أولاً.'); return; }
   const p = prodById(val('st-prod')); if (!p) { toast('اختر المنتج.'); return; }
-  renderStudio(); p.photo = thumbFromCanvas(studioCanvas()); save(); toast(`أصبحت صورة "${p.name}" ✅`, true);
+  renderStudio(); p.photo = thumbFromCanvas(studioCanvas()); save(); toast(`أصبحت صورة "${p.name}"`, true);
 };
 
 /* ============================================================
@@ -1655,7 +1672,7 @@ ROUTES.chat = {
     return `<div class="fade-in flex flex-col" style="min-height:calc(100vh - 210px)">
       <div class="flex justify-between items-center mb-3"><h1 class="text-2xl font-extrabold text-craft-800">اسأل المساعد</h1><button type="button" class="btn btn-soft btn-sm" data-act="chatReset"><i class="fa-solid fa-rotate-right"></i> محادثة جديدة</button></div>
       <div id="chat-log" class="flex-1 space-y-3"></div>
-      <div class="sticky bg-[#fdf8f6] pt-2 mt-3 space-y-2" style="bottom: calc(64px + env(safe-area-inset-bottom, 0px))">
+      <div class="sticky bg-craft-100 pt-2 mt-3 space-y-2" style="bottom: calc(64px + env(safe-area-inset-bottom, 0px))">
         <div id="chat-att" class="hidden items-center gap-3 p-2 bg-white rounded-xl w-fit border"><img id="chat-att-img" alt="المرفق" class="h-10 w-10 object-cover rounded"><span class="text-sm text-gray-600">ستُرسل الصورة مع سؤالك</span><button type="button" class="text-gray-400 hover:text-red-600" data-act="chatClearAtt" aria-label="إزالة الصورة"><i class="fa-solid fa-circle-xmark"></i></button></div>
         <div class="flex gap-2 items-end">
           <label for="chat-file" id="chat-attach" class="img-only ${CAP.canImages ? 'flex' : 'hidden'} cursor-pointer flex-shrink-0 bg-craft-100 hover:bg-craft-200 text-craft-700 w-12 h-12 rounded-xl border border-craft-300 items-center justify-center" title="أرسل صورة"><i class="fa-solid fa-camera text-lg"></i></label>
@@ -1678,11 +1695,11 @@ ROUTES.chat = {
 };
 function bubbleHtml(m, i) {
   if (m.role === 'user') return `<div class="flex justify-end"><div class="bg-craft-600 text-white p-3 rounded-2xl rounded-tl-none max-w-[85%] whitespace-pre-wrap break-words">${m.img ? `<img src="${m.img}" alt="" class="rounded-lg max-h-40 mb-2">` : ''}${esc(m.text)}</div></div>`;
-  return `<div class="flex justify-start"><div class="bg-white border border-craft-200 p-3 rounded-2xl rounded-tr-none max-w-[90%] min-w-0 break-words"><div class="text-xs font-bold text-craft-500 mb-1">مساعد الحرفي</div><div class="md leading-relaxed" id="bub-${i}">${m.pending ? loaderHtml('يفكّر…') : md(m.text)}</div>${m.chips ? `<div class="flex flex-wrap gap-2 mt-3">${m.chips.map(c => `<button type="button" class="chip" data-act="chatStarter">${esc(c)}</button>`).join('')}</div>` : ''}<div class="chat-actions" data-i="${i}"></div></div></div>`;
+  return `<div class="flex justify-start"><div class="bg-craft-50 border border-craft-300 p-3 rounded-2xl rounded-tr-none max-w-[90%] min-w-0 break-words"><div class="text-xs font-bold text-craft-500 mb-1">مساعد الحرفي</div><div class="md leading-relaxed" id="bub-${i}">${m.pending ? loaderHtml('يفكّر…') : md(m.text)}</div>${m.chips ? `<div class="flex flex-wrap gap-2 mt-3">${m.chips.map(c => `<button type="button" class="chip" data-act="chatStarter">${esc(c)}</button>`).join('')}</div>` : ''}<div class="chat-actions" data-i="${i}"></div></div></div>`;
 }
 function renderChatLog() {
   const log = $('chat-log'); if (!log) return;
-  const welcome = { role: 'assistant', text: `أهلاً ${S.profile.name ? S.profile.name + ' ' : ''}👋 أنا مساعدك.\nاسألني عن **سعر منتجك** أو **طريقة تسويقه** أو **الرد على زبون**${CAP.canImages ? '، أو أرسل لي صورة منتجك وسأخبرك كيف تصوّره بشكل أفضل' : ''}.\nأطّلع على منتجاتك وأسعارك لأجيبك بدقة.`, chips: STARTERS };
+  const welcome = { role: 'assistant', text: `أهلاً ${S.profile.name ? S.profile.name + ' ' : ''} أنا مساعدك.\nاسألني عن **سعر منتجك** أو **طريقة تسويقه** أو **الرد على زبون**${CAP.canImages ? '، أو أرسل لي صورة منتجك وسأخبرك كيف تصوّره بشكل أفضل' : ''}.\nأطّلع على منتجاتك وأسعارك لأجيبك بدقة.`, chips: STARTERS };
   const items = [welcome, ...CHAT.view];
   log.innerHTML = items.map(bubbleHtml).join('');
   items.forEach((m, i) => { if (m.role === 'assistant' && i > 0 && !m.pending && m.text) { const slot = log.querySelector(`.chat-actions[data-i="${i}"]`); if (slot) slot.appendChild(outActions(m.text, { kind: 'chat' })); } });
@@ -1751,7 +1768,7 @@ ROUTES.logo = {
     return screen({
       title: 'اسم وشعار لمتجرك', sub: 'ليس لديك اسم؟ يقترح عليك المساعد أسماء، ثم صمّم شعاراً نصياً بسيطاً لحساباتك.', back: 'market',
       body: `<div class="card space-y-3">
-        <div class="font-extrabold text-craft-800"><i class="fa-solid fa-wand-magic-sparkles ml-1"></i> اقترح عليّ أسماء</div>
+        <div class="font-extrabold text-craft-800"><i class="fa-solid fa-lightbulb ml-1"></i> اقترح عليّ أسماء</div>
         ${fInput({ id: 'lg-about', label: 'عمّ تريد أن يعبّر الاسم؟', ph: 'مثال: التراث، الجدة، الصحراء، البساطة' })}
         <button type="button" class="btn btn-soft w-full" data-act="genNames">اقترح 8 أسماء</button>
         <div id="out-names" class="hidden"></div>
@@ -1795,8 +1812,8 @@ ACT.genNames = (btn) => {
   });
 };
 ACT.pickName = (b) => { ROUTES.logo._d.name = b.dataset.name; $('lg-name').value = b.dataset.name; drawLogo(); $('logo-canvas').scrollIntoView({ behavior: 'smooth', block: 'center' }); };
-ACT.saveLogo = async () => { const blob = await new Promise(r => $('logo-canvas').toBlob(r, 'image/png')); track('actions', 'logo'); offerFile(`شعار_${safeName(ROUTES.logo._d.name)}.png`, blob, 'تم حفظ الشعار ✅'); };
-ACT.useLogoName = () => { if (!ROUTES.logo._d.name) { toast('اكتب الاسم.'); return; } S.profile.store = ROUTES.logo._d.name; save(); toast('أصبح هذا اسم متجرك ✅', true); };
+ACT.saveLogo = async () => { const blob = await new Promise(r => $('logo-canvas').toBlob(r, 'image/png')); track('actions', 'logo'); offerFile(`شعار_${safeName(ROUTES.logo._d.name)}.png`, blob, 'تم حفظ الشعار'); };
+ACT.useLogoName = () => { if (!ROUTES.logo._d.name) { toast('اكتب الاسم.'); return; } S.profile.store = ROUTES.logo._d.name; save(); toast('أصبح هذا اسم متجرك', true); };
 
 /* ============================================================
    لوحة صاحب المنصة: الآراء والاستخدام

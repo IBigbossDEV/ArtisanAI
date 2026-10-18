@@ -70,7 +70,7 @@ ROUTES.photographer = {
         <img src="${esc(r.src)}" alt="صورة من المصوّر الذكي" class="w-full rounded-xl border border-craft-100">
         <div class="grid grid-cols-2 gap-2">
           <button type="button" class="btn btn-green btn-sm" data-act="phSave" data-i="${i}"><i class="fa-solid fa-download"></i> احفظ الصورة</button>
-          <button type="button" class="btn btn-soft btn-sm" data-act="phAgain" data-i="${i}"><i class="fa-solid fa-wand-magic-sparkles"></i> عدّل عليها بطلب جديد</button>
+          <button type="button" class="btn btn-soft btn-sm" data-act="phAgain" data-i="${i}"><i class="fa-solid fa-pen"></i> عدّل عليها بطلب جديد</button>
           <button type="button" class="btn btn-soft btn-sm" data-act="phToStudio" data-i="${i}"><i class="fa-solid fa-sliders"></i> أضف اسمك وإطاراً</button>
           ${S.products.length ? `<button type="button" class="btn btn-soft btn-sm" data-act="phToProduct" data-i="${i}"><i class="fa-solid fa-box-open"></i> اجعلها صورة المنتج</button>` : ''}
         </div>
@@ -112,7 +112,7 @@ ROUTES.photographer = {
         <div class="font-extrabold text-craft-800 pt-1">المقاس</div>
         ${segGroup('ph-ratio', [['1:1', 'مربع'], ['4:5', 'طولي'], ['9:16', 'ستوري'], ['16:9', 'عرضي']], PH.ratio, 4)}
       </div>
-      <button type="button" id="ph-go" class="btn btn-main w-full text-lg" data-act="phGenerate"><i class="fa-solid fa-wand-magic-sparkles"></i> ${PH.busy ? 'إيقاف' : 'صوّر منتجي'}</button>
+      <button type="button" id="ph-go" class="btn btn-main w-full text-lg" data-act="phGenerate"><i class="fa-solid fa-camera"></i> ${PH.busy ? 'إيقاف' : 'صوّر منتجي'}</button>
       <button type="button" class="btn btn-soft w-full" data-go="studio"><i class="fa-solid fa-sliders"></i> لديك صورة جاهزة؟ عدّلها بنفسك (المقاس، الإضاءة، الإطار)</button>
       <p class="hint">تُحسب كل صورة من رصيدك، وإذا لم تظهر صورة فلن يُخصم شيء. قد يغيّر المصوّر تفاصيل بسيطة، فتأكد أن المنتج يطابق منتجك قبل النشر.</p>
       <div id="ph-out" class="space-y-3">${PH.busy ? phLoader() : ''}${results}</div>`,
@@ -170,7 +170,7 @@ ACT.phGenerate = async () => {
     const src = await PLAT.generateImage({ file: PH.file, instruction, name, details, ratio, signal: PH.ctl.signal });
     PH.results.unshift({ src, label, name });
     PH.results = PH.results.slice(0, 6);
-    toast('الصورة جاهزة ✅', true);
+    toast('الصورة جاهزة', true);
   } catch (e) {
     const c = e && (e.name === 'AbortError' ? 'cancelled' : e.code);
     if (c === 'cancelled') PLAT.refreshMe(); // الإيقاف بعد بدء العمل قد يُحسب من الرصيد، فنحدّث العدّاد
@@ -192,7 +192,7 @@ ACT.phSave = async (b) => {
   const r = PH.results[b.dataset.i]; if (!r) return;
   const blob = await phBlob(b.dataset.i);
   const ext = blob.type === 'image/jpeg' ? 'jpg' : blob.type === 'image/webp' ? 'webp' : 'png';
-  offerFile(`${safeName(r.name || S.profile.store || 'منتجي')}_المصوّر_الذكي.${ext}`, blob, 'تم حفظ الصورة ✅');
+  offerFile(`${safeName(r.name || S.profile.store || 'منتجي')}_المصوّر_الذكي.${ext}`, blob, 'تم حفظ الصورة');
 };
 ACT.phToStudio = async (b) => {
   const r = PH.results[b.dataset.i]; if (!r) return;
@@ -209,7 +209,7 @@ ACT.phToProduct = (b) => {
     const c = document.createElement('canvas'); c.width = img.naturalWidth; c.height = img.naturalHeight;
     c.getContext('2d').drawImage(img, 0, 0);
     p.photo = thumbFromCanvas(c); save();
-    toast(`أصبحت صورة "${p.name || 'المنتج'}" ✅`, true);
+    toast(`أصبحت صورة "${p.name || 'المنتج'}"`, true);
   };
   img.src = r.src;
 };
