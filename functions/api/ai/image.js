@@ -79,6 +79,7 @@ export async function onRequestPost({ request, env, waitUntil }) {
   if (!upstream.ok) {
     await refund();
     logAi(env, waitUntil, { user_id: user.id, kind: 'image', model, ok: false });
+    console.log('gemini image error', upstream.status, text.slice(0, 400));
     return fail(upstream.status === 429 ? 'rate_limited' : 'upstream_error', upstream.status === 429 ? 429 : 502);
   }
 

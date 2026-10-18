@@ -1,6 +1,7 @@
 // لوحة صاحب المنصة (نسخة الجمعية): الأرقام، الحرفيين، والحدود الشهرية. لا توجد مدفوعات.
 // مسموحة فقط للإيميلات المكتوبة في ADMIN_EMAILS.
 import { json, fail, db, getUser, isAdmin, readJson, getPlans, missingEnv, authAdmin } from './_lib.js';
+import { checkText, checkImageModel, tryImage } from './_health.js';
 
 const int = (v, min, max) => { const n = Math.round(Number(v)); return Number.isFinite(n) && n >= min && n <= max ? n : null; };
 const PAGE_KEYS = ['terms', 'privacy', 'contact'];
@@ -31,6 +32,14 @@ export async function onRequestGet({ request, env }) {
     const q = (url.searchParams.get('q') || '').slice(0, 80).replace(/[%_,()]/g, '');
     return json({ users: await d.rpc('admin_users', { p_search: q, p_limit: 300 }) });
   }
+  if (view === 'health') {
+    const need = ['SUPABASE_URL', 'SUPABASE_ANON_KEY', 'SUPABASE_SERVICE_ROLE_KEY', 'GEMINI_API_KEY', 'ADMIN_EMAILS'];
+    const missing = need.filter((k) => !env[k]);
+    let supabase = { ok: true };
+    try { await d.select('app_settings', 'select=key&limit=1'); } catch (e) { supabase = { ok: false, detail: String(e.message || '').slice(0, 200) }; }
+    const [text, image] = await Promise.all([checkText(env), checkImageModel(env)]);
+    return json({ missing, supabase, text, image });
+  }
   return fail('bad_request', 400);
 }
 
@@ -40,6 +49,9 @@ export async function onRequestPost({ request, env }) {
   const { body, error } = await readJson(request, 200 * 1024);
   if (error) return fail('bad_request', 400);
   const uid = /^[0-9a-f-]{36}$/i.test(body.user_id || '') ? body.user_id : null;
+
+  // تجربة توليد صورة فعلية من لوحة المالك (لا تُخصم من رصيد أحد)
+  if (body.action === 'health_image') return json(await tryImage(env));
 
   // حسابات الحرفيين: الجمعية تنشئ الحساب وكلمة المرور (لا يوجد تسجيل ذاتي)
   const passOk = (p) => typeof p === 'string' && p.length >= 8 && p.length <= 72;

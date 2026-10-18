@@ -78,6 +78,7 @@ export async function onRequestPost({ request, env, waitUntil }) {
     await refund();
     const t = await upstream.text().catch(() => '');
     logAi(env, waitUntil, { user_id: user.id, kind: 'chat', model, ok: false });
+    console.log('gemini chat error', upstream.status, t.slice(0, 400));
     let code = 'upstream_error';
     if (upstream.status === 429 || upstream.status === 503) code = 'rate_limited';
     else if (/token|too long|exceeds/i.test(t) && upstream.status === 400) code = 'prompt_too_large';
