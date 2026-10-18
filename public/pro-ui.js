@@ -11,20 +11,25 @@ ROUTES.plan = {
   render() {
     const m = PLAT.me || {};
     return screen({
-      title: 'رصيدي', sub: 'رصيدك من المساعد والمصوّر هذا الشهر.', back: 'more',
+      title: 'رصيدي', sub: m.guest ? 'رصيدك اليومي من المساعد والمصوّر.' : 'رصيدك من المساعد والمصوّر هذا الشهر.', back: 'more',
       body: `<div class="space-y-4">${PLAT.planHtml()}
-        <div class="card space-y-3">
+        ${m.guest ? `<div class="card space-y-3">
+          <div class="font-extrabold text-craft-800"><i class="fa-solid fa-user ml-1"></i> لديك حساب من الجمعية؟</div>
+          <p class="text-gray-600">ادخل به لتحصل على رصيدك الشهري، وتُحفظ بياناتك في حسابك وتصل إليها من أي جهاز.</p>
+          <button type="button" class="btn btn-main w-full" data-act="platLogin"><i class="fa-solid fa-right-to-bracket"></i> تسجيل الدخول</button>
+        </div>` : `<div class="card space-y-3">
           <div class="font-extrabold text-craft-800"><i class="fa-solid fa-user ml-1"></i> حسابي</div>
           <p class="text-gray-700 break-all" dir="ltr" style="text-align:right">${esc(m.email || '')}</p>
           <button type="button" class="btn btn-soft w-full" data-act="platPass"><i class="fa-solid fa-key"></i> تغيير كلمة المرور</button>
           <button type="button" class="btn btn-soft w-full" data-act="platSignOut"><i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج</button>
-        </div>
+        </div>`}
         <nav class="flex flex-wrap justify-center gap-x-4 gap-y-2 text-sm text-craft-600"><a class="underline" href="/terms.html">الشروط والأحكام</a><a class="underline" href="/privacy.html">الخصوصية</a><a class="underline" href="/contact.html">تواصل معنا</a></nav>
       </div>`,
     });
   },
   after() { PLAT.wireBuy($('view')); },
 };
+ACT.platLogin = () => PLAT.showLogin();
 ACT.platPass = () => {
   openModal(`<h2 class="text-lg font-bold text-craft-800 mb-3">تغيير كلمة المرور</h2>
     <label for="pp-1" class="lbl">كلمة المرور الجديدة</label>

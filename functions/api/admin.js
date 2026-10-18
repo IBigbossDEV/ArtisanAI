@@ -3,6 +3,7 @@
 import { json, fail, db, getUser, isAdmin, readJson, getPlans, missingEnv, authAdmin } from './_lib.js';
 import { checkText, checkImageModel, checkOpenAI, tryImage } from './_health.js';
 import { provider, generate, buildPrompt, RATIOS } from './_imagegen.js';
+import { guestOn, guestLimits, GUEST_DEFAULTS } from './_quota.js';
 
 const int = (v, min, max) => { const n = Math.round(Number(v)); return Number.isFinite(n) && n >= min && n <= max ? n : null; };
 const PAGE_KEYS = ['terms', 'privacy', 'contact'];
@@ -27,7 +28,7 @@ export async function onRequestGet({ request, env }) {
       d.rpc('admin_stats'), getPlans(env),
       d.select('app_settings', 'key=eq.pages&select=value').then((r) => (r[0] ? r[0].value : {})),
     ]);
-    return json({ stats, plans, pages });
+    return json({ stats, plans, pages, guestMode: guestOn(env), guestLimits: await guestLimits(env) });
   }
   if (view === 'users') {
     const q = (url.searchParams.get('q') || '').slice(0, 80).replace(/[%_,()]/g, '');
@@ -40,7 +41,9 @@ export async function onRequestGet({ request, env }) {
     let supabase = { ok: true };
     try { await d.select('app_settings', 'select=key&limit=1'); } catch (e) { supabase = { ok: false, detail: String(e.message || '').slice(0, 200) }; }
     const [text, image, openai] = await Promise.all([checkText(env), checkImageModel(env), env.OPENAI_API_KEY ? checkOpenAI(env) : null]);
-    return json({ missing, supabase, text, image, openai, provider: prov });
+    let guest = { on: guestOn(env), ok: true };
+    if (guest.on) { try { await d.rpc('guest_state', { p_dev: 'd:health-check' }); } catch (e) { guest = { on: true, ok: false, detail: String(e.message || '').slice(0, 200) }; } }
+    return json({ missing, supabase, text, image, openai, provider: prov, guest });
   }
   return fail('bad_request', 400);
 }
@@ -132,6 +135,10 @@ export async function onRequestPost({ request, env }) {
     const next = JSON.parse(JSON.stringify(cur));
     for (const tier of ['free', 'pro']) for (const k of ['chat', 'images']) {
       if (p[tier] && p[tier][k] !== undefined) { const v = int(p[tier][k], 0, 100000); if (v === null) return fail('bad_value', 400, { field: `${tier}.${k}` }); next[tier][k] = v; }
+    }
+    if (p.guest) {
+      next.guest = { ...GUEST_DEFAULTS, ...(next.guest || {}) };
+      for (const k of Object.keys(GUEST_DEFAULTS)) if (p.guest[k] !== undefined) { const v = int(p.guest[k], 0, 100000); if (v === null) return fail('bad_value', 400, { field: 'guest.' + k }); next.guest[k] = v; }
     }
     for (const key of Object.keys(next.products || {})) {
       const src = (p.products || {})[key]; if (!src) continue;

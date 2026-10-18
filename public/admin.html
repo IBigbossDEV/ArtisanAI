@@ -256,6 +256,7 @@ const HEALTH_MSG = {
   quota: 'تجاوزت الحد المسموح حالياً. انتظر قليلاً، أو ارفع الحد بتفعيل الفوترة.',
   refused: 'رفض نظام الأمان هذا الطلب. جرّب صورة أو وصفاً آخر.',
   no_image: 'وصل الطلب لكن لم ترجع صورة. جرّب مرة أخرى.',
+  guest_sql: 'جدول الزوار غير موجود في قاعدة البيانات. شغّل ملف supabase/guest.sql في Supabase ← SQL Editor.',
   network: 'تعذّر الوصول إلى الخدمة من السيرفر. جرّب بعد قليل.',
   error: 'خطأ غير متوقع.',
 };
@@ -322,6 +323,7 @@ async function renderHealth() {
         healthRow('إعدادات Cloudflare', { ok: !h.missing.length, code: h.missing.length ? 'error' : 'ok' },
           h.missing.length ? `<div class="text-sm text-red-800">متغيرات ناقصة: <span dir="ltr">${h.missing.map(esc).join(', ')}</span></div>` : '') +
         healthRow('قاعدة البيانات (Supabase)', { ok: h.supabase.ok, code: h.supabase.ok ? 'ok' : 'error', detail: h.supabase.detail }) +
+        (h.guest && h.guest.on ? healthRow('وضع الزوار (بدون تسجيل دخول)', { ok: h.guest.ok, code: h.guest.ok ? 'ok' : 'guest_sql', detail: h.guest.detail }) : '') +
         healthRow('المساعد (مفتاح جيمني)', h.text) +
         healthRow('نموذج صور جيمني', h.image, h.image.ok ? '<div class="text-xs text-gray-500 mt-1">النموذج متاح. للتأكد من الفوترة جرّب توليد صورة بالأسفل.</div>' : '') +
         (h.openai ? healthRow('نموذج صور OpenAI', h.openai, h.openai.ok ? '<div class="text-xs text-gray-500 mt-1">النموذج متاح. للتأكد من الرصيد جرّب توليد صورة بالأسفل.</div>' : '', 'openai')
@@ -360,6 +362,7 @@ async function renderHealth() {
 
 function renderPlans() {
   const p = DATA.plans || { free: {}, pro: {} };
+  const g = Object.assign({ chat: 10, images: 2, dayChat: 300, dayImages: 40 }, DATA.guestLimits || {}, p.guest || {});
   const f = (id, label, v) => `<label class="block"><span class="text-sm font-bold text-gray-700">${label}</span><input class="inp num mt-1" id="${id}" value="${esc(v)}" inputmode="numeric"></label>`;
   $('view').innerHTML = `<div class="grid md:grid-cols-2 gap-3">
     <div class="card space-y-3"><b class="text-craft-800">الرصيد العادي (لكل حرفي شهرياً)</b>
@@ -368,11 +371,16 @@ function renderPlans() {
     <div class="card space-y-3"><b class="text-craft-800">الرصيد الموسّع (لمن تمنحه من "الحرفيون")</b>
       <div class="grid grid-cols-2 gap-2">${f('pro-chat', 'طلبات المساعد', p.pro.chat)}${f('pro-images', 'صور المصوّر', p.pro.images)}</div>
     </div></div>
-    <p class="text-xs text-gray-500 mt-2">التكلفة على مفتاحك في Gemini، فابدأ بأرقام صغيرة وراقب "نظرة عامة".</p>
+    <div class="card space-y-3 mt-3"><b class="text-craft-800">الزوار (بدون حساب)</b>
+      <p class="text-sm ${DATA.guestMode ? 'text-green-800' : 'text-gray-600'}">${DATA.guestMode ? 'وضع الزوار مفعّل: الموقع يفتح بدون تسجيل دخول.' : 'وضع الزوار غير مفعّل: الموقع يطلب تسجيل الدخول. للتفعيل أضف GUEST_MODE = 1 في Cloudflare.'}</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2">${f('g-chat', 'طلبات المساعد يومياً لكل جهاز', g.chat)}${f('g-images', 'صور المصوّر يومياً لكل جهاز', g.images)}${f('g-daychat', 'سقف طلبات المساعد يومياً لكل الزوار', g.dayChat)}${f('g-dayimages', 'سقف الصور يومياً لكل الزوار', g.dayImages)}</div>
+      <p class="hint">السقف اليومي يحمي التكلفة: إذا وصل إليه الزوار توقف المساعد والمصوّر للزوار حتى اليوم التالي، ويبقى للحرفيين المسجّلين.</p>
+    </div>
+    <p class="text-xs text-gray-500 mt-2">التكلفة على مفاتيحك، فابدأ بأرقام صغيرة وراقب "نظرة عامة".</p>
     <button class="btn btn-main mt-3" id="plans-save"><i class="fa-solid fa-floppy-disk"></i> احفظ الحدود</button>`;
   $('plans-save').onclick = async () => {
     const v = (id) => Number($(id).value);
-    const body = { action: 'plans', plans: { free: { chat: v('free-chat'), images: v('free-images') }, pro: { chat: v('pro-chat'), images: v('pro-images') } } };
+    const body = { action: 'plans', plans: { free: { chat: v('free-chat'), images: v('free-images') }, pro: { chat: v('pro-chat'), images: v('pro-images') }, guest: { chat: v('g-chat'), images: v('g-images'), dayChat: v('g-daychat'), dayImages: v('g-dayimages') } } };
     try { const r = await api('/api/admin', body); DATA.plans = r.plans; toast('تم الحفظ ✅'); } catch (e) { toast('قيمة غير صحيحة: ' + (e.code || '')); }
   };
 }

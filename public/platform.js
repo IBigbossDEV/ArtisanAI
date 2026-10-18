@@ -39,12 +39,25 @@
   function codeErr(code, text) { const e = new Error(code); e.code = code; if (text) e.text = text; return e; }
 
   /* ---------- الاتصال بالسيرفر ---------- */
+  // رقم عشوائي لهذا الجهاز (لحساب رصيد الزائر اليومي عند تفعيل وضع الزوار)
+  const GUEST_KEY = 'artisan_guest_id';
+  function guestId() {
+    try {
+      let v = localStorage.getItem(GUEST_KEY);
+      if (!v || !/^[A-Za-z0-9-]{16,64}$/.test(v)) {
+        v = crypto.randomUUID ? crypto.randomUUID() : Array.from(crypto.getRandomValues(new Uint8Array(16)), (b) => b.toString(16).padStart(2, '0')).join('');
+        localStorage.setItem(GUEST_KEY, v);
+      }
+      return v;
+    } catch { return ''; }
+  }
   async function token() {
     const { data } = await PLAT.sb.auth.getSession();
     return data && data.session ? data.session.access_token : '';
   }
   async function api(path, { method = 'GET', body, signal, raw = false } = {}) {
     const headers = { authorization: 'Bearer ' + (await token()) };
+    if (PLAT.guest) { const g = guestId(); if (g) headers['x-guest-id'] = g; }
     if (body !== undefined) headers['content-type'] = 'application/json';
     const res = await fetch(path, { method, headers, body: body !== undefined ? JSON.stringify(body) : undefined, signal });
     if (raw) return res;
@@ -111,7 +124,7 @@
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
       const code = data.error || 'upstream_error';
-      if (code === 'quota_exceeded') { PLAT.showQuota('chat'); throw codeErr('quota_exceeded'); }
+      if (code === 'quota_exceeded') { PLAT.showQuota('chat', data); throw codeErr('quota_exceeded'); }
       if (code === 'session_expired') { await signOut(); }
       throw codeErr(SERVER_TO_APP[code] || code);
     }
@@ -164,7 +177,7 @@
     const res = await api('/api/ai/image', { method: 'POST', body: { image, instruction, scene, custom, name, details, ratio }, signal, raw: true });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
-      if (data.error === 'quota_exceeded') { PLAT.showQuota('image'); throw codeErr('quota_exceeded'); }
+      if (data.error === 'quota_exceeded') { PLAT.showQuota('image', data); throw codeErr('quota_exceeded'); }
       if (data.error === 'session_expired') await signOut();
       throw codeErr(data.error || 'upstream_error');
     }
@@ -210,12 +223,12 @@
     async use(name) {
       await PLAT.ready;
       if (name === 'sample') return sample;
-      if (name === 'db') return dbCap;
+      if (name === 'db') return PLAT.guest ? null : dbCap; // الزائر: بياناته في جهازه فقط
       if (name === 'downloads') return downloads;
       if (name === 'user') return {
         isOwner: async () => !!(PLAT.me && PLAT.me.isAdmin),
         id: async () => (PLAT.me ? PLAT.me.id : null),
-        can: async () => true,
+        can: async () => !PLAT.guest,
       };
       return null;
     },
@@ -264,7 +277,7 @@
   }
 
   /* ---------- شاشة الدخول ---------- */
-  function showLogin(msg) {
+  function showLogin(msg, closable) {
     const old = document.getElementById('plat-login'); if (old) old.remove();
     const c = PLAT.config || {};
     const wrap = el(`<div id="plat-login" class="plat-full" dir="rtl" lang="ar">
@@ -292,11 +305,13 @@
           <button type="button" class="block mx-auto text-sm underline text-craft-600" id="plat-forgot">نسيت كلمة المرور؟</button>
           <p class="hint hidden" id="plat-forgot-msg">تواصل مع الجمعية، وستعطيك كلمة مرور جديدة.</p>
         </form>
+        ${closable ? '<button type="button" class="btn btn-soft w-full mt-3" id="plat-guest-back">متابعة بدون حساب</button>' : ''}
         <p class="text-xs text-gray-500 mt-5 text-center leading-relaxed">بدخولك توافق على <a class="underline" href="/terms.html">الشروط والأحكام</a> و<a class="underline" href="/privacy.html">سياسة الخصوصية</a>.</p>
       </div></div>`);
     document.body.appendChild(wrap);
 
     const passForm = wrap.querySelector('#plat-pass-form'), passIn = wrap.querySelector('#plat-pass');
+    const back = wrap.querySelector('#plat-guest-back'); if (back) back.addEventListener('click', () => wrap.remove());
     wrap.querySelector('#plat-pass-eye').addEventListener('click', (e) => {
       const show = passIn.type === 'password';
       passIn.type = show ? 'text' : 'password';
@@ -312,7 +327,11 @@
       const btn = wrap.querySelector('#plat-pass-btn'); btn.disabled = true; btn.textContent = 'لحظة…';
       const { error } = await PLAT.sb.auth.signInWithPassword({ email, password });
       // جلسة واحدة لكل حساب: الدخول من هذا الجهاز يُخرج الأجهزة الأخرى
-      if (!error) { try { await PLAT.sb.auth.signOut({ scope: 'others' }); } catch {} }
+      if (!error) {
+        PLAT.loggingIn = true;
+        try { await PLAT.sb.auth.signOut({ scope: 'others' }); } catch {}
+        if (PLAT.guest) { location.reload(); return; } // كان زائراً: نعيد التحميل لربط بياناته بحسابه
+      }
       btn.disabled = false; btn.textContent = 'دخول';
       if (error) {
         const why = `${error.code || ''} ${error.message || ''}`;
@@ -330,6 +349,7 @@
   let leaving = false; // true عند ضغط الحرفي على "خروج" بنفسه
   const markKicked = () => { try { sessionStorage.setItem('plat_kicked', '1'); } catch {} };
   async function signOut({ wipe = false } = {}) {
+    if (PLAT.guest) { location.replace('/'); return; }
     // خروج غير مقصود (انتهت الجلسة أو فُتح الحساب من جهاز آخر): نعرض سبباً عند الرجوع لشاشة الدخول
     if (wipe) leaving = true; else markKicked();
     try { await PLAT.sb.auth.signOut(wipe ? undefined : { scope: 'local' }); } catch {}
@@ -339,13 +359,29 @@
     location.replace('/');
   }
   PLAT.signOut = signOut;
+  PLAT.showLogin = (msg) => showLogin(msg || '', !!PLAT.guest);
 
   /* ---------- نافذة الاشتراك والدفع ---------- */
   const products = () => ((PLAT.config && PLAT.config.plans && PLAT.config.plans.products) || {});
   const limits = (tier) => ((PLAT.config && PLAT.config.plans && PLAT.config.plans[tier]) || {});
 
-  PLAT.showQuota = (kind) => {
+  PLAT.showQuota = (kind, info) => {
     const m = PLAT.me || {};
+    if (m.guest || (info && info.guest)) {
+      const what = kind === 'image' ? 'صور المصوّر' : 'طلبات المساعد';
+      const all = info && info.reason === 'global';
+      openLayer(`
+      <div class="text-center space-y-3">
+        <div class="mx-auto w-14 h-14 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-2xl"><i class="fa-solid fa-hourglass-end"></i></div>
+        <h2 class="text-xl font-extrabold text-craft-800">${all ? `وصل الموقع إلى الحد اليومي من ${what}` : `انتهت ${what} المجانية لهذا اليوم`}</h2>
+        <p class="text-gray-600 leading-relaxed">${all ? 'الحد يخص الزوار، ويتجدد غداً.' : 'يتجدد رصيدك غداً.'} بقية الأدوات تعمل كالمعتاد.</p>
+        <p class="text-gray-600 leading-relaxed">إذا كان لديك حساب من الجمعية فادخل به لتحصل على رصيدك الشهري.</p>
+        <button type="button" class="btn btn-main w-full" id="plat-q-login">تسجيل الدخول</button>
+        <button type="button" class="btn btn-soft w-full" data-plat-close>حسناً</button>
+      </div>`);
+      const b = document.getElementById('plat-q-login'); if (b) b.onclick = () => { closeLayer(); PLAT.showLogin(); };
+      return;
+    }
     const isPro = m.plan === 'pro';
     const what = kind === 'image' ? 'الصور' : 'طلبات المساعد';
     const end = m.cycleEnd ? dayFmt(m.cycleEnd) : '';
@@ -367,6 +403,13 @@
 
   PLAT.planHtml = () => {
     const m = PLAT.me || { plan: 'free', chat: { used: 0, limit: 0 }, images: { used: 0, limit: 0, extra: 0 } };
+    if (m.guest) return `
+      <div class="card space-y-3">
+        <div><div class="text-sm text-gray-500">أنت تستخدم المنصة كزائر</div><div class="text-xl font-extrabold text-craft-800"><i class="fa-solid fa-hand-holding-heart text-craft-500 ml-1"></i> رصيد يومي مجاني</div></div>
+        ${usageRow('طلبات المساعد اليوم', m.chat.used, m.chat.limit)}
+        ${usageRow('صور المصوّر اليوم', m.images.used, m.images.limit)}
+        <p class="hint">يتجدد الرصيد كل يوم. بياناتك محفوظة في هذا الجهاز فقط.</p>
+      </div>`;
     return `
       <div class="card space-y-3">
         <div><div class="text-sm text-gray-500">خطتك</div><div class="text-xl font-extrabold text-craft-800"><i class="fa-solid fa-hand-holding-heart text-craft-500 ml-1"></i> مجانية للحرفيين والأسر المنتجة</div></div>
@@ -424,6 +467,15 @@
     });
 
     let started = false;
+    // وضع الزوار: الموقع يعمل بدون حساب، والبيانات في الجهاز فقط
+    const startGuest = async () => {
+      if (started) return;
+      started = true; PLAT.guest = true;
+      await refreshMe();
+      if (!PLAT.me) PLAT.me = { guest: true, plan: 'free', chat: { used: 0, limit: 0 }, images: { used: 0, limit: 0, extra: 0 } };
+      PLAT.emit();
+      resolveReady();
+    };
     const start = async (session) => {
       if (started || !session) return;
       started = true;
@@ -444,11 +496,13 @@
     };
 
     PLAT.sb.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && PLAT.guest && session) { if (!PLAT.loggingIn) location.reload(); return; }
       if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') start(session);
       if (event === 'SIGNED_OUT' && started) { if (!leaving) markKicked(); location.replace('/'); }
     });
     const { data } = await PLAT.sb.auth.getSession();
     if (data && data.session) start(data.session);
+    else if (PLAT.config.guestMode) { try { sessionStorage.removeItem('plat_kicked'); } catch {} startGuest(); }
     else if (!/[?&]code=/.test(location.search)) {
       let kicked = false; try { kicked = sessionStorage.getItem('plat_kicked') === '1'; sessionStorage.removeItem('plat_kicked'); } catch {}
       showLogin(kicked ? 'خرجت من هذا الجهاز لأن الحساب فُتح من جهاز آخر، أو لأن الجلسة انتهت. الحساب شخصي ولا يُشارك مع أحد.' : '');

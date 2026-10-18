@@ -1,11 +1,14 @@
 // حالة حساب الحرفي: خطته ورصيده هذا الشهر
-import { json, fail, db, getUser, isAdmin, missingEnv } from './_lib.js';
+import { json, fail, db, isAdmin, missingEnv } from './_lib.js';
+import { identify, guestState } from './_quota.js';
 
 export async function onRequestGet({ request, env }) {
   const miss = missingEnv(env, ['SUPABASE_URL', 'SUPABASE_ANON_KEY', 'SUPABASE_SERVICE_ROLE_KEY']);
   if (miss) return miss;
-  const user = await getUser(request, env);
-  if (!user) return fail('session_expired', 401);
+  const who = await identify(request, env);
+  if (!who) return fail('session_expired', 401);
+  if (who.guest) return json(await guestState(env, who));
+  const user = who.user;
   const d = db(env);
   const rows = await d.rpc('plan_state', { p_user: user.id });
   const payments = [];

@@ -1,6 +1,7 @@
 // المساعد: يمرر الطلب لـ Gemini بمفتاح السيرفر بعد خصم طلب من رصيد الحرفي.
 // يحوّل بث Gemini إلى نفس صيغة الأحداث التي تقرؤها الواجهة (content_block_delta / message_delta).
-import { fail, db, getUser, readJson, logAi, missingEnv } from '../_lib.js';
+import { fail, readJson, logAi, missingEnv } from '../_lib.js';
+import { identify, consume } from '../_quota.js';
 
 const MAX_BODY = 4 * 1024 * 1024;   // يكفي صورة مصغّرة مع المحادثة
 const MAX_CHARS = 90000;            // حد مجموع النص في الطلب الواحد
@@ -30,8 +31,9 @@ function normalize(messages) {
 export async function onRequestPost({ request, env, waitUntil }) {
   const miss = missingEnv(env, ['SUPABASE_URL', 'SUPABASE_ANON_KEY', 'SUPABASE_SERVICE_ROLE_KEY', 'GEMINI_API_KEY']);
   if (miss) return miss;
-  const user = await getUser(request, env);
-  if (!user) return fail('session_expired', 401);
+  const who = await identify(request, env);
+  if (!who) return fail('session_expired', 401);
+  const uid = who.user ? who.user.id : null;
 
   const { body, error } = await readJson(request, MAX_BODY);
   if (error) return fail(error === 'too_large' ? 'prompt_too_large' : 'bad_request', 400);
@@ -48,9 +50,10 @@ export async function onRequestPost({ request, env, waitUntil }) {
   }
 
   // خصم طلب من الرصيد قبل الإرسال
-  const q = await db(env).rpc('consume_quota', { p_user: user.id, p_kind: 'chat' });
-  if (!q || !q.ok) return fail('quota_exceeded', 402, { kind: 'chat', plan: q && q.plan });
-  const refund = () => db(env).rpc('refund_quota', { p_user: user.id, p_kind: 'chat', p_source: q.source, p_cycle: q.cycle }).catch(() => {});
+  const q = await consume(env, who, 'chat');
+  if (q.setup) return fail('not_configured', 500);
+  if (!q.ok) return fail('quota_exceeded', 402, { kind: 'chat', plan: q.plan, guest: !!q.guest, reason: q.reason });
+  const refund = q.refund;
 
   const contents = turns.map((t) => ({ role: t.role === 'assistant' ? 'model' : 'user', parts: [{ text: t.text }] }));
   if (image) contents[contents.length - 1].parts.unshift(image);
@@ -77,7 +80,7 @@ export async function onRequestPost({ request, env, waitUntil }) {
   if (!upstream.ok) {
     await refund();
     const t = await upstream.text().catch(() => '');
-    logAi(env, waitUntil, { user_id: user.id, kind: 'chat', model, ok: false });
+    logAi(env, waitUntil, { user_id: uid, kind: 'chat', model, ok: false });
     console.log('gemini chat error', upstream.status, t.slice(0, 400));
     let code = 'upstream_error';
     if (upstream.status === 429 || upstream.status === 503) code = 'rate_limited';
@@ -116,7 +119,7 @@ export async function onRequestPost({ request, env, waitUntil }) {
       if (buf.trim()) handle(ctl, buf.trim());
       out(ctl, { type: 'message_delta', delta: { stop_reason: stop || 'end_turn' } });
       if (!sent) refund(); // لم يصل أي نص: لا يُخصم الطلب
-      logAi(env, waitUntil, { user_id: user.id, kind: 'chat', model, input_tokens: input, output_tokens: output, ok: sent });
+      logAi(env, waitUntil, { user_id: uid, kind: 'chat', model, input_tokens: input, output_tokens: output, ok: sent });
     },
   });
 

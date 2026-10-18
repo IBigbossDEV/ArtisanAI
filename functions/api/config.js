@@ -12,6 +12,7 @@ export async function onRequestGet({ env }) {
     edition: 'association',
     appleLogin: env.ENABLE_APPLE_LOGIN === '1',
     googleLogin: env.ENABLE_GOOGLE_LOGIN !== '0',
+    guestMode: env.GUEST_MODE === '1',
     plans,
   }, 200, { 'cache-control': 'public, max-age=60' });
 }
