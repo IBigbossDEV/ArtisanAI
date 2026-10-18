@@ -54,7 +54,7 @@ const PH_IDEAS = [
 ];
 
 function phSetFile(file, url) {
-  if (PH.url && PH.url.startsWith('blob:') && PH.url !== url) URL.revokeObjectURL(PH.url);
+  if (PH.url && PH.url.startsWith('blob:') && PH.url !== url && PH.url !== st.url) URL.revokeObjectURL(PH.url); // لا نلغي صورة ما زالت في "تعديل الصور"
   PH.file = file; PH.url = url;
 }
 

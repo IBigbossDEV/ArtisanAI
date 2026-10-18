@@ -135,7 +135,7 @@
   <nav class="fixed bottom-0 inset-x-0 z-40 bg-white border-t border-craft-200 shadow-[0_-4px_16px_rgba(0,0,0,0.06)]" style="padding-bottom: env(safe-area-inset-bottom, 0px)" aria-label="الأقسام">
     <div class="max-w-3xl mx-auto flex">
       <button type="button" class="nav-item" data-go="home" data-nav="home"><span class="nav-pill"><i class="fa-solid fa-house"></i></span>الرئيسية</button>
-      <button type="button" class="nav-item" data-go="products" data-nav="products"><span class="nav-pill"><i class="fa-solid fa-box-open"></i></span>منتجاتي</button>
+      <button type="button" class="nav-item" data-go="products" data-nav="products"><span class="nav-pill"><i class="fa-solid fa-tags"></i></span>التسعير</button>
       <button type="button" class="nav-item" data-go="chat" data-nav="chat"><span class="nav-pill"><i class="fa-solid fa-comments"></i></span>المساعد</button>
       <button type="button" class="nav-item" data-go="photographer" data-nav="photographer"><span class="nav-pill"><i class="fa-solid fa-wand-magic-sparkles"></i></span>المصوّر</button>
       <button type="button" class="nav-item" data-go="market" data-nav="market"><span class="nav-pill"><i class="fa-solid fa-bullhorn"></i></span>التسويق</button>
@@ -264,6 +264,8 @@ function newProduct(init = {}) {
     competitors: [], tiers: { shop: 20, bulk: 30, bulkMin: 20 }, createdAt: Date.now(),
   }, init);
 }
+/* يكمّل الحقول الناقصة في المنتجات القديمة حتى لا تتعطل الشاشات */
+const fixProducts = (list) => (Array.isArray(list) ? list : []).filter(p => p && typeof p === 'object').map(p => newProduct(Object.assign({}, p, { tiers: Object.assign({ shop: 20, bulk: 30, bulkMin: 20 }, p.tiers), timer: p.timer && Array.isArray(p.timer.sessions) ? p.timer : { sessions: [], running: null, pieces: 0 }, matList: Array.isArray(p.matList) ? p.matList : [], competitors: Array.isArray(p.competitors) ? p.competitors : [] })));
 function migrateV1() {
   const st = DEFAULT_STATE();
   try {
@@ -278,7 +280,7 @@ function migrateV1() {
 function loadState() {
   try {
     const d = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
-    if (d && d.v === 2) { const st = Object.assign(DEFAULT_STATE(), d); st.profile = Object.assign(DEFAULT_STATE().profile, d.profile); st.settings = Object.assign(DEFAULT_STATE().settings, d.settings); return st; }
+    if (d && d.v === 2) { const st = Object.assign(DEFAULT_STATE(), d); st.profile = Object.assign(DEFAULT_STATE().profile, d.profile); st.settings = Object.assign(DEFAULT_STATE().settings, d.settings); st.products = fixProducts(st.products); return st; }
   } catch {}
   return migrateV1();
 }
@@ -338,6 +340,7 @@ async function initAccount() {
       const st = Object.assign(DEFAULT_STATE(), remote);
       st.profile = Object.assign(DEFAULT_STATE().profile, remote.profile);
       st.settings = Object.assign(DEFAULT_STATE().settings, remote.settings);
+      st.products = fixProducts(st.products);
       st.products.forEach(p => { const ph = docs['photo-' + p.id]; p.photo = ph && ph.data ? ph.data : ''; ACC.sentPhotos[p.id] = photoSig(p.photo); });
       S = st; saveLocal(); applyScale(); rerender();
     } else {
@@ -571,13 +574,19 @@ const ROUTES = {};
 let CUR = { name: 'home', params: {} };
 function screen({ title, sub = '', back = '', body = '' }) {
   return `<div class="fade-in space-y-4">
-    ${back ? `<button type="button" data-go="${back}" class="btn btn-soft btn-sm"><i class="fa-solid fa-arrow-right"></i> رجوع</button>` : ''}
+    ${back ? `<button type="button" data-act="goBack" data-fallback="${back}" class="btn btn-soft btn-sm"><i class="fa-solid fa-arrow-right"></i> رجوع</button>` : ''}
     <div><h1 class="text-2xl font-extrabold text-craft-800 leading-snug" style="text-wrap:balance">${title}</h1>${sub ? `<p class="text-gray-600 mt-1 leading-relaxed">${sub}</p>` : ''}</div>
     ${body}
   </div>`;
 }
-function go(name, params = {}) {
+/* سجل التنقل: زر "رجوع" يعيدك إلى الصفحة التي جئت منها فعلاً */
+let HISTORY = [];
+const sameRoute = (a, b) => a.name === b.name && JSON.stringify(a.params || {}) === JSON.stringify(b.params || {});
+function go(name, params = {}, opts = {}) {
   if (!ROUTES[name]) name = 'home';
+  if (opts.reset) HISTORY = [];
+  else if (!opts.replace && !opts.back && CUR.name && !sameRoute(CUR, { name, params })) { HISTORY.push(CUR); if (HISTORY.length > 30) HISTORY.shift(); }
+  if (name === 'home') HISTORY = [];
   if (name !== 'home' && !S.settings.onboarded && name !== 'onboard') { /* يسمح بالتصفح قبل التعريف */ }
   CUR = { name, params };
   $('price-bar').classList.add('hidden'); $('view').classList.remove('with-bar');
@@ -596,13 +605,20 @@ function rerender() { go(CUR.name, CUR.params); }
 const ACT = {};
 document.addEventListener('click', e => {
   const g = e.target.closest('[data-go]');
-  if (g) { e.preventDefault(); let p = {}; try { p = g.dataset.p ? JSON.parse(g.dataset.p) : {}; } catch {} go(g.dataset.go, p); return; }
+  if (g) { e.preventDefault(); let p = {}; try { p = g.dataset.p ? JSON.parse(g.dataset.p) : {}; } catch {} go(g.dataset.go, p, { reset: g.classList.contains('nav-item') }); return; }
   const s = e.target.closest('[data-seg]');
   if (s) { const grp = s.closest('[data-seg-group]'); grp.dataset.value = s.dataset.seg; grp.querySelectorAll('[data-seg]').forEach(b => { const on = b === s; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); }); grp.dispatchEvent(new CustomEvent('segchange', { bubbles: true, detail: { id: grp.dataset.segGroup, value: s.dataset.seg } })); }
   const a = e.target.closest('[data-act]');
   if (a && ACT[a.dataset.act]) ACT[a.dataset.act](a, e);
 });
 ACT.closeModal = closeModal;
+ACT.goBack = (b) => {
+  while (HISTORY.length) {
+    const prev = HISTORY.pop();
+    if (ROUTES[prev.name] && !(prev.params && prev.params.id && /^(product|savedText)$/.test(prev.name) && !(prev.name === 'product' ? prodById(prev.params.id) : S.texts.find(t => t.id === prev.params.id)))) { go(prev.name, prev.params, { back: true }); return; }
+  }
+  go((b && b.dataset.fallback) || 'home', {}, { back: true });
+};
 document.addEventListener('segchange', e => { const r = ROUTES[CUR.name]; if (r && r.onSeg) r.onSeg(e.detail, CUR.params); });
 const goP = (name, params) => `data-go="${name}" data-p='${esc(JSON.stringify(params))}'`;
 
@@ -679,7 +695,7 @@ ROUTES.products = {
     }).join('');
     const tot = S.products.reduce((a, p) => a + computeRow(p).realMargin, 0);
     return screen({
-      title: 'منتجاتي', sub: 'لكل منتج بطاقة فيها تكاليفه وسعره. اضغط على المنتج لتعديله.',
+      title: 'تسعير منتجاتي', sub: 'لكل منتج تكاليفه وسعره وربحك منه. اضغط على المنتج لتعديله.',
       body: `
       <button type="button" class="btn btn-main w-full text-lg" data-act="newProduct"><i class="fa-solid fa-plus"></i> أضف منتجاً جديداً</button>
       ${S.products.length ? `
@@ -862,14 +878,14 @@ function updateProductResult(p) {
   const row = (l, v, cls = '') => `<div class="flex justify-between items-center p-3 ${cls}"><span class="text-gray-600">${l}</span><span class="font-bold num whitespace-nowrap">${v}</span></div>`;
   out.innerHTML = `
     <div class="card p-0 divide-y divide-gray-100">
-      ${row('تكلفة صنع القطعة <span class="text-gray-400 text-sm">(مواد + جهدك + إيجار وكهرباء)</span>', money(r.production))}
+      ${row('تكلفة صنع القطعة <span class="text-gray-500 text-sm">(مواد + جهدك + إيجار وكهرباء)</span>', money(r.production))}
       ${r.shipIn && r.shipping ? row('الشحن', money(r.shipping)) : ''}
       ${row('<b class="text-gray-800">كل التكاليف</b>', money(r.totalCost), 'bg-gray-50')}
       ${r.artValue ? row('قيمة فنية (قطعة فريدة)', money(r.artValue)) : ''}
       ${row('ربحك', `<span class="text-green-700">${money(r.profitValue)}</span>`)}
       ${r.fee ? row('نصيب المتجر أو الدفع', money(r.feeValue)) : ''}
       ${r.vatRate ? row('سعرك قبل الضريبة', money(r.sellingPrice), 'bg-gray-50') : ''}
-      ${r.vatRate ? row(`ضريبة القيمة المضافة ${r.vatRate}% <span class="text-gray-400 text-sm">(تدفعها للهيئة، وليست لك)</span>`, money(r.vatValue)) : ''}
+      ${r.vatRate ? row(`ضريبة القيمة المضافة ${r.vatRate}% <span class="text-gray-500 text-sm">(تدفعها للهيئة، وليست لك)</span>`, money(r.vatValue)) : ''}
     </div>
     <div class="bg-craft-700 text-white rounded-2xl p-4">
       <div class="flex justify-between items-center gap-2"><span class="font-bold">${r.vatRate ? 'سعر البيع شامل الضريبة' : 'سعر بيع القطعة'}</span><span class="text-2xl font-extrabold num">${r.sellingPrice ? money(r.finalPrice) : '—'}</span></div>
@@ -993,7 +1009,7 @@ ACT.askDelete = (b) => {
   $('del-zone').innerHTML = `<div class="card border-red-200 bg-red-50 space-y-2"><p class="font-bold text-red-800">هل أنت متأكد من حذف المنتج؟ لا يمكن استرجاعه.</p><div class="grid grid-cols-2 gap-2"><button type="button" class="btn bg-red-600 text-white" data-act="doDelete" data-id="${b.dataset.id}">نعم، احذفه</button><button type="button" class="btn btn-soft" data-act="cancelDelete" data-id="${b.dataset.id}">لا، أبقِه</button></div></div>`;
 };
 ACT.cancelDelete = (b) => { $('del-zone').innerHTML = `<button type="button" class="btn w-full text-red-700 hover:bg-red-50" data-act="askDelete" data-id="${b.dataset.id}"><i class="fa-solid fa-trash"></i> احذف المنتج</button>`; };
-ACT.doDelete = (b) => { S.products = S.products.filter(p => p.id !== b.dataset.id); save(); toast('تم حذف المنتج', true); go('products'); };
+ACT.doDelete = (b) => { S.products = S.products.filter(p => p.id !== b.dataset.id); save(); toast('تم حذف المنتج', true); go('products', {}, { replace: true }); };
 
 /* تصغير صورة إلى صورة مصغّرة محفوظة */
 function thumbFromFile(file, max = 480, quality = 0.8) {
@@ -1030,7 +1046,7 @@ ROUTES.savedText = {
   },
   after({ id }) { const t = S.texts.find(x => x.id === id); if (t) $('st-actions').appendChild(outActions(t.text, { kind: t.kind, saveable: false })); },
 };
-ACT.delText = (b) => { S.texts = S.texts.filter(t => t.id !== b.dataset.id); save(); go('savedTexts'); };
+ACT.delText = (b) => { S.texts = S.texts.filter(t => t.id !== b.dataset.id); save(); go('savedTexts', {}, { replace: true }); };
 
 /* ============================================================
    الرئيسية والتعريف والمزيد والإعدادات
@@ -1056,7 +1072,8 @@ ROUTES.home = {
       </div>
       <h2 class="text-xl font-extrabold text-craft-800">ماذا تريد أن تفعل اليوم؟</h2>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <button type="button" class="big-action" data-act="${S.products.length ? 'goProducts' : 'newProduct'}"><span class="ic bg-amber-100 text-amber-700"><i class="fa-solid fa-coins"></i></span><span>تسعير منتج<span class="block text-sm font-medium text-gray-500">بكم أبيع؟ وكم ربحي؟</span></span></button>
+        <button type="button" class="big-action" data-act="newProduct"><span class="ic bg-amber-100 text-amber-700"><i class="fa-solid fa-coins"></i></span><span>تسعير قطعة جديدة<span class="block text-sm font-medium text-gray-500">بكم أبيع؟ وكم ربحي؟</span></span></button>
+        ${S.products.length ? `<button type="button" class="big-action" data-go="products"><span class="ic bg-amber-100 text-amber-700"><i class="fa-solid fa-tags"></i></span><span>أسعار منتجاتي<span class="block text-sm font-medium text-gray-500">${(n => n === 1 ? 'منتج واحد، وسعره وربحك منه' : n === 2 ? 'منتجان، وأسعارهما وربحك منهما' : `${n} ${n <= 10 ? 'منتجات' : 'منتجاً'}، وأسعارها وربحك منها`)(S.products.length)}</span></span></button>` : ''}
         <button type="button" class="big-action" data-go="description"><span class="ic bg-blue-100 text-blue-700"><i class="fa-solid fa-pen-nib"></i></span><span>كتابة إعلان<span class="block text-sm font-medium text-gray-500">وصف جاهز للنشر</span></span></button>
         <button type="button" class="big-action" data-go="photographer"><span class="ic bg-purple-100 text-purple-700"><i class="fa-solid fa-wand-magic-sparkles"></i></span><span>تصوير منتجي<span class="block text-sm font-medium text-gray-500">صورة إعلانية من صورة جوالك</span></span></button>
         <button type="button" class="big-action" data-go="chat"><span class="ic bg-green-100 text-green-700"><i class="fa-solid fa-comments"></i></span><span>استشارة المساعد<span class="block text-sm font-medium text-gray-500">أي سؤال عن عملك ومشروعك</span></span></button>
@@ -1099,7 +1116,7 @@ ACT.saveProfile = (btn) => {
   Object.assign(S.profile, { name: val('o-name'), craft: val('o-craft'), category: val('o-cat'), region: val('o-region'), store: val('o-store'), whatsapp: val('o-wa'), handle: val('o-handle') });
   S.settings.onboarded = true; save(); queueFeedback();
   toast('تم الحفظ ✅', true);
-  go(btn.dataset.first ? 'home' : 'more');
+  if (btn.dataset.first) go('home'); else ACT.goBack({ dataset: { fallback: 'more' } });
 };
 ACT.skipOnboard = () => { S.settings.onboarded = true; save(); go('home'); };
 
@@ -1171,7 +1188,11 @@ ROUTES.dataPage = {
       try {
         const d = JSON.parse(await f.text());
         if (!d || d.v !== 2) throw 0;
-        S = Object.assign(DEFAULT_STATE(), d); S.updatedAt = Date.now(); save(); applyScale(); toast('تم استرجاع بياناتك ✅', true); go('home');
+        const st = Object.assign(DEFAULT_STATE(), d);
+        st.profile = Object.assign(DEFAULT_STATE().profile, d.profile); st.settings = Object.assign(DEFAULT_STATE().settings, d.settings);
+        ['products', 'texts', 'feedback'].forEach(k => { if (!Array.isArray(st[k])) st[k] = []; });
+        st.products = fixProducts(st.products);
+        S = st; S.updatedAt = Date.now(); save(); applyScale(); toast('تم استرجاع بياناتك ✅', true); go('home', {}, { reset: true });
       } catch { toast('هذا الملف ليس نسخة احتياطية من المنصة.'); }
     });
   },
@@ -1602,7 +1623,7 @@ function drawCaption(ctx, W, H, inset) {
 }
 function loadStudioImage(src, file) {
   const img = new Image();
-  img.onload = () => { if (st.url && st.url.startsWith('blob:') && st.url !== src) URL.revokeObjectURL(st.url); Object.assign(st, { img, url: src, file }); track('actions', 'photo_upload'); if (CUR.name === 'studio') { rerender(); } };
+  img.onload = () => { if (st.url && st.url.startsWith('blob:') && st.url !== src && (typeof PH === 'undefined' || st.url !== PH.url)) URL.revokeObjectURL(st.url); Object.assign(st, { img, url: src, file }); track('actions', 'photo_upload'); if (CUR.name === 'studio') { rerender(); } };
   img.onerror = () => toast('تعذّر فتح الصورة. جرّب صورة أخرى.');
   img.src = src;
 }
