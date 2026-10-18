@@ -1,78 +1,50 @@
-// فحص ربط جيمني من لوحة المالك: يحدد سبب المشكلة بدقة (المفتاح، القيود، النموذج، الفوترة)
-const API = 'https://generativelanguage.googleapis.com/v1beta/models/';
+// فحص الربط من لوحة المالك: يحدد سبب المشكلة بدقة (المفتاح، القيود، النموذج، الفوترة)
+import { geminiCode, openaiCode, geminiImageModel, openaiImageModel, generate } from './_imagegen.js';
+export { geminiCode as classify };
+const GAPI = 'https://generativelanguage.googleapis.com/v1beta/models/';
 export const textModel = (env) => env.GEMINI_TEXT_MODEL || 'gemini-3.8-flash';
-export const imageModel = (env) => env.GEMINI_IMAGE_MODEL || 'gemini-3.1-flash-image';
 
-// يحوّل رد جيمني إلى رمز واضح
-export function classify(status, bodyText) {
-  const t = String(bodyText || '');
-  if (status >= 200 && status < 300) return 'ok';
-  if (/API_KEY_INVALID|API key not valid|API key expired/i.test(t)) return 'bad_key';
-  if (/location is not supported|User location/i.test(t)) return 'region';
-  if (/billing|BILLING/i.test(t) && status !== 429) return 'billing';
-  if (status === 403) return /SERVICE_DISABLED|has not been used|is disabled/i.test(t) ? 'service_disabled' : 'key_restricted';
-  if (status === 404) return 'model_not_found';
-  if (status === 429) return /limit: 0|free_tier|FreeTier/i.test(t) ? 'billing' : 'quota';
-  if (status === 401) return 'bad_key';
-  return 'error';
-}
+const detailOf = (t) => { try { return String(((JSON.parse(t).error) || {}).message || '').slice(0, 300); } catch { return ''; } };
 
-async function call(env, url, init) {
-  if (!env.GEMINI_API_KEY) return { ok: false, code: 'missing_key', status: 0, detail: '' };
+async function call(url, init, codeFn) {
   try {
-    const r = await fetch(url, { ...init, headers: { 'x-goog-api-key': env.GEMINI_API_KEY, 'content-type': 'application/json', ...(init && init.headers) } });
+    const r = await fetch(url, init);
     const t = await r.text().catch(() => '');
-    let detail = '';
-    try { detail = (JSON.parse(t).error || {}).message || ''; } catch {}
-    const code = classify(r.status, t);
-    return { ok: code === 'ok', code, status: r.status, detail: String(detail).slice(0, 300), body: code === 'ok' ? t : '' };
+    if (r.ok) return { ok: true, code: 'ok', status: r.status, detail: '' };
+    return { ok: false, code: codeFn(r.status, t), status: r.status, detail: detailOf(t) };
   } catch (e) {
     return { ok: false, code: 'network', status: 0, detail: String(e && e.message || '').slice(0, 200) };
   }
 }
+const gHead = (env) => ({ 'x-goog-api-key': env.GEMINI_API_KEY, 'content-type': 'application/json' });
 
 // المساعد: طلب نصي صغير جداً
 export async function checkText(env) {
   const model = textModel(env);
-  const r = await call(env, `${API}${encodeURIComponent(model)}:generateContent`, {
-    method: 'POST',
+  if (!env.GEMINI_API_KEY) return { model, ok: false, code: 'missing_key', status: 0, detail: '' };
+  return { model, ...(await call(`${GAPI}${encodeURIComponent(model)}:generateContent`, {
+    method: 'POST', headers: gHead(env),
     body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: 'اكتب كلمة واحدة: تم' }] }], generationConfig: { maxOutputTokens: 64 } }),
-  });
-  delete r.body;
-  return { model, ...r };
+  }, geminiCode)) };
 }
 
-// المصوّر: هل النموذج موجود ومتاح لهذا المفتاح؟ (بدون توليد وبدون تكلفة)
+// نموذج جيمني للصور: موجود ومتاح لهذا المفتاح؟ (بدون توليد وبدون تكلفة)
 export async function checkImageModel(env) {
-  const model = imageModel(env);
-  const r = await call(env, `${API}${encodeURIComponent(model)}`, { method: 'GET' });
-  delete r.body;
-  return { model, ...r };
+  const model = geminiImageModel(env);
+  if (!env.GEMINI_API_KEY) return { model, ok: false, code: 'missing_key', status: 0, detail: '' };
+  return { model, ...(await call(`${GAPI}${encodeURIComponent(model)}`, { method: 'GET', headers: gHead(env) }, geminiCode)) };
 }
 
-// المصوّر: توليد صورة تجريبية فعلية (تكلفة صورة واحدة) للتأكد من الفوترة
-export async function tryImage(env) {
-  const model = imageModel(env);
-  const r = await call(env, `${API}${encodeURIComponent(model)}:generateContent`, {
-    method: 'POST',
-    body: JSON.stringify({
-      contents: [{ role: 'user', parts: [{ text: 'A simple handmade palm-leaf basket on a plain white background, product photo.' }] }],
-      generationConfig: { responseModalities: ['TEXT', 'IMAGE'], imageConfig: { aspectRatio: '1:1' } },
-    }),
-  });
-  if (r.ok) {
-    let img = null;
-    try {
-      const j = JSON.parse(r.body);
-      const parts = (((j.candidates || [])[0] || {}).content || {}).parts || [];
-      const p = parts.find((x) => x.inlineData || x.inline_data);
-      const d = p && (p.inlineData || p.inline_data);
-      if (d && d.data) img = `data:${d.mimeType || d.mime_type || 'image/png'};base64,${d.data}`;
-    } catch {}
-    delete r.body;
-    if (!img) return { model, ok: false, code: 'no_image', status: r.status, detail: '' };
-    return { model, ...r, image: img };
-  }
-  delete r.body;
-  return { model, ...r };
+// نموذج OpenAI للصور (إن وُجد مفتاح): موجود ومتاح؟ (بدون تكلفة)
+export async function checkOpenAI(env) {
+  const model = openaiImageModel(env);
+  if (!env.OPENAI_API_KEY) return { model, ok: false, code: 'missing_key', status: 0, detail: '' };
+  return { model, ...(await call(`https://api.openai.com/v1/models/${encodeURIComponent(model)}`, { method: 'GET', headers: { authorization: `Bearer ${env.OPENAI_API_KEY}` } }, openaiCode)) };
+}
+
+// توليد صورة تجريبية فعلية (تكلفة صورة واحدة) للتأكد من الفوترة
+export async function tryImage(env, p = 'gemini') {
+  const r = await generate(p, env, { prompt: 'A simple handmade palm-leaf basket on a plain white background, product photo.', image: null, ratio: '1:1' });
+  if (r.ok) return { ok: true, code: 'ok', model: r.model, image: `data:${r.mime};base64,${r.data}` };
+  return r;
 }

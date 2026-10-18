@@ -254,13 +254,25 @@ const HEALTH_MSG = {
   model_not_found: 'اسم النموذج غير موجود أو غير متاح لهذا المفتاح. احذف متغير اسم النموذج من Cloudflare إن وُجد، أو أرسل هذه النتيجة للمطوّر.',
   billing: 'الفوترة غير مفعّلة في مشروع المفتاح. فعّلها من aistudio.google.com ← Get API key ← Set up billing.',
   quota: 'تجاوزت الحد المسموح حالياً. انتظر قليلاً، أو ارفع الحد بتفعيل الفوترة.',
+  refused: 'رفض نظام الأمان هذا الطلب. جرّب صورة أو وصفاً آخر.',
   no_image: 'وصل الطلب لكن لم ترجع صورة. جرّب مرة أخرى.',
-  network: 'تعذّر الوصول إلى خوادم قوقل من السيرفر. جرّب بعد قليل.',
+  network: 'تعذّر الوصول إلى الخدمة من السيرفر. جرّب بعد قليل.',
   error: 'خطأ غير متوقع.',
 };
-function healthRow(title, r, extra = '') {
+const OPENAI_MSG = {
+  missing_key: 'مفتاح OpenAI غير موجود. أضف OPENAI_API_KEY في Cloudflare (نوع Secret)، ثم أعد النشر.',
+  bad_key: 'مفتاح OpenAI غير صحيح. أنشئ مفتاحاً جديداً من platform.openai.com ← API keys، وضعه مكان OPENAI_API_KEY في Cloudflare.',
+  key_restricted: 'المفتاح لا يملك صلاحية نماذج الصور. في platform.openai.com ← API keys: اجعل صلاحيات المفتاح All أو فعّل Images.',
+  org_verify: 'حساب OpenAI يحتاج توثيق المنظمة لاستخدام نماذج الصور: platform.openai.com ← Settings ← Organization ← General ← Verify Organization. قد يستغرق التفعيل بعد التوثيق حتى 15 دقيقة.',
+  model_not_found: 'نموذج الصور غير متاح لهذا الحساب. تأكد من توثيق المنظمة، أو احذف OPENAI_IMAGE_MODEL من Cloudflare إن وُجد.',
+  billing: 'لا يوجد رصيد في حساب OpenAI. اشحن رصيداً من platform.openai.com ← Settings ← Billing.',
+  quota: 'تجاوزت حد الطلبات في OpenAI حالياً. انتظر قليلاً ثم أعد المحاولة.',
+};
+const PNAME = { gemini: 'جيمني', openai: 'OpenAI' };
+function healthRow(title, r, extra = '', prov = 'gemini') {
   const ok = r && r.ok;
-  const msg = HEALTH_MSG[(r && r.code) || 'error'] || HEALTH_MSG.error;
+  const code = (r && r.code) || 'error';
+  const msg = (prov === 'openai' && OPENAI_MSG[code]) || HEALTH_MSG[code] || HEALTH_MSG.error;
   return `<div class="flex gap-3 items-start py-3" style="border-top:1px solid #E8DAB9">
     <span class="pill ${ok ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}" style="min-width:3.5rem;text-align:center;align-self:flex-start;flex-shrink:0">${ok ? 'سليم' : 'مشكلة'}</span>
     <div class="flex-1 min-w-0"><div class="font-bold">${title}</div>
@@ -268,35 +280,79 @@ function healthRow(title, r, extra = '') {
       ${!ok && r && (r.status || r.detail) ? `<div class="text-xs text-gray-500 mt-1 break-all" dir="ltr" style="text-align:right">${r.status ? 'HTTP ' + esc(r.status) + ' · ' : ''}${esc(r.detail || '')}</div>` : ''}
       ${extra}</div></div>`;
 }
+// تصغير الصورة قبل الإرسال (أخف وأسرع)
+async function filePayload(file, max = 1536) {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = url; });
+    const k = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
+    const c = document.createElement('canvas'); c.width = Math.round(img.naturalWidth * k); c.height = Math.round(img.naturalHeight * k);
+    const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(img, 0, 0, c.width, c.height);
+    return { media_type: 'image/jpeg', data: c.toDataURL('image/jpeg', 0.9).split(',')[1] };
+  } finally { URL.revokeObjectURL(url); }
+}
+let HEALTH = null;
 async function renderHealth() {
   $('view').innerHTML = `<div class="card space-y-2">
     <div class="flex justify-between items-center gap-2"><b>فحص ربط المنصة</b><button class="btn btn-main" id="h-run">افحص الآن</button></div>
-    <p class="text-sm text-gray-600">يتأكد من إعدادات Cloudflare وقاعدة البيانات ومفتاح جيمني. لا يُخصم من رصيد أحد.</p>
+    <p class="text-sm text-gray-600">يتأكد من إعدادات Cloudflare وقاعدة البيانات ومفاتيح الذكاء الاصطناعي. لا يُخصم من رصيد أحد.</p>
     <div id="h-out"><p class="text-gray-500 text-sm">جارٍ الفحص…</p></div></div>
     <div class="card space-y-2">
       <b>تجربة توليد صورة فعلية</b>
-      <p class="text-sm text-gray-600">يولّد صورة تجريبية واحدة للتأكد من أن المصوّر والفوترة يعملان. تُحسب على مفتاح جيمني كصورة واحدة.</p>
-      <button class="btn btn-soft" id="h-img">جرّب توليد صورة</button>
-      <div id="h-img-out"></div></div>`;
+      <p class="text-sm text-gray-600">يولّد صورة تجريبية واحدة للتأكد من أن المصوّر والفوترة يعملان. تُحسب على المفتاح كصورة واحدة.</p>
+      <div class="flex flex-wrap gap-2"><button class="btn btn-soft" data-try="gemini">جرّب جيمني</button><button class="btn btn-soft" data-try="openai">جرّب OpenAI</button></div>
+      <div id="h-img-out"></div></div>
+    <div class="card space-y-3">
+      <b>قارن بين جيمني وOpenAI على منتج حقيقي</b>
+      <p class="text-sm text-gray-600">ارفع صورة منتج، فيصنع كل نموذج صورة إعلانية بنفس الطلب لتقارن بينهما. كل مقارنة تُحسب صورتين: واحدة على كل مفتاح.</p>
+      <input type="file" id="c-file" accept="image/*" class="inp">
+      <div class="grid sm:grid-cols-2 gap-2">
+        <select id="c-scene" class="inp"><option value="white">خلفية بيضاء</option><option value="majlis">مجلس</option><option value="desert">صحراء</option><option value="mud">جدار طين نجدي</option><option value="modern">بيت حديث</option><option value="gift">هدية</option><option value="palms">نخيل ونباتات</option><option value="marble">رخام</option></select>
+        <select id="c-ratio" class="inp"><option value="1:1">مربع 1:1</option><option value="4:5">إنستغرام 4:5</option><option value="9:16">ستوري 9:16</option></select>
+      </div>
+      <input id="c-wish" class="inp" placeholder="طلب خاص (اختياري)، مثل: على طاولة خشب مع فنجان قهوة">
+      <button class="btn btn-main" id="c-go">قارن</button>
+      <div id="c-out"></div></div>`;
   const run = async () => {
     $('h-out').innerHTML = '<p class="text-gray-500 text-sm">جارٍ الفحص…</p>';
     try {
-      const h = await api('/api/admin?view=health');
+      const h = HEALTH = await api('/api/admin?view=health');
       $('h-out').innerHTML =
+        `<p class="text-sm py-2">المصوّر يستخدم الآن: <b>${PNAME[h.provider] || 'جيمني'}</b> <span class="text-gray-500">(للتبديل: المتغير IMAGE_PROVIDER في Cloudflare = gemini أو openai)</span></p>` +
         healthRow('إعدادات Cloudflare', { ok: !h.missing.length, code: h.missing.length ? 'error' : 'ok' },
           h.missing.length ? `<div class="text-sm text-red-800">متغيرات ناقصة: <span dir="ltr">${h.missing.map(esc).join(', ')}</span></div>` : '') +
         healthRow('قاعدة البيانات (Supabase)', { ok: h.supabase.ok, code: h.supabase.ok ? 'ok' : 'error', detail: h.supabase.detail }) +
         healthRow('المساعد (مفتاح جيمني)', h.text) +
-        healthRow('نموذج المصوّر', h.image, h.image.ok ? '<div class="text-xs text-gray-500 mt-1">النموذج متاح. للتأكد من الفوترة جرّب توليد صورة بالأسفل.</div>' : '');
+        healthRow('نموذج صور جيمني', h.image, h.image.ok ? '<div class="text-xs text-gray-500 mt-1">النموذج متاح. للتأكد من الفوترة جرّب توليد صورة بالأسفل.</div>' : '') +
+        (h.openai ? healthRow('نموذج صور OpenAI', h.openai, h.openai.ok ? '<div class="text-xs text-gray-500 mt-1">النموذج متاح. للتأكد من الرصيد جرّب توليد صورة بالأسفل.</div>' : '', 'openai')
+          : '<p class="text-sm text-gray-500 py-2" style="border-top:1px solid #E8DAB9">OpenAI غير مربوط. للمقارنة أضف OPENAI_API_KEY في Cloudflare (نوع Secret) ثم أعد النشر.</p>');
     } catch (e) { $('h-out').innerHTML = `<p class="text-red-700 text-sm">تعذّر الفحص (${esc(e.code || e.message)}).</p>`; }
   };
   $('h-run').onclick = run;
-  $('h-img').onclick = async () => {
-    const b = $('h-img'); b.disabled = true; $('h-img-out').innerHTML = '<p class="text-gray-500 text-sm">جارٍ التوليد… قد يستغرق دقيقة.</p>';
+  document.querySelectorAll('[data-try]').forEach((b) => b.onclick = async () => {
+    const prov = b.dataset.try;
+    document.querySelectorAll('[data-try]').forEach((x) => x.disabled = true);
+    $('h-img-out').innerHTML = '<p class="text-gray-500 text-sm">جارٍ التوليد… قد يستغرق دقيقة.</p>';
     try {
-      const r = await api('/api/admin', { action: 'health_image' });
-      $('h-img-out').innerHTML = healthRow('المصوّر', r) + (r.image ? `<img src="${r.image}" alt="صورة تجريبية" style="max-width:240px;border-radius:6px;border:1px solid #D9C49C">` : '');
+      const r = await api('/api/admin', { action: 'health_image', provider: prov });
+      $('h-img-out').innerHTML = healthRow('المصوّر عبر ' + PNAME[prov], r, '', prov) + (r.image ? `<img src="${r.image}" alt="صورة تجريبية" style="max-width:240px;border-radius:6px;border:1px solid #D9C49C">` : '');
     } catch (e) { $('h-img-out').innerHTML = `<p class="text-red-700 text-sm">تعذّر الطلب (${esc(e.code || e.message)}).</p>`; }
+    document.querySelectorAll('[data-try]').forEach((x) => x.disabled = false);
+  });
+  $('c-go').onclick = async () => {
+    const f = $('c-file').files && $('c-file').files[0];
+    if (!f) { toast('اختر صورة منتج أولاً'); return; }
+    const b = $('c-go'); b.disabled = true;
+    $('c-out').innerHTML = '<p class="text-gray-500 text-sm">جارٍ صنع الصورتين… قد يستغرق دقيقة أو دقيقتين.</p>';
+    try {
+      const image = await filePayload(f);
+      const r = await api('/api/admin', { action: 'compare_image', image, scene: $('c-scene').value, ratio: $('c-ratio').value, instruction: $('c-wish').value.trim() });
+      const col = (prov, x) => `<div class="space-y-2"><div class="font-bold">${PNAME[prov]} <span class="text-xs text-gray-500" dir="ltr">${esc(x.model || '')}${x.ms ? ' · ' + Math.round(x.ms / 1000) + 's' : ''}</span></div>
+        ${x.ok ? `<img src="${x.image}" alt="نتيجة ${PNAME[prov]}" style="width:100%;border-radius:6px;border:1px solid #D9C49C">` : healthRow('لم تنجح', x, '', prov)}</div>`;
+      const orig = `<div class="space-y-2"><div class="font-bold">الصورة الأصلية</div><img src="data:${image.media_type};base64,${image.data}" alt="الأصلية" style="width:100%;border-radius:6px;border:1px solid #D9C49C"></div>`;
+      $('c-out').innerHTML = `<div class="grid sm:grid-cols-3 gap-3">${orig}${col('gemini', r.gemini)}${col('openai', r.openai)}</div>
+        <p class="text-xs text-gray-500 mt-2">انظر: هل بقي المنتج كما هو (الشكل والألوان والنقوش)؟ وأيهما أجمل وأكثر واقعية؟</p>`;
+    } catch (e) { $('c-out').innerHTML = `<p class="text-red-700 text-sm">تعذّر الطلب (${esc(e.code || e.message)}).</p>`; }
     b.disabled = false;
   };
   run();

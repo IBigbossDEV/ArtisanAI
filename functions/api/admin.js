@@ -1,7 +1,8 @@
 // لوحة صاحب المنصة (نسخة الجمعية): الأرقام، الحرفيين، والحدود الشهرية. لا توجد مدفوعات.
 // مسموحة فقط للإيميلات المكتوبة في ADMIN_EMAILS.
 import { json, fail, db, getUser, isAdmin, readJson, getPlans, missingEnv, authAdmin } from './_lib.js';
-import { checkText, checkImageModel, tryImage } from './_health.js';
+import { checkText, checkImageModel, checkOpenAI, tryImage } from './_health.js';
+import { provider, generate, buildPrompt, RATIOS } from './_imagegen.js';
 
 const int = (v, min, max) => { const n = Math.round(Number(v)); return Number.isFinite(n) && n >= min && n <= max ? n : null; };
 const PAGE_KEYS = ['terms', 'privacy', 'contact'];
@@ -33,12 +34,13 @@ export async function onRequestGet({ request, env }) {
     return json({ users: await d.rpc('admin_users', { p_search: q, p_limit: 300 }) });
   }
   if (view === 'health') {
-    const need = ['SUPABASE_URL', 'SUPABASE_ANON_KEY', 'SUPABASE_SERVICE_ROLE_KEY', 'GEMINI_API_KEY', 'ADMIN_EMAILS'];
+    const prov = provider(env);
+    const need = ['SUPABASE_URL', 'SUPABASE_ANON_KEY', 'SUPABASE_SERVICE_ROLE_KEY', 'GEMINI_API_KEY', 'ADMIN_EMAILS'].concat(prov === 'openai' ? ['OPENAI_API_KEY'] : []);
     const missing = need.filter((k) => !env[k]);
     let supabase = { ok: true };
     try { await d.select('app_settings', 'select=key&limit=1'); } catch (e) { supabase = { ok: false, detail: String(e.message || '').slice(0, 200) }; }
-    const [text, image] = await Promise.all([checkText(env), checkImageModel(env)]);
-    return json({ missing, supabase, text, image });
+    const [text, image, openai] = await Promise.all([checkText(env), checkImageModel(env), env.OPENAI_API_KEY ? checkOpenAI(env) : null]);
+    return json({ missing, supabase, text, image, openai, provider: prov });
   }
   return fail('bad_request', 400);
 }
@@ -46,12 +48,28 @@ export async function onRequestGet({ request, env }) {
 export async function onRequestPost({ request, env }) {
   const g = await guard(request, env); if (g.res) return g.res;
   const d = db(env);
-  const { body, error } = await readJson(request, 200 * 1024);
+  const { body, error } = await readJson(request, 6 * 1024 * 1024); // كبير بسبب صورة المقارنة
   if (error) return fail('bad_request', 400);
   const uid = /^[0-9a-f-]{36}$/i.test(body.user_id || '') ? body.user_id : null;
 
   // تجربة توليد صورة فعلية من لوحة المالك (لا تُخصم من رصيد أحد)
-  if (body.action === 'health_image') return json(await tryImage(env));
+  if (body.action === 'health_image') return json(await tryImage(env, body.provider === 'openai' ? 'openai' : 'gemini'));
+
+  // مقارنة جيمني وOpenAI على صورة منتج حقيقية (لا تُخصم من رصيد أحد، وتُحسب صورتين على المفاتيح)
+  if (body.action === 'compare_image') {
+    const img = body.image;
+    if (!img || typeof img.data !== 'string' || !['image/jpeg', 'image/png', 'image/webp'].includes(img.media_type) || img.data.length > 5_000_000) return fail('image_rejected', 400);
+    const ratio = RATIOS.includes(body.ratio) ? body.ratio : '1:1';
+    const prompt = buildPrompt({ instruction: body.instruction, scene: body.scene, name: body.name });
+    const run = async (p) => {
+      const t0 = Date.now();
+      const r = await generate(p, env, { prompt, image: img, ratio, user: g.user.id });
+      const ms = Date.now() - t0;
+      return r.ok ? { ok: true, model: r.model, ms, image: `data:${r.mime};base64,${r.data}` } : { ...r, ms };
+    };
+    const [gemini, openai] = await Promise.all([run('gemini'), run('openai')]);
+    return json({ gemini, openai });
+  }
 
   // حسابات الحرفيين: الجمعية تنشئ الحساب وكلمة المرور (لا يوجد تسجيل ذاتي)
   const passOk = (p) => typeof p === 'string' && p.length >= 8 && p.length <= 72;
