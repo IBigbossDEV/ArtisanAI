@@ -98,6 +98,8 @@ create table if not exists public.docs (
   primary key (collection, doc_id)
 );
 create index if not exists docs_owner_idx on public.docs (owner);
+-- حجم كل مستند، لنضع حداً لمساحة كل حرفي ولا يمتلئ مخزن الموقع بسبب حساب واحد
+alter table public.docs add column if not exists bytes int generated always as (octet_length(data::text)) stored;
 
 -- ---------- 6) سجل طلبات الذكاء الاصطناعي (للوحة الاستهلاك) ----------
 create table if not exists public.ai_log (
@@ -127,6 +129,18 @@ revoke all on public.app_settings, public.accounts, public.usage_counters,
 -- الدوال (يستدعيها السيرفر فقط)
 -- ============================================================
 
+-- رقم دورة المحترف الحالية (0 = الشهر الأول): آخر "يوم اشتراك" شهري بدأ فعلاً.
+-- (age() وحدها تتأخر يوماً أو أكثر إذا بدأ الاشتراك يوم 29 أو 30 أو 31، فنصحّحها)
+create or replace function public.pro_cycle_index(p_start timestamptz, p_now timestamptz)
+returns int language plpgsql stable set search_path = public as $$
+declare k int;
+begin
+  k := greatest(0, (extract(year from age(p_now, p_start)) * 12 + extract(month from age(p_now, p_start)))::int);
+  while p_start + make_interval(months => k + 1) <= p_now loop k := k + 1; end loop;
+  while k > 0 and p_start + make_interval(months => k) > p_now loop k := k - 1; end loop;
+  return k;
+end $$;
+
 -- حالة خطة الحرفي ودورته الحالية واستهلاكه
 create or replace function public.plan_state(p_user uuid)
 returns table (
@@ -150,11 +164,11 @@ begin
 
   if a.plan = 'pro' and a.period_end > now() then
     plan := 'pro';
-    k := (extract(year from age(now(), a.period_start)) * 12
-        + extract(month from age(now(), a.period_start)))::int;
+    k := public.pro_cycle_index(a.period_start, now());
     cstart := a.period_start + make_interval(months => k);
     cycle := 'p' || to_char(cstart at time zone 'Asia/Riyadh', 'YYYY-MM-DD');
-    cycle_end := least(cstart + interval '1 month', a.period_end);
+    -- نهاية الدورة = بداية الدورة التالية (وليس بداية هذه + شهر، فقد يختلفان آخر الشهر)
+    cycle_end := least(a.period_start + make_interval(months => k + 1), a.period_end);
     chat_limit := (s -> 'pro' ->> 'chat')::int;
     images_limit := (s -> 'pro' ->> 'images')::int;
   else
@@ -301,6 +315,14 @@ begin
   return jsonb_build_object('applied', true);
 end $$;
 
+-- عدد مستندات الحرفي ومجموع حجمها (بدون مستند معيّن نستبدله)
+create or replace function public.docs_usage(p_user uuid, p_collection text, p_except text default '')
+returns jsonb language sql stable security definer set search_path = public as $$
+  select jsonb_build_object('count', count(*), 'bytes', coalesce(sum(bytes), 0))
+    from public.docs
+   where owner = p_user and collection = p_collection and doc_id <> p_except;
+$$;
+
 -- ملخص لوحة المالك
 create or replace function public.admin_stats()
 returns jsonb language plpgsql security definer set search_path = public as $$
@@ -358,6 +380,9 @@ revoke execute on function public.apply_payment(text, uuid, text, int, text, tex
 revoke execute on function public.admin_stats() from public, anon, authenticated;
 revoke execute on function public.admin_users(text, int) from public, anon, authenticated;
 revoke execute on function public.handle_new_user() from public, anon, authenticated;
+revoke execute on function public.docs_usage(uuid, text, text) from public, anon, authenticated;
+revoke execute on function public.pro_cycle_index(timestamptz, timestamptz) from public, anon, authenticated;
+grant execute on function public.docs_usage(uuid, text, text) to service_role;
 
 grant execute on function public.plan_state(uuid) to service_role;
 grant execute on function public.consume_quota(uuid, text) to service_role;

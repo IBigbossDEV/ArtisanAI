@@ -70,13 +70,18 @@ export async function getUser(request, env) {
   const token = h.startsWith('Bearer ') ? h.slice(7).trim() : '';
   if (!token) return null;
   const r = await fetch(`${base(env)}/auth/v1/user`, { headers: { apikey: env.SUPABASE_ANON_KEY, authorization: `Bearer ${token}` } });
-  if (!r.ok) return null;
+  // 401/403 = الجلسة منتهية فعلاً. أي خطأ آخر (تعطل مؤقت في Supabase) لا يعني خروج الحرفي،
+  // فنرمي خطأ يتحول إلى unavailable بدل session_expired حتى لا يُسجَّل خروجه بلا داعٍ.
+  if (r.status === 401 || r.status === 403) return null;
+  if (!r.ok) throw new Error('auth ' + r.status);
   const u = await r.json().catch(() => null);
   return u && u.id ? u : null;
 }
 
 export function isAdmin(env, user) {
   if (!user || !user.email) return false;
+  // لا نعطي صلاحية المالك لبريد لم يتأكد صاحبه منه
+  if (!user.email_confirmed_at && !user.confirmed_at) return false;
   const list = String(env.ADMIN_EMAILS || '').split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
   return list.includes(String(user.email).toLowerCase());
 }
@@ -85,8 +90,9 @@ export function isAdmin(env, user) {
 export async function readJson(request, maxBytes) {
   const len = Number(request.headers.get('content-length') || 0);
   if (len > maxBytes) return { error: 'too_large' };
-  const text = await request.text();
-  if (text.length > maxBytes) return { error: 'too_large' };
+  const buf = await request.arrayBuffer();
+  if (buf.byteLength > maxBytes) return { error: 'too_large' };   // بالبايت (الحرف العربي = 2 بايت)
+  const text = new TextDecoder().decode(buf);
   try { return { body: JSON.parse(text) }; } catch { return { error: 'bad_json' }; }
 }
 

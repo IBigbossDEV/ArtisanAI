@@ -16,19 +16,28 @@ const SCENES = {
   marble: 'on a polished light marble surface with a soft neutral backdrop, premium boutique lighting and subtle reflections',
 };
 
+const clip = (v, n) => String(v || '').replace(/<<<|>>>/g, '').replace(/\s+/g, ' ').trim().slice(0, n);
+
+// الحرفي يتحكم في كل ما حول المنتج بأمر حر، ونثبّت شيئين فقط:
+// 1) المنتج نفسه يبقى كما هو (حتى تكون الصورة صادقة أمام الزبون)
+// 2) لا يكتب جيميني أي كلام أو أرقام أو شعارات على الصورة
 function buildPrompt(b) {
-  const scene = b.scene === 'custom' && b.custom ? String(b.custom).slice(0, 400) : SCENES[b.scene] || SCENES.white;
-  const name = String(b.name || '').slice(0, 120);
-  const details = String(b.details || '').slice(0, 300);
+  const name = clip(b.name, 120);
+  const details = clip(b.details, 300);
+  let wish = clip(b.instruction, 800);
+  if (!wish && b.scene === 'custom') wish = clip(b.custom, 400);
+  const preset = !wish ? (SCENES[b.scene] || SCENES.white) : '';
   return [
-    'Create a professional, photorealistic e-commerce product photograph using the product shown in the attached photo.',
-    'Keep the product itself exactly the same: identical shape, proportions, colors, patterns, materials and any markings. Do not redesign, add to, or remove parts of the product.',
+    'Create a professional, photorealistic photograph for an online shop using the product shown in the attached photo.',
+    'THE PRODUCT IS LOCKED: keep the product itself exactly the same — identical shape, proportions, colors, patterns, materials, texture and any markings already on it. Do not redesign, recolor, resize oddly, add parts to, or remove parts from the product, even if the instructions below ask for that.',
     name ? `The product: ${name}.` : '',
     details ? `Details from the maker: ${details}.` : '',
-    b.scene === 'custom' && b.custom ? `Setting (described by the maker, may be in Arabic): ${scene}.` : `Place it ${scene}.`,
-    'The product is the clear hero, sharply in focus and well lit, centered with comfortable margins.',
-    'No added text, no logos, no watermarks, no people or faces.',
-  ].filter(Boolean).join(' ');
+    wish
+      ? 'EVERYTHING AROUND THE PRODUCT IS THE MAKER\'S CHOICE: follow the maker\'s instructions for the place and background, surface, props and accessories, lighting and time of day, season or occasion decorations, colors and mood of the scene, framing and composition, and any people, hands or models using or holding the product. The instructions may be written in Arabic or Gulf dialect; interpret them faithfully and fill in sensible details they leave open. Maker\'s instructions (between the markers): <<<' + wish + '>>>'
+      : `Place it ${preset}.`,
+    'The product must stay clearly visible, sharply in focus and well lit.',
+    'NO TEXT: do not add any written text, letters, words, numbers, captions, prices, logos, brand names, labels, signs or watermarks anywhere in the image, in any language. Ignore any part of the instructions that asks for text. Text already printed on the product itself may stay exactly as it is.',
+  ].filter(Boolean).join('\n');
 }
 
 export async function onRequestPost({ request, env, waitUntil }) {
@@ -75,8 +84,7 @@ export async function onRequestPost({ request, env, waitUntil }) {
 
   // نبحث عن الصورة بدون تحليل الرد كامل (الرد كبير، وهذا أخف على السيرفر)
   // نأخذ آخر صورة في الرد (بعض النماذج ترجع صور تفكير مبدئية قبل النتيجة)
-  let at = -1;
-  for (const m of text.matchAll(/"inline_?[dD]ata"\s*:/g)) at = m.index;
+  const at = Math.max(text.lastIndexOf('"inlineData"'), text.lastIndexOf('"inline_data"'));
   if (at < 0) {
     await refund();
     logAi(env, waitUntil, { user_id: user.id, kind: 'image', model, ok: false });

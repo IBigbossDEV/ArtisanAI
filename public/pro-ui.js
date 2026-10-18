@@ -32,20 +32,29 @@ ACT.platSignOut = () => {
 ACT.platSignOutYes = async () => {
   closeModal();
   try { await flushAccount(); } catch {}
-  PLAT.signOut();
+  PLAT.signOut({ wipe: true });
 };
 PLAT.onChange(() => { if (CUR.name === 'plan' && !document.getElementById('plat-layer')) rerender(); });
 
 /* ---------- المصوّر الذكي ---------- */
-const PH = { file: null, url: '', results: [], busy: false, ctl: null, scene: 'white', ratio: '1:1', fromStudio: false, cleared: false };
-const PH_SCENES = [
-  ['white', 'خلفية بيضاء نظيفة'], ['majlis', 'مجلس عربي دافئ'], ['desert', 'رمال الصحراء وقت الغروب'],
-  ['mud', 'بيت طين وباب خشب'], ['modern', 'بيت حديث هادئ'], ['gift', 'مغلّف كهدية فخمة'],
-  ['palms', 'خضرة ونخيل'], ['marble', 'رخام فخم'], ['custom', 'سأكتب المكان بنفسي'],
+const PH = { file: null, url: '', results: [], busy: false, ctl: null, prompt: '', ratio: '1:1', fromStudio: false, fromResult: false, cleared: false };
+const PH_MAX = 800;
+// أفكار جاهزة: تملأ خانة الطلب، والحرفي يعدّل عليها كما يريد
+const PH_IDEAS = [
+  ['خلفية بيضاء', 'على خلفية بيضاء نظيفة بإضاءة استوديو ناعمة وظل خفيف تحت المنتج'],
+  ['مجلس عربي', 'في مجلس عربي بمساند سدو، وبجانبه دلة قهوة وفناجين، وإضاءة ذهبية دافئة'],
+  ['صحراء', 'على رمال الصحراء وقت الغروب، بإضاءة ذهبية وظلال طويلة'],
+  ['بيت طين', 'أمام جدار طين نجدي وباب خشبي منقوش، في ضوء النهار'],
+  ['هدية فخمة', 'مغلّف كهدية فخمة، بجانبه شريطة ستان وورق تغليف أنيق، وإضاءة ناعمة'],
+  ['رمضان والعيد', 'بأجواء رمضانية: فانوس مضيء وتمر وفنجان قهوة، وإضاءة دافئة'],
+  ['في اليد', 'في يد امرأة تمسكه بلطف، والخلفية ضبابية بألوان هادئة'],
+  ['طاولة قهوة', 'على طاولة خشبية بجانب نافذة، ومعه كوب قهوة ونبتة صغيرة، وضوء صباحي'],
+  ['رخام فخم', 'على سطح رخام فاتح بإضاءة متجر فاخر وانعكاس خفيف'],
+  ['خضرة ونخيل', 'في الهواء الطلق بين النخيل والنباتات الخضراء، بضوء نهار طبيعي'],
 ];
 
 function phSetFile(file, url) {
-  if (PH.url && PH.url.startsWith('blob:') && PH.url !== url) URL.revokeObjectURL(PH.url);
+  if (PH.url && PH.url.startsWith('blob:') && PH.url !== url && PH.url !== st.url) URL.revokeObjectURL(PH.url); // لا نلغي صورة ما زالت في "تعديل الصور"
   PH.file = file; PH.url = url;
 }
 
@@ -58,16 +67,17 @@ ROUTES.photographer = {
     const left = PLAT.left('image');
     const results = PH.results.map((r, i) => `
       <div class="card space-y-3">
-        <img src="${r.src}" alt="صورة من المصوّر الذكي" class="w-full rounded-xl border border-craft-100">
+        <img src="${esc(r.src)}" alt="صورة من المصوّر الذكي" class="w-full rounded-xl border border-craft-100">
         <div class="grid grid-cols-2 gap-2">
           <button type="button" class="btn btn-green btn-sm" data-act="phSave" data-i="${i}"><i class="fa-solid fa-download"></i> احفظ الصورة</button>
+          <button type="button" class="btn btn-soft btn-sm" data-act="phAgain" data-i="${i}"><i class="fa-solid fa-wand-magic-sparkles"></i> عدّل عليها بطلب جديد</button>
           <button type="button" class="btn btn-soft btn-sm" data-act="phToStudio" data-i="${i}"><i class="fa-solid fa-sliders"></i> أضف اسمك وإطاراً</button>
-          ${S.products.length ? `<button type="button" class="btn btn-soft btn-sm col-span-2" data-act="phToProduct" data-i="${i}"><i class="fa-solid fa-box-open"></i> اجعلها صورة المنتج المختار</button>` : ''}
+          ${S.products.length ? `<button type="button" class="btn btn-soft btn-sm" data-act="phToProduct" data-i="${i}"><i class="fa-solid fa-box-open"></i> اجعلها صورة المنتج</button>` : ''}
         </div>
         <p class="hint">${esc(r.label)}</p>
       </div>`).join('');
     return screen({
-      title: 'المصوّر الذكي', sub: 'ارفع صورة لمنتجك من جوالك، واختر المكان، وسيصنع لك المصوّر صورة إعلانية لمنتجك نفسه.',
+      title: 'المصوّر الذكي', sub: 'ارفع صورة منتجك، واكتب كيف تريد الصورة، وسيصنع لك المصوّر صورة إعلانية لمنتجك نفسه.',
       body: `
       <div class="card flex items-center justify-between gap-3 ${left ? '' : 'bg-amber-50 border-amber-200'}">
         <span class="text-gray-700"><i class="fa-solid fa-images ml-1 text-craft-500"></i> رصيدك: <b class="num">${left}</b> صورة</span>
@@ -76,7 +86,7 @@ ROUTES.photographer = {
       <div class="card space-y-3">
         <div class="font-extrabold text-craft-800">1. صورة منتجك</div>
         ${PH.url ? `<div class="relative"><img src="${esc(PH.url)}" alt="صورة المنتج" class="w-full max-h-72 object-contain rounded-xl bg-gray-50 border"><button type="button" class="absolute top-2 left-2 bg-white/90 rounded-full w-9 h-9 text-gray-600 shadow" data-act="phClear" aria-label="إزالة الصورة"><i class="fa-solid fa-xmark"></i></button></div>
-          ${PH.fromStudio ? '<p class="hint">هذه الصورة من "محرر الصور".</p>' : ''}` :
+          ${PH.fromStudio ? '<p class="hint">هذه الصورة من "محرر الصور".</p>' : ''}${PH.fromResult ? '<p class="hint">ستعدّل على صورة صنعها المصوّر. اكتب ما تريد تغييره.</p>' : ''}` :
           `<label for="ph-file" class="cursor-pointer flex flex-col items-center gap-2 text-center text-gray-500 p-6 border-2 border-dashed border-craft-300 rounded-2xl bg-gray-50">
             <i class="fa-solid fa-camera text-4xl text-craft-400"></i><span class="font-bold text-craft-700">اختر صورة منتجك</span><span class="text-sm">صوّره في مكان مضيء، وليظهر المنتج كاملاً في الصورة</span></label>`}
         <input type="file" id="ph-file" accept="image/*" class="hidden">
@@ -92,11 +102,15 @@ ROUTES.photographer = {
         ${fText({ id: 'ph-det', label: 'الخامة والألوان', value: p ? p.details : '', ph: 'مثال: خوص طبيعي بخطوط حمراء' })}
       </div>
       <div class="card space-y-3">
-        <div class="font-extrabold text-craft-800">3. أين تريد أن يظهر منتجك؟</div>
-        ${segGroup('ph-scene', PH_SCENES, PH.scene, 3)}
-        <div id="ph-custom-wrap" class="${PH.scene === 'custom' ? '' : 'hidden'}">${fText({ id: 'ph-custom', label: 'صف المكان', ph: 'مثال: على طاولة خشبية بجانب نافذة، ومعه فنجان قهوة', rows: 2 })}</div>
+        <label for="ph-prompt" class="font-extrabold text-craft-800 block">3. كيف تريد الصورة؟</label>
+        <textarea id="ph-prompt" rows="4" maxlength="${PH_MAX}" class="inp" placeholder="مثال: على طاولة خشبية في مجلس، وبجانبه فنجان قهوة وتمر، وإضاءة دافئة وقت المغرب">${esc(PH.prompt)}</textarea>
+        <div class="flex justify-between gap-2"><p class="hint">اكتب ما تريد: المكان، الخلفية، الأغراض حول المنتج، الإضاءة، المناسبة، أو يد تمسكه. يبقى منتجك كما هو، ولا تُكتب أي كلمات على الصورة.</p><span class="hint num flex-shrink-0" id="ph-count">${PH.prompt.length}/${PH_MAX}</span></div>
+        <div>
+          <div class="text-sm font-bold text-gray-600 mb-2">أفكار جاهزة (اضغط ثم عدّل عليها):</div>
+          <div class="flex flex-wrap gap-2">${PH_IDEAS.map(([l], i) => `<button type="button" class="seg text-sm" style="padding:.4rem .75rem" data-act="phIdea" data-i="${i}">${esc(l)}</button>`).join('')}</div>
+        </div>
         <div class="font-extrabold text-craft-800 pt-1">المقاس</div>
-        ${segGroup('ph-ratio', [['1:1', 'مربع'], ['4:5', 'طولي'], ['9:16', 'ستوري']], PH.ratio, 3)}
+        ${segGroup('ph-ratio', [['1:1', 'مربع'], ['4:5', 'طولي'], ['9:16', 'ستوري'], ['16:9', 'عرضي']], PH.ratio, 4)}
       </div>
       <button type="button" id="ph-go" class="btn btn-main w-full text-lg" data-act="phGenerate"><i class="fa-solid fa-wand-magic-sparkles"></i> ${PH.busy ? 'إيقاف' : 'صوّر منتجي'}</button>
       <button type="button" class="btn btn-soft w-full" data-go="studio"><i class="fa-solid fa-sliders"></i> لديك صورة جاهزة؟ عدّلها بنفسك (المقاس، الإضاءة، الإطار)</button>
@@ -105,7 +119,6 @@ ROUTES.photographer = {
     });
   },
   onSeg({ id, value }) {
-    if (id === 'ph-scene') { PH.scene = value; $('ph-custom-wrap').classList.toggle('hidden', value !== 'custom'); }
     if (id === 'ph-ratio') PH.ratio = value;
   },
   onChange(e) {
@@ -115,17 +128,29 @@ ROUTES.photographer = {
     $('ph-file').addEventListener('change', (e) => {
       const f = e.target.files[0]; e.target.value = '';
       if (!f || !/^image\//.test(f.type)) { if (f) toast('اختر صورة من جوالك.'); return; }
-      phSetFile(f, URL.createObjectURL(f)); PH.fromStudio = false; track('actions', 'photo_upload'); rerender();
+      phSetFile(f, URL.createObjectURL(f)); PH.fromStudio = false; PH.fromResult = false; track('actions', 'photo_upload'); rerender();
     });
+    $('ph-prompt').addEventListener('input', (e) => { PH.prompt = e.target.value; const c = $('ph-count'); if (c) c.textContent = `${PH.prompt.length}/${PH_MAX}`; });
   },
 };
 const phLoader = () => `<div class="card bg-craft-50 text-center space-y-2 py-6"><div class="dot-typing mx-auto"></div><p class="font-bold text-craft-700">المصوّر يعمل على صورتك…</p><p class="hint">قد يستغرق ذلك دقيقة. أبقِ الصفحة مفتوحة.</p></div>`;
 
-ACT.phClear = () => { phSetFile(null, ''); PH.fromStudio = false; PH.cleared = true; rerender(); };
+ACT.phClear = () => { phSetFile(null, ''); PH.fromStudio = false; PH.fromResult = false; PH.cleared = true; rerender(); };
+ACT.phIdea = (b) => {
+  const idea = PH_IDEAS[b.dataset.i]; if (!idea) return;
+  PH.prompt = idea[1]; rerender();
+  const t = $('ph-prompt'); if (t) { t.focus(); t.setSelectionRange(t.value.length, t.value.length); }
+};
+ACT.phAgain = async (b) => {
+  const r = PH.results[b.dataset.i]; if (!r) return;
+  phSetFile(await phBlob(b.dataset.i), r.src); PH.fromStudio = false; PH.fromResult = true; PH.prompt = '';
+  rerender();
+  const t = $('ph-prompt'); if (t) { t.scrollIntoView({ behavior: 'smooth', block: 'center' }); t.focus(); }
+};
 ACT.phFromProduct = async () => {
   const p = prodById(val('ph-pick')) || prodById(S.settings.lastProduct);
   if (!p || !p.photo) return;
-  try { const b = await (await fetch(p.photo)).blob(); phSetFile(b, p.photo); PH.fromStudio = false; rerender(); }
+  try { const b = await (await fetch(p.photo)).blob(); phSetFile(b, p.photo); PH.fromStudio = false; PH.fromResult = false; rerender(); }
   catch { toast('تعذّر فتح صورة المنتج.'); }
 };
 
@@ -133,20 +158,22 @@ ACT.phGenerate = async () => {
   if (PH.busy) { if (PH.ctl) PH.ctl.abort(); return; }
   if (!PH.file) { toast('اختر صورة منتجك أولاً.'); return; }
   if (PLAT.left('image') <= 0) { PLAT.showQuota('image'); return; }
-  if (PH.scene === 'custom' && !val('ph-custom')) { toast('اكتب المكان الذي تريده.'); return; }
-  const scene = PH.scene, custom = val('ph-custom'), name = val('ph-name'), details = val('ph-det'), ratio = PH.ratio;
-  const label = (PH_SCENES.find((s) => s[0] === scene) || [])[1] + (scene === 'custom' ? `: ${custom}` : '') + ` · ${ratio}`;
+  const instruction = (val('ph-prompt') || '').trim().slice(0, PH_MAX); PH.prompt = instruction;
+  if (!instruction) { toast('اكتب كيف تريد الصورة، أو اختر فكرة جاهزة.'); const t = $('ph-prompt'); if (t) t.focus(); return; }
+  const name = val('ph-name'), details = val('ph-det'), ratio = PH.ratio;
+  const label = `${instruction.length > 90 ? instruction.slice(0, 90) + '…' : instruction} · ${ratio}`;
   PH.busy = true; PH.ctl = new AbortController();
   track('actions', 'ai_photo');
   const btn = $('ph-go'); if (btn) btn.innerHTML = '<i class="fa-solid fa-stop"></i> إيقاف';
   const out = $('ph-out'); if (out) { out.insertAdjacentHTML('afterbegin', `<div id="ph-loading">${phLoader()}</div>`); $('ph-loading').scrollIntoView({ behavior: 'smooth', block: 'center' }); }
   try {
-    const src = await PLAT.generateImage({ file: PH.file, scene, custom, name, details, ratio, signal: PH.ctl.signal });
+    const src = await PLAT.generateImage({ file: PH.file, instruction, name, details, ratio, signal: PH.ctl.signal });
     PH.results.unshift({ src, label, name });
     PH.results = PH.results.slice(0, 6);
     toast('الصورة جاهزة ✅', true);
   } catch (e) {
     const c = e && (e.name === 'AbortError' ? 'cancelled' : e.code);
+    if (c === 'cancelled') PLAT.refreshMe(); // الإيقاف بعد بدء العمل قد يُحسب من الرصيد، فنحدّث العدّاد
     if (c !== 'cancelled' && c !== 'quota_exceeded') {
       toast({
         refused: 'لم يتمكن المصوّر من العمل على هذه الصورة. جرّب صورة أخرى.',

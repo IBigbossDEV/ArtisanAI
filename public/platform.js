@@ -9,6 +9,7 @@
 
   const APP_KEYS = ['artisan_state_v2', 'artisan_pricelist_v1', 'artisan_usage_v1'];
   const OWNER_KEY = 'artisan_owner_v1';
+  const PENDING_KEY = 'artisan_pending_pay';
 
   const PLAT = (window.PLAT = {
     config: null, sb: null, session: null, me: null,
@@ -48,7 +49,7 @@
     const res = await fetch(path, { method, headers, body: body !== undefined ? JSON.stringify(body) : undefined, signal });
     if (raw) return res;
     const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw codeErr(data.error || 'upstream_error', '');
+    if (!res.ok) { const e = codeErr(data.error || 'upstream_error', ''); if (data.reason) e.reason = data.reason; throw e; }
     return data;
   }
   PLAT.api = api;
@@ -158,9 +159,9 @@
   sample.limits = async () => ({ images: { mediaTypes: ['image/jpeg', 'image/png', 'image/webp'] } });
 
   /* ---------- المصوّر الذكي (Gemini عبر السيرفر) ---------- */
-  PLAT.generateImage = async ({ file, scene, custom, name, details, ratio, signal }) => {
+  PLAT.generateImage = async ({ file, instruction, scene, custom, name, details, ratio, signal }) => {
     const image = await toImagePayload(file, 1536);
-    const res = await api('/api/ai/image', { method: 'POST', body: { image, scene, custom, name, details, ratio }, signal, raw: true });
+    const res = await api('/api/ai/image', { method: 'POST', body: { image, instruction, scene, custom, name, details, ratio }, signal, raw: true });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
       if (data.error === 'quota_exceeded') { PLAT.showQuota('image'); throw codeErr('quota_exceeded'); }
@@ -174,7 +175,7 @@
   /* ---------- مخزن البيانات (بنفس شكل قدرة db في Claude) ---------- */
   function dbErr(e) {
     const c = e && e.code;
-    if (c === 'not_granted' || c === 'invalid_argument') return codeErr(c);
+    if (c === 'not_granted' || c === 'invalid_argument') { const x = codeErr(c); x.reason = e.reason; return x; }
     return codeErr('unavailable');
   }
   const dbCall = (body) => api('/api/db', { method: 'POST', body }).catch((e) => { throw dbErr(e); });
@@ -270,8 +271,8 @@
       <div class="plat-card">
         <div class="text-center mb-5">
           <div class="mx-auto mb-3 w-16 h-16 rounded-2xl bg-craft-700 text-craft-100 flex items-center justify-center text-3xl"><i class="fa-solid fa-hands-holding-circle"></i></div>
-          <h1 class="text-2xl font-extrabold text-craft-800">منصة الحرفي السعودي</h1>
-          <p class="text-craft-600 font-bold mt-1">مجانية لحرفيي بيت الحرفيين</p>
+          <h1 class="text-2xl font-extrabold text-craft-800">منصة الحرفي</h1>
+          <p class="text-craft-600 font-bold mt-1">مجانية للحرفيين والحرفيات والأسر المنتجة</p>
           <p class="text-gray-600 mt-1">مستشارك الذكي في الحرفة: سعّر منتجاتك، وسوّقها، وصوّرها صوراً احترافية.</p>
         </div>
         ${msg ? `<div class="mb-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 p-3 text-sm">${escH(msg)}</div>` : ''}
@@ -328,10 +329,14 @@
     wrap.querySelector('#plat-code-back').addEventListener('click', () => { codeForm.classList.add('hidden'); emailForm.classList.remove('hidden'); });
   }
 
-  async function signOut() {
+  // wipe=true عند ضغط الحرفي على "خروج" (بعد حفظ بياناته في حسابه): نمسح بياناته من الجهاز.
+  // عند انتهاء الجلسة تلقائياً لا نمسح شيئاً، حتى لا تضيع تعديلات لم تُحفظ بعد؛
+  // وإذا دخل حساب آخر على الجهاز نفسه تُمسح البيانات القديمة عند دخوله (انظر start).
+  async function signOut({ wipe = false } = {}) {
     try { await PLAT.sb.auth.signOut(); } catch {}
-    APP_KEYS.forEach((k) => { try { localStorage.removeItem(k); } catch {} });
-    try { localStorage.removeItem(OWNER_KEY); } catch {}
+    if (wipe) {
+      [...APP_KEYS, OWNER_KEY, PENDING_KEY].forEach((k) => { try { localStorage.removeItem(k); } catch {} });
+    }
     location.replace('/');
   }
   PLAT.signOut = signOut;
@@ -350,7 +355,7 @@
         <div class="mx-auto w-14 h-14 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-2xl"><i class="fa-solid fa-hourglass-end"></i></div>
         <h2 class="text-xl font-extrabold text-craft-800">انتهى رصيد ${what} لهذا الشهر</h2>
         <p class="text-gray-600 leading-relaxed">${end ? `يتجدد رصيدك يوم <b>${escH(end)}</b>. ` : ''}بقية الأدوات تعمل كالمعتاد.</p>
-        <p class="text-gray-600 leading-relaxed">إذا احتجت رصيداً أكثر، تواصل مع إدارة بيت الحرفيين.</p>
+        <p class="text-gray-600 leading-relaxed">إذا احتجت رصيداً أكثر، تواصل مع إدارة المنصة.</p>
         <button type="button" class="btn btn-soft w-full" data-plat-close>حسناً</button>
       </div>`);
     wireBuy();
@@ -365,12 +370,12 @@
     const m = PLAT.me || { plan: 'free', chat: { used: 0, limit: 0 }, images: { used: 0, limit: 0, extra: 0 } };
     return `
       <div class="card space-y-3">
-        <div><div class="text-sm text-gray-500">خطتك</div><div class="text-xl font-extrabold text-craft-800"><i class="fa-solid fa-hand-holding-heart text-craft-500 ml-1"></i> مجانية لحرفيي بيت الحرفيين</div></div>
+        <div><div class="text-sm text-gray-500">خطتك</div><div class="text-xl font-extrabold text-craft-800"><i class="fa-solid fa-hand-holding-heart text-craft-500 ml-1"></i> مجانية للحرفيين والأسر المنتجة</div></div>
         ${usageRow('طلبات المساعد هذا الشهر', m.chat.used, m.chat.limit)}
         ${usageRow('صور المصوّر الذكي', m.images.used, m.images.limit, m.images.extra)}
         ${m.cycleEnd ? `<p class="hint">يتجدد الرصيد يوم ${escH(dayFmt(m.cycleEnd))}.</p>` : ''}
       </div>
-      <p class="hint">المنصة مجانية بالكامل، ولا يوجد أي دفع. إذا احتجت رصيداً أكثر، تواصل مع إدارة بيت الحرفيين.</p>`;
+      <p class="hint">المنصة مجانية بالكامل، ولا يوجد أي دفع. إذا احتجت رصيداً أكثر، تواصل مع إدارة المنصة.</p>`;
   };
 
   function wireBuy(root = document) {
@@ -427,7 +432,7 @@
       // إذا دخل حساب ثاني على نفس الجهاز، نمسح بيانات الحساب السابق من الجهاز
       let prev = null; try { prev = localStorage.getItem(OWNER_KEY); } catch {}
       if (prev && prev !== session.user.id) {
-        APP_KEYS.forEach((k) => { try { localStorage.removeItem(k); } catch {} });
+        [...APP_KEYS, PENDING_KEY].forEach((k) => { try { localStorage.removeItem(k); } catch {} });
         try { localStorage.setItem(OWNER_KEY, session.user.id); } catch {}
         location.reload();
         return;
