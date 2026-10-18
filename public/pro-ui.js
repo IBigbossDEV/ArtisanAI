@@ -16,6 +16,7 @@ ROUTES.plan = {
         <div class="card space-y-3">
           <div class="font-extrabold text-craft-800"><i class="fa-solid fa-user ml-1"></i> حسابي</div>
           <p class="text-gray-700 break-all" dir="ltr" style="text-align:right">${esc(m.email || '')}</p>
+          <button type="button" class="btn btn-soft w-full" data-act="platPass"><i class="fa-solid fa-key"></i> تغيير كلمة المرور</button>
           <button type="button" class="btn btn-soft w-full" data-act="platSignOut"><i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج</button>
         </div>
         <nav class="flex flex-wrap justify-center gap-x-4 gap-y-2 text-sm text-craft-600"><a class="underline" href="/terms.html">الشروط والأحكام</a><a class="underline" href="/privacy.html">الخصوصية</a><a class="underline" href="/contact.html">تواصل معنا</a></nav>
@@ -23,6 +24,29 @@ ROUTES.plan = {
     });
   },
   after() { PLAT.wireBuy($('view')); },
+};
+ACT.platPass = () => {
+  openModal(`<h2 class="text-lg font-bold text-craft-800 mb-3">تغيير كلمة المرور</h2>
+    <label for="pp-1" class="lbl">كلمة المرور الجديدة</label>
+    <input id="pp-1" type="password" class="inp mb-3" dir="ltr" autocomplete="new-password">
+    <label for="pp-2" class="lbl">اكتبها مرة أخرى</label>
+    <input id="pp-2" type="password" class="inp mb-2" dir="ltr" autocomplete="new-password">
+    <p class="hint mb-4">8 أحرف على الأقل. احفظها في مكان آمن.</p>
+    <div class="grid grid-cols-2 gap-2"><button type="button" class="btn btn-dark" data-act="platPassSave">حفظ</button><button type="button" class="btn btn-soft" data-act="closeModal">رجوع</button></div>`);
+};
+ACT.platPassSave = async (btn) => {
+  const a = ($('pp-1') || {}).value || '', b = ($('pp-2') || {}).value || '';
+  if (a.length < 8) { toast('كلمة المرور 8 أحرف على الأقل.'); return; }
+  if (a !== b) { toast('كلمتا المرور غير متطابقتين.'); return; }
+  if (btn) btn.disabled = true;
+  const { error } = await PLAT.sb.auth.updateUser({ password: a });
+  if (btn) btn.disabled = false;
+  if (error) {
+    const why = `${error.code || ''} ${error.message || ''}`;
+    toast(/same_password|different from the old/i.test(why) ? 'هذه كلمة المرور الحالية نفسها. اختر كلمة جديدة.' : /weak/i.test(why) ? 'كلمة المرور ضعيفة، اختر أطول.' : 'تعذّر الحفظ. حاول مرة أخرى.');
+    return;
+  }
+  closeModal(); toast('تم تغيير كلمة المرور.', true);
 };
 ACT.platSignOut = () => {
   openModal(`<h2 class="text-lg font-bold text-craft-800 mb-2">هل تريد تسجيل الخروج؟</h2>

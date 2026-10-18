@@ -1,6 +1,6 @@
 // لوحة صاحب المنصة (نسخة الجمعية): الأرقام، الحرفيين، والحدود الشهرية. لا توجد مدفوعات.
 // مسموحة فقط للإيميلات المكتوبة في ADMIN_EMAILS.
-import { json, fail, db, getUser, isAdmin, readJson, getPlans, missingEnv } from './_lib.js';
+import { json, fail, db, getUser, isAdmin, readJson, getPlans, missingEnv, authAdmin } from './_lib.js';
 
 const int = (v, min, max) => { const n = Math.round(Number(v)); return Number.isFinite(n) && n >= min && n <= max ? n : null; };
 const PAGE_KEYS = ['terms', 'privacy', 'contact'];
@@ -40,6 +40,39 @@ export async function onRequestPost({ request, env }) {
   const { body, error } = await readJson(request, 200 * 1024);
   if (error) return fail('bad_request', 400);
   const uid = /^[0-9a-f-]{36}$/i.test(body.user_id || '') ? body.user_id : null;
+
+  // حسابات الحرفيين: الجمعية تنشئ الحساب وكلمة المرور (لا يوجد تسجيل ذاتي)
+  const passOk = (p) => typeof p === 'string' && p.length >= 8 && p.length <= 72;
+  const authFail = (r) => {
+    const why = `${r.code} ${r.msg}`;
+    if (/email_exists|already been registered|already registered/i.test(why)) return fail('email_exists', 409);
+    if (/weak_password|password/i.test(why)) return fail('weak_password', 400);
+    if (r.status === 404) return fail('not_found', 404);
+    return fail('auth_error', 502, { status: r.status });
+  };
+  if (body.action === 'create_user') {
+    const email = String(body.email || '').trim().toLowerCase();
+    const name = String(body.name || '').trim().slice(0, 80);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 200) return fail('bad_email', 400);
+    if (!passOk(body.password)) return fail('weak_password', 400);
+    const r = await authAdmin(env).create(email, body.password, name);
+    if (!r.ok) return authFail(r);
+    return json({ ok: true, user_id: r.data.id || (r.data.user && r.data.user.id) || null });
+  }
+  if (body.action === 'set_password') {
+    if (!uid) return fail('bad_request', 400);
+    if (!passOk(body.password)) return fail('weak_password', 400);
+    const r = await authAdmin(env).setPassword(uid, body.password);
+    if (!r.ok) return authFail(r);
+    return json({ ok: true });
+  }
+  if (body.action === 'delete_user') {
+    if (!uid) return fail('bad_request', 400);
+    if (uid === g.user.id) return fail('cannot_delete_self', 400);
+    const r = await authAdmin(env).remove(uid);
+    if (!r.ok) return authFail(r);
+    return json({ ok: true });
+  }
 
   // منح رصيد موسّع لحرفي (يستخدم حدود "pro" في الإعدادات)
   if (body.action === 'grant') {

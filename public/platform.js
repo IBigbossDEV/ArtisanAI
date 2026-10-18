@@ -279,59 +279,47 @@
           ${c.googleLogin !== false ? `<button type="button" class="plat-oauth" data-oauth="google"><svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.3-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.3-.4-3.5z"/></svg> الدخول بحساب جيميل</button>` : ''}
           ${c.appleLogin ? `<button type="button" class="plat-oauth apple" data-oauth="apple"><i class="fa-brands fa-apple text-xl"></i> الدخول بحساب آبل</button>` : ''}
         </div>
-        <div class="plat-or">أو بالبريد الإلكتروني</div>
-        <form id="plat-email-form" class="space-y-3" novalidate>
-          <label for="plat-email" class="lbl">بريدك الإلكتروني</label>
-          <input id="plat-email" type="email" class="inp" dir="ltr" autocomplete="email" inputmode="email" placeholder="name@example.com" required>
-          <button type="submit" class="btn btn-main w-full text-lg" id="plat-email-btn">أرسل لي رمز الدخول</button>
-          <p class="hint">سيصلك رمز من 6 أرقام على بريدك. لا تحتاج إلى كلمة مرور.</p>
-        </form>
-        <form id="plat-code-form" class="space-y-3 hidden" novalidate>
-          <p class="text-gray-700">أرسلنا الرمز إلى <b id="plat-code-to" dir="ltr"></b></p>
-          <label for="plat-code" class="lbl">اكتب الرمز</label>
-          <input id="plat-code" class="inp plat-code" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="••••••" required>
-          <button type="submit" class="btn btn-main w-full text-lg" id="plat-code-btn">دخول</button>
-          <button type="button" class="btn btn-soft w-full" id="plat-code-back">غيّر البريد أو أعد الإرسال</button>
+        ${(c.googleLogin !== false || c.appleLogin) ? '<div class="plat-or">أو بالبريد الإلكتروني</div>' : ''}
+        <form id="plat-pass-form" class="space-y-3" novalidate>
+          <label for="plat-email" class="lbl">البريد الإلكتروني</label>
+          <input id="plat-email" type="email" class="inp" dir="ltr" autocomplete="username" inputmode="email" placeholder="name@example.com" required>
+          <label for="plat-pass" class="lbl">كلمة المرور</label>
+          <div class="relative">
+            <input id="plat-pass" type="password" class="inp" dir="ltr" autocomplete="current-password" required style="padding-left:4.5rem">
+            <button type="button" id="plat-pass-eye" class="absolute left-2 top-1/2 -translate-y-1/2 text-sm font-bold text-craft-600 px-2 py-1">إظهار</button>
+          </div>
+          <button type="submit" class="btn btn-main w-full text-lg" id="plat-pass-btn">دخول</button>
+          <button type="button" class="block mx-auto text-sm underline text-craft-600" id="plat-forgot">نسيت كلمة المرور؟</button>
+          <p class="hint hidden" id="plat-forgot-msg">تواصل مع الجمعية، وستعطيك كلمة مرور جديدة.</p>
         </form>
         <p class="text-xs text-gray-500 mt-5 text-center leading-relaxed">بدخولك توافق على <a class="underline" href="/terms.html">الشروط والأحكام</a> و<a class="underline" href="/privacy.html">سياسة الخصوصية</a>.</p>
       </div></div>`);
     document.body.appendChild(wrap);
 
-    let email = '';
-    wrap.querySelectorAll('[data-oauth]').forEach((b) => b.addEventListener('click', async () => {
-      b.disabled = true;
-      const { error } = await PLAT.sb.auth.signInWithOAuth({ provider: b.dataset.oauth, options: { redirectTo: location.origin + '/' } });
-      if (error) { b.disabled = false; flash('تعذّر فتح صفحة الدخول. حاول مرة أخرى.'); }
-    }));
-    const emailForm = wrap.querySelector('#plat-email-form'), codeForm = wrap.querySelector('#plat-code-form');
-    emailForm.addEventListener('submit', async (e) => {
+    const passForm = wrap.querySelector('#plat-pass-form'), passIn = wrap.querySelector('#plat-pass');
+    wrap.querySelector('#plat-pass-eye').addEventListener('click', (e) => {
+      const show = passIn.type === 'password';
+      passIn.type = show ? 'text' : 'password';
+      e.currentTarget.textContent = show ? 'إخفاء' : 'إظهار';
+    });
+    wrap.querySelector('#plat-forgot').addEventListener('click', () => wrap.querySelector('#plat-forgot-msg').classList.remove('hidden'));
+    passForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      email = wrap.querySelector('#plat-email').value.trim().toLowerCase();
+      const email = wrap.querySelector('#plat-email').value.trim().toLowerCase();
+      const password = passIn.value;
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { flash('اكتب البريد الإلكتروني بشكل صحيح، مثل name@gmail.com'); return; }
-      const btn = wrap.querySelector('#plat-email-btn'); btn.disabled = true; btn.textContent = 'جارٍ الإرسال…';
-      const { error } = await PLAT.sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
-      btn.disabled = false; btn.textContent = 'أرسل لي رمز الدخول';
+      if (!password) { flash('اكتب كلمة المرور.'); return; }
+      const btn = wrap.querySelector('#plat-pass-btn'); btn.disabled = true; btn.textContent = 'لحظة…';
+      const { error } = await PLAT.sb.auth.signInWithPassword({ email, password });
+      btn.disabled = false; btn.textContent = 'دخول';
       if (error) {
         const why = `${error.code || ''} ${error.message || ''}`;
-        // عند قفل التسجيل في Supabase: البريد غير مضاف من الجمعية
-        if (/otp_disabled|signup_disabled|signups? not allowed/i.test(why)) flash('هذا البريد غير مسجّل في المنصة. تواصل مع الجمعية لإضافتك.');
-        else flash(/rate|seconds/i.test(why) ? 'انتظر دقيقة ثم حاول مرة أخرى.' : 'تعذّر إرسال الرمز. تأكد من البريد الإلكتروني.');
-        return;
+        if (/rate|too many|seconds/i.test(why)) flash('محاولات كثيرة. انتظر دقيقة ثم حاول مرة أخرى.');
+        else if (/banned|user_banned/i.test(why)) flash('هذا الحساب موقوف. تواصل مع الجمعية.');
+        else if (/invalid_credentials|invalid login/i.test(why)) flash('البريد أو كلمة المرور غير صحيحة. إذا لم يكن لديك حساب فتواصل مع الجمعية.');
+        else flash('تعذّر الدخول. تحقق من الاتصال وحاول مرة أخرى.');
       }
-      wrap.querySelector('#plat-code-to').textContent = email;
-      emailForm.classList.add('hidden'); codeForm.classList.remove('hidden');
-      wrap.querySelector('#plat-code').focus();
     });
-    codeForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const code = wrap.querySelector('#plat-code').value.replace(/\D/g, '');
-      if (code.length < 6) { flash('الرمز مكوّن من 6 أرقام.'); return; }
-      const btn = wrap.querySelector('#plat-code-btn'); btn.disabled = true; btn.textContent = 'لحظة…';
-      const { error } = await PLAT.sb.auth.verifyOtp({ email, token: code, type: 'email' });
-      btn.disabled = false; btn.textContent = 'دخول';
-      if (error) flash('الرمز غير صحيح أو انتهت صلاحيته. اطلب رمزاً جديداً.');
-    });
-    wrap.querySelector('#plat-code-back').addEventListener('click', () => { codeForm.classList.add('hidden'); emailForm.classList.remove('hidden'); });
   }
 
   // wipe=true عند ضغط الحرفي على "خروج" (بعد حفظ بياناته في حسابه): نمسح بياناته من الجهاز.

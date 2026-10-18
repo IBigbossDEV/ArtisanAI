@@ -148,22 +148,74 @@ function renderOverview() {
   };
 }
 
+// كلمة مرور سهلة القراءة (بدون حروف متشابهة مثل l و1 و0 وO)
+function genPass() {
+  const abc = 'abcdefghjkmnpqrstuvwxyz23456789';
+  const a = new Uint32Array(10); crypto.getRandomValues(a);
+  return Array.from(a, (x) => abc[x % abc.length]).join('');
+}
+let LAST_CRED = null;
+function credText(c) {
+  return `حسابك في منصة الحرفي\nالرابط: ${location.origin}\nالبريد: ${c.email}\nكلمة المرور: ${c.password}`;
+}
+function credBox() {
+  if (!LAST_CRED) return '';
+  return `<div class="card space-y-2" style="border-color:#A8322A">
+    <div class="font-bold">${LAST_CRED.isNew ? 'تم إنشاء الحساب' : 'تم تغيير كلمة المرور'}. أرسل هذه البيانات للحرفي:</div>
+    <pre class="whitespace-pre-wrap text-sm bg-white border rounded p-3" dir="rtl" id="cred-text" style="font-family:inherit">${esc(credText(LAST_CRED))}</pre>
+    <div class="flex gap-2"><button class="btn btn-main" id="cred-copy">نسخ</button><button class="btn btn-soft" id="cred-hide">إخفاء</button></div>
+    <p class="text-xs text-gray-500">لن تظهر كلمة المرور مرة أخرى بعد إخفاء هذا المربع.</p>
+  </div>`;
+}
+
 async function renderUsers(q = '') {
-  $('view').innerHTML = `<div class="card space-y-3">
+  $('view').innerHTML = `${credBox()}
+  <div class="card space-y-3">
+    <div class="font-bold">إضافة حرفي</div>
+    <div class="grid sm:grid-cols-3 gap-2">
+      <input class="inp" id="n-email" type="email" dir="ltr" placeholder="البريد الإلكتروني" autocomplete="off">
+      <input class="inp" id="n-name" placeholder="الاسم (اختياري)" autocomplete="off">
+      <div class="flex gap-2"><input class="inp" id="n-pass" dir="ltr" value="${genPass()}" autocomplete="off" aria-label="كلمة المرور"><button class="btn btn-soft" id="n-gen" title="كلمة مرور جديدة">توليد</button></div>
+    </div>
+    <button class="btn btn-main" id="n-add">إنشاء الحساب</button>
+    <p class="text-xs text-gray-500">كلمة المرور 8 أحرف على الأقل. بعد الإنشاء تظهر لك بيانات الدخول لترسلها للحرفي.</p>
+  </div>
+  <div class="card space-y-3">
     <div class="flex gap-2"><input class="inp" id="u-q" placeholder="ابحث بالبريد الإلكتروني أو الاسم" value="${esc(q)}"><button class="btn btn-main" id="u-go">ابحث</button></div>
     <div id="u-list" class="overflow-x-auto"><p class="text-gray-500">جارٍ التحميل…</p></div></div>`;
+  if (LAST_CRED) {
+    $('cred-copy').onclick = async () => { try { await navigator.clipboard.writeText(credText(LAST_CRED)); toast('تم النسخ'); } catch { toast('انسخ النص يدوياً'); } };
+    $('cred-hide').onclick = () => { LAST_CRED = null; renderUsers($('u-q').value.trim()); };
+  }
+  $('n-gen').onclick = () => { $('n-pass').value = genPass(); };
+  $('n-add').onclick = async () => {
+    const email = $('n-email').value.trim().toLowerCase(), name = $('n-name').value.trim(), password = $('n-pass').value.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { toast('اكتب البريد الإلكتروني بشكل صحيح'); return; }
+    if (password.length < 8) { toast('كلمة المرور 8 أحرف على الأقل'); return; }
+    const b = $('n-add'); b.disabled = true;
+    try {
+      await api('/api/admin', { action: 'create_user', email, name, password });
+      LAST_CRED = { email, password, isNew: true };
+      toast('تم إنشاء الحساب'); renderUsers('');
+    } catch (e) {
+      b.disabled = false;
+      toast(e.code === 'email_exists' ? 'هذا البريد مسجّل من قبل' : e.code === 'weak_password' ? 'كلمة المرور ضعيفة، اختر أطول' : 'لم يتم: ' + (e.code || ''));
+    }
+  };
   $('u-go').onclick = () => renderUsers($('u-q').value.trim());
   $('u-q').onkeydown = (e) => { if (e.key === 'Enter') renderUsers($('u-q').value.trim()); };
   const { users } = await api('/api/admin?view=users&q=' + encodeURIComponent(q));
   $('u-list').innerHTML = users.length ? `<table><thead><tr><th>الحرفي</th><th>الرصيد</th><th>الاستهلاك</th><th></th></tr></thead><tbody>${users.map((u) => `
-    <tr><td><div class="font-bold break-all" dir="ltr" style="text-align:right">${esc(u.email || '—')}</div><div class="text-xs text-gray-500">${esc(u.name || '')} · سجّل ${esc(day(u.created_at))}</div></td>
+    <tr><td><div class="font-bold break-all" dir="ltr" style="text-align:right">${esc(u.email || '—')}</div><div class="text-xs text-gray-500">${esc(u.name || '')} · أُضيف ${esc(day(u.created_at))}</div></td>
     <td>${u.plan === 'pro' ? `<span class="pill bg-amber-100 text-amber-800">موسّع</span><div class="text-xs text-gray-500 mt-1">حتى ${esc(day(u.period_end))}</div>` : '<span class="pill bg-gray-100 text-gray-600">عادي</span>'}</td>
     <td class="num text-sm">مساعد ${u.chat_used}/${u.chat_limit}<br>صور ${u.images_used}/${u.images_limit}${u.extra_images ? ` +${u.extra_images}` : ''}</td>
     <td><div class="flex flex-wrap gap-1">
       <button class="btn btn-soft" data-u="${u.user_id}" data-a="grant" data-m="1" title="رصيد موسّع لمدة شهر">+شهر موسّع</button>
       <button class="btn btn-soft" data-u="${u.user_id}" data-a="grant" data-m="12" title="رصيد موسّع لمدة سنة">+سنة موسّعة</button>
       <button class="btn btn-soft" data-u="${u.user_id}" data-a="images" title="إضافة صور">+صور</button>
-      ${u.plan === 'pro' ? `<button class="btn btn-red" data-u="${u.user_id}" data-a="revoke">إيقاف</button>` : ''}
+      ${u.plan === 'pro' ? `<button class="btn btn-soft" data-u="${u.user_id}" data-a="revoke" title="إعادته إلى الرصيد العادي">إلغاء الموسّع</button>` : ''}
+      <button class="btn btn-soft" data-u="${u.user_id}" data-e="${esc(u.email || '')}" data-a="set_password">كلمة مرور جديدة</button>
+      <button class="btn btn-red" data-u="${u.user_id}" data-e="${esc(u.email || '')}" data-a="delete_user">حذف الحساب</button>
     </div></td></tr>`).join('')}</tbody></table>` : '<p class="text-gray-500">لا توجد نتائج.</p>';
   $('u-list').querySelectorAll('[data-a]').forEach((b) => b.onclick = async () => {
     const a = b.dataset.a, user_id = b.dataset.u;
@@ -171,8 +223,22 @@ async function renderUsers(q = '') {
     if (a === 'grant') { if (!confirm(`هل تمنح هذا الحرفي رصيداً موسّعاً لمدة ${b.dataset.m === '12' ? 'سنة' : 'شهر'}؟`)) return; body.months = Number(b.dataset.m); }
     if (a === 'images') { const c = prompt('كم صورة تريد إضافتها؟ (اكتب رقماً سالباً للخصم)', '20'); if (!c) return; body.count = Number(c); }
     if (a === 'revoke' && !confirm('هل تعيد هذا الحرفي إلى الرصيد العادي الآن؟')) return;
+    if (a === 'set_password') {
+      const p = prompt(`كلمة المرور الجديدة لـ ${b.dataset.e} (8 أحرف على الأقل):`, genPass());
+      if (p === null) return;
+      if (p.trim().length < 8) { toast('كلمة المرور 8 أحرف على الأقل'); return; }
+      body.password = p.trim();
+    }
+    if (a === 'delete_user' && !confirm(`حذف حساب ${b.dataset.e} نهائياً؟ ستُحذف بياناته ومنتجاته، ولن يستطيع الدخول.`)) return;
     b.disabled = true;
-    try { await api('/api/admin', body); toast('تم ✅'); renderUsers($('u-q').value.trim()); } catch (e) { b.disabled = false; toast('لم يتم: ' + (e.code || '')); }
+    try {
+      await api('/api/admin', body);
+      if (a === 'set_password') LAST_CRED = { email: b.dataset.e, password: body.password, isNew: false };
+      toast('تم'); renderUsers($('u-q').value.trim());
+    } catch (e) {
+      b.disabled = false;
+      toast(e.code === 'cannot_delete_self' ? 'لا يمكنك حذف حسابك أنت' : e.code === 'weak_password' ? 'كلمة المرور ضعيفة، اختر أطول' : 'لم يتم: ' + (e.code || ''));
+    }
   });
 }
 

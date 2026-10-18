@@ -65,6 +65,26 @@ export function db(env) {
 }
 
 // يتأكد من دخول الحرفي عن طريق Supabase (التوكن يرسله المتصفح في Authorization)
+// إدارة حسابات الدخول (إنشاء حرفي، كلمة مرور جديدة، حذف) بصلاحية السيرفر
+export function authAdmin(env) {
+  const key = env.SUPABASE_SERVICE_ROLE_KEY;
+  const auth = String(key || '').startsWith('eyJ') ? { authorization: `Bearer ${key}` } : {};
+  const call = async (method, path, body) => {
+    const r = await fetch(`${base(env)}/auth/v1/admin/users${path}`, {
+      method, headers: { apikey: key, ...auth, 'content-type': 'application/json' },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    const t = await r.text().catch(() => '');
+    let j = {}; try { j = t ? JSON.parse(t) : {}; } catch {}
+    return { ok: r.ok, status: r.status, data: j, code: j.error_code || j.code || '', msg: String(j.msg || j.message || j.error_description || '') };
+  };
+  return {
+    create: (email, password, name) => call('POST', '', { email, password, email_confirm: true, user_metadata: name ? { name } : {} }),
+    setPassword: (id, password) => call('PUT', `/${id}`, { password }),
+    remove: (id) => call('DELETE', `/${id}`),
+  };
+}
+
 export async function getUser(request, env) {
   const h = request.headers.get('authorization') || '';
   const token = h.startsWith('Bearer ') ? h.slice(7).trim() : '';
