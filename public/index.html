@@ -1886,6 +1886,22 @@ initTTS();
   const h = (location.hash || '').replace('#', '');
   go(ROUTES[h] && h !== 'product' ? h : 'home');
 }
+/* زر الرجوع في الجوال والمتصفح (والسحب للخلف): نحجز خطوة واحدة في سجل المتصفح،
+   وكل رجوع منه يعمل مثل زر "رجوع" في المنصة. من الصفحة الرئيسية يخرج من الموقع كالمعتاد. */
+(function () {
+  try { history.replaceState({ artisan: 'base' }, ''); history.pushState({ artisan: 'app' }, ''); } catch { return; }
+  const arm = () => { try { history.pushState({ artisan: 'app' }, ''); } catch {} };
+  window.addEventListener('popstate', () => {
+    const modal = $('modal');
+    if (modal && !modal.classList.contains('hidden')) { closeModal(); arm(); return; }
+    if (document.getElementById('plat-layer') && window.PLAT) { PLAT.closeLayer(); arm(); return; }
+    const login = document.getElementById('plat-login');
+    if (login) { if (document.getElementById('plat-guest-back')) { login.remove(); arm(); } return; }
+    if (CUR.name === 'home' && !HISTORY.length) { history.back(); return; }
+    ACT.goBack({ dataset: { fallback: 'home' } });
+    arm();
+  });
+})();
 (async () => {
   const [s, d, db, u] = await Promise.all([capUse('sample'), capUse('downloads'), capUse('db'), capUse('user')]);
   Object.assign(CAP, { sample: s, downloads: d, db, user: u });
